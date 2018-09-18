@@ -1,0 +1,16 @@
+{
+  "name": "blockio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "block_io": "^1.0.9-5",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3"
+  }
+}
