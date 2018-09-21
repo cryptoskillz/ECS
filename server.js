@@ -41,6 +41,10 @@ let keyPair = bitcoin.ECPair.makeRandom({ network: TestNet })
 const {address}  = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey }) 
 //debug
 //console.log(address);
+
+//todo: store the somewhere safe. 
+
+
 console.log('Pay me f00l'+address)
 /*
 * Display the address
