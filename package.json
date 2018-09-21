@@ -9,8 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bitcoinjs-lib": "^4.0.2",
     "block_io": "^1.0.9-5",
     "body-parser": "^1.18.3",
+    "btcnodejs": "^0.1.2",
     "express": "^4.16.3"
   }
 }
