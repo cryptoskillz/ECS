@@ -1,7 +1,8 @@
 /*
 
 This is a general guide on how to code BTC to accept payments on a website. I am pretty much learning from scratch so
-with each branch you will my knowledge grow and the software evolve. 
+with each branch you will my knowledge grow and the software evolve. I have pretty much gone on sabbatical and moved to Asia 
+to really deep dive this tech and  I am not coming back until I have a very deep understanding. 
 
 TODO:
 
