@@ -4,16 +4,28 @@ This is a general guide on how to code BTC to accept payments on a website. I am
 with each branch you will my knowledge grow and the software evolve. I have pretty much gone on sabbatical and moved to Asia 
 to really deep dive this tech and  I am not coming back until I have a very deep understanding. 
 
+Treat the branches as a chronological order of  development
+
+master
+
+First code commits using the most basic implementation by integrating into a 3rd party API.
+
+generateaddress
+
+Remove the dependency of the 3rd party API (block.io) and store the details in a database. 
+
+
+
 TODO:
 
 Turn it into a REST API
 Add the listen script that checks for payments made
 Store the keys more securely
-Create a WWW which generate barcode etc
+Create a WWW which generate bar code etc
 Create a back office script that deals with orders etc
 Create a sweeping script that sweeps the funds into cold storage
 Investigate lighting
-Investigate sidechains
+Investigate side chains
 Investigate RSK
 
 Purpose of this branch
