@@ -1,5 +1,20 @@
 /*
 
+This is a general guide on how to code BTC to accept payments on a website. I am pretty much learning from scratch so
+with each branch you will my knowledge grow and the software evolve. 
+
+TODO:
+
+Turn it into a REST API
+Add the listen script that checks for payments made
+Store the keys more securely
+Create a WWW which generate barcode etc
+Create a back office script that deals with orders etc
+Create a sweeping script that sweeps the funds into cold storage
+Investigate lighting
+Investigate sidechains
+Investigate RSK
+
 Purpose of this branch
 
 Remove Block.io dependency 
@@ -91,13 +106,14 @@ console.log(address2);
 
 //store it in the database
 //note: Not 100% sure that we have to store the public kkey
-  db.run(`INSERT INTO keys(address,privatekey,publickey) VALUES(?,?,?)`, [address,privateKey,publicKey], function(err) {
-    if (err) {
-      return console.log(err.message);
-    }
-    // get the last insert id
-    console.log(`A row has been inserted with rowid ${this.lastID}`);
-  });
+db.run(`INSERT INTO keys(address,privatekey,publickey) VALUES(?,?,?)`, [address,privateKey,publicKey], function(err) {
+if (err) {
+  return console.log(err.message);
+}
+// get the last insert id
+//debug
+//console.log(this.lastID);
+});
 
 
 //display it to the user
