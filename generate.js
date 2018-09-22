@@ -2,9 +2,24 @@
 
 Purpose of this branch
 
-Remove Block.io dependancy 
+Remove Block.io dependency 
 Generate an address 
 Store the details in a SQL database, insecure I know we will be upgrading it later
+
+Tools used
+
+http://sqlitebrowser.org/ : Sql browser for mac
+https://testnet.blockchain.info/ : blockchain explorer for testnet 
+https://www.blockchain.com/explorer :  live blockchain explorer 
+https://bitcoin.org/en/download : Bitcoin client used (for testnet)
+
+Resources
+
+https://github.com/bitcoinjs/bitcoinjs-lib
+https://medium.com/@cruzw/crafting-a-blockchain-transaction-with-javascript-3946bda1df7b
+https://medium.com/@orweinberger/how-to-create-a-raw-transaction-using-bitcoinjs-lib-1347a502a3a
+http://www.sqlitetutorial.net/sqlite-nodejs/
+https://awebanalysis.com/en/bitcoin-address-validate/ 
 
 Notes
 	Why on earth do I have to specify the testnet in every method just let me call it once and be done with it.
