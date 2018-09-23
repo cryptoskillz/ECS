@@ -47,7 +47,7 @@ function checkForPayment()
 	
 
 	//get the entrys 
-	let sql = `SELECT * FROM keys where processed = 0 limit 0,1`;
+	let sql = `SELECT * FROM keys where processed = 0 `;
  
 	db.all(sql, [], (err, rows) => {
 	  if (err) {
@@ -104,6 +104,7 @@ function checkForPayment()
 		  	}
 		  	else
 		  	{
+		  		console.log('payment not received for '+address);
 		  		//In case you want to start ordering process or something on a pending balance this is where you would put that code
 		  		//for simplicity I am waiting until the balance has actually been confirmed.
 		  		if (pendingbalance > 0)

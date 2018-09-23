@@ -95,32 +95,14 @@ let privateKey = keyPair.toWIF();
 //console.log(privateKey);
 
 //get an address from the keyPair we generated above. 
-let { address } = bitcoin.payments.p2pkh({ pubkey: publicKey,network: TestNet  });
+let address  = bitcoin.payments.p2pkh({ pubkey: publicKey,network: TestNet  });
 //debug
 //console.log(address);
 
 
-/*
-This is a test to make sure we can turn the private key back into the address.
-It does not appear to work at present, requires further research
-
-//rant: Why on earth do I have to specify the testnet parameter this way when its the other way everywhere else!
-let keyPair2 = bitcoin.ECPair.fromWIF(privateKey, TestNet)
-let publicKey2 = keyPair2.publicKey;
-//debug
-//console.log(keyPair2);
-//console.log(publicKey2);
-
-let { address2 } = bitcoin.payments.p2pkh({ pubkey: publicKey2,network: TestNet });
-console.log(address2);
-
-*/
-
-
-
 //store it in the database
 //note: Not 100% sure that we have to store the public kkey
-db.run(`INSERT INTO keys(address,privatekey,publickey) VALUES(?,?,?)`, [address,privateKey,publicKey], function(err) {
+db.run(`INSERT INTO keys(address,privatekey,publickey) VALUES(?,?,?)`, [address.address,privateKey,publicKey], function(err) {
 if (err) {
   return console.log(err.message);
 }
@@ -131,7 +113,7 @@ if (err) {
 
 
 //display it to the user
-console.log('Pay me f00l '+address)
+console.log('Pay me f00l '+address.address)
 
 
 app.listen(3000, () => {
