@@ -89,6 +89,18 @@ function checkForPayment()
 		  	{
 		  		console.log('we got it');
 		  		//update the database that the payment is successful
+		  		let data = ['1', address];
+				let sql = `UPDATE keys
+				            SET processed = ?
+				            WHERE address = ?`;
+				 
+				db.run(sql, data, function(err) {
+				  if (err) {
+				    return console.error(err.message);
+				  }
+				  console.log(`Row(s) updated: ${this.changes}`);
+				 
+				});
 		  	}
 		  	else
 		  	{
@@ -102,7 +114,7 @@ function checkForPayment()
 		});
 	  });
 	})
-
+	console.log('finished checking');
 
 
 
