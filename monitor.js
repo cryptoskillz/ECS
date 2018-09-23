@@ -12,7 +12,12 @@ const bodyParser = require('body-parser');
 //set up block.io
 var BlockIo = require('block_io');
 var version = 2; // API version
-var block_io = new BlockIo('9ccb-fad0-7811-4dfb', 'TFcce3dNxcfk7E3D', version);
+
+//set up block.io 
+//note: We are using env vars to set up block.io you can find more about this here 
+//https://medium.com/ibm-watson-data-lab/environment-variables-or-keeping-your-secrets-secret-in-a-node-js-app-99019dfff716
+var block_io = new BlockIo(process.env.blockiokey,process.env.blockiosecret, version);
+const sqlite3 = require('sqlite3').verbose();
 //init it
 const app = express();
 
@@ -33,6 +38,8 @@ in a later tutorial.
 
 block_io.get_address_balance({'address': address}, function (error, data)
 {
+	//debug
+	//console.log(data);
 	//some kind of error, deal with it (literately )
   	if (error) return console.log("Error occurred:", error.message);
   	//store the balance
@@ -47,7 +54,7 @@ block_io.get_address_balance({'address': address}, function (error, data)
   	//console.log(pendingbalance);
   	if (balance > 0)
   	{
-  		//console.log('we got it');
+  		console.log('we got it');
   		//update the database that the payment is successful
   	}
   	else

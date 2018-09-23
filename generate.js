@@ -48,6 +48,7 @@ https://medium.com/@cruzw/crafting-a-blockchain-transaction-with-javascript-3946
 https://medium.com/@orweinberger/how-to-create-a-raw-transaction-using-bitcoinjs-lib-1347a502a3a
 http://www.sqlitetutorial.net/sqlite-nodejs/
 https://awebanalysis.com/en/bitcoin-address-validate/ 
+https://medium.com/ibm-watson-data-lab/environment-variables-or-keeping-your-secrets-secret-in-a-node-js-app-99019dfff716
 
 Notes
 	Why on earth do I have to specify the testnet in every method just let me call it once and be done with it.
