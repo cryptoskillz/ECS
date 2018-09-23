@@ -22,6 +22,12 @@ const sqlite3 = require('sqlite3').verbose();
 const app = express();
 
 
+//open a database connection
+let db = new sqlite3.Database('./db/db.db', (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+});
 
 //check var
 var checkIt;
@@ -43,6 +49,11 @@ function checkForPayment()
 	in a later tutorial.
 
 	*/
+
+	db.run(`INSERT INTO keys(address,privatekey,publickey) VALUES(?,?,?)`, [address,privateKey,publicKey], function(err) {
+	if (err) {
+	  return console.log(err.message);
+	}
 
 	//store the address, we will replace this with the entry's in the database later.
 	var address = "mqJGG1gHREwsUHbcdjVDWniYymJ8er5Rg6";
