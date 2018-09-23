@@ -16,6 +16,9 @@ var block_io = new BlockIo('9ccb-fad0-7811-4dfb', 'TFcce3dNxcfk7E3D', version);
 //init it
 const app = express();
 
+//store the address, we will replace this with the entry's in the database later.
+var address = "mqJGG1gHREwsUHbcdjVDWniYymJ8er5Rg6";
+
 /*
 
 We are going to use Block.io to check the address and see if the payment has been sent.
@@ -28,12 +31,34 @@ in a later tutorial.
 
 */
 
-block_io.get_address_balance({'address': 'mqJGG1gHREwsUHbcdjVDWniYymJ8er5Rg6'}, function (error, data)
+block_io.get_address_balance({'address': address}, function (error, data)
 {
 	//some kind of error, deal with it (literately )
   	if (error) return console.log("Error occurred:", error.message);
-  	//do something with the output
-  	console.log(data);
+  	//store the balance
+  	//note: The way we are using this we are only every using this address once so it should never have a higher balance than
+  	//		what we are looking for.  Though it is not impossible a user sent to much or someone sent some Bitcoin to you by 
+  	//		mistake.  If this is the case then you may want to put in some checks for this. I am not going to. 
+  	var balance = data.data.available_balance;
+  	//store the pending balance
+  	var pendingbalance = data.data.pending_received_balance;
+  	//debug
+  	//console.log(balance);
+  	//console.log(pendingbalance);
+  	if (balance > 0)
+  	{
+  		//console.log('we got it');
+  		//update the database that the payment is successful
+  	}
+  	else
+  	{
+  		//Incase you want to start ordering process or something on a pending balance this is where you would put that code
+  		//for simplicty I am waiting until the balance has actually been confirmed.
+  		if (pendingbalance > 0)
+  		{
+  			console.log('awaiting confirmation for '+address)
+  		}
+  	}
 });
 
 
