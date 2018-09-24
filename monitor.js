@@ -69,10 +69,11 @@ function checkForPayment()
 
 		*/	
 
+
 	    block_io.get_address_balance({'address': address}, function (error, data)
 		{
 			//debug
-			//console.log(data);
+			console.log(data.data);
 			//some kind of error, deal with it (literately )
 		  	if (error) return console.log("Error occurred:", error.message);
 		  	//store the balance
@@ -116,15 +117,8 @@ function checkForPayment()
 	  });
 	})
 	console.log('finished checking');
-
-
-
 	
 }
-
-
-
-
 
 app.listen(3000, () => {
 });
