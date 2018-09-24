@@ -61,12 +61,20 @@ db.all(sql, [], (err, rows) => {
     //get the address
     var address =  row.address;
     //get the private key
-    var privateKey = row.privateKey
+    var privateKey = row.privatekey;
+    //debug
+    //console.log(row);
+    //return;
+   // mqJGG1gHREwsUHbcdjVDWniYymJ8er5Rg6
+    //console.log(address);
+   	//console.log(privateKey);
     //get the transactions
     //note: We should only have one transaction in this address so we can make some assumpation. We would however harden this 
     //		function before it was used in any production enviorment.
     block_io.get_transactions({'type': 'received', 'addresses': address}, function (error, data)
 	{
+		//todo : check for no transactions
+		//console.dir(data, { depth: null });
 		//get the tx transaction id
 		var txid = data.data.txs[0].txid;
 		//get the amount in the transaction
@@ -75,9 +83,9 @@ db.all(sql, [], (err, rows) => {
 		//note : Satoshi information can be found here https://en.bitcoin.it/wiki/Satoshi_(unit)
 		amountReceivedSatoshi = amountReceived * 100000000;
 		//debug
+		
 		//console.log(address);
 		//console.log(privateKey)
-		//console.dir(data, { depth: null });
 		//console.log(txid);
 		//console.log(amountReceived);
 		//console.log(amountReceivedSatoshi);
@@ -88,19 +96,34 @@ db.all(sql, [], (err, rows) => {
 			//store the network fee.
 			var networkfee = data2.data.estimated_network_fee;
 			//debug
+			//console.log(networkfee);
+			//console.log(amountReceived);
+			//console.log(amountReceivedSatoshi);
 			//console.log(data2.data.estimated_network_fee);
+
 			//init a new transaction
 			let tx = new bitcoin.TransactionBuilder(TestNet);
 			//note we may not need this as we have stored the address though we could just store the private key and always 
 			//		deriver it from the keypair.
-			//let hotKeyPair = new bitcoin.ECPair.fromWIF(privateKey, TestNet)
-			//let address = bitcoin.payments.p2pkh({ pubkey: hotKeyPair.publicKey,network: TestNet  });
+			console.log(privateKey);
+			let hotKeyPair = new bitcoin.ECPair.fromWIF(privateKey, TestNet)
+			console.log(privateKey);
+			console.log(hotKeyPair);
+			//et address = bitcoin.payments.p2pkh({ pubkey: hotKeyPair.publicKey,network: TestNet  });
 			
 			//work out the amount to send 
-			let amountToSend = amountReceivedSatoshi  - networkfee;
+			//let amountToSend =  amountReceivedSatoshi - networkfee   ;
+						let amountToSend =  amountReceivedSatoshi - 10000   ;
+
+			console.log(amountReceivedSatoshi);
+			console.log(networkfee);
+			console.log(amountToSend);
 			//add the input the transaction we are building
 			tx.addInput(txid, 0, 0xfffffffe);
-
+			//this seems to do the fee on of its own accord.
+			tx.addOutput(process.env.toaddress, amountToSend);
+			tx.sign(0, hotKeyPair);
+			console.log(tx.build().toHex());
 
 			//update the database.
 			console.log('yup');
