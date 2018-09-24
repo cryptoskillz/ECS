@@ -47,8 +47,6 @@ db.all(sql, [], (err, rows) => {
     var privateKey = row.privatekey;
     //debug
     //console.log(row);
-    //return;
-   // mqJGG1gHREwsUHbcdjVDWniYymJ8er5Rg6
     //console.log(address);
    	//console.log(privateKey);
     //get the transactions
@@ -62,17 +60,9 @@ db.all(sql, [], (err, rows) => {
 		var txid = data.data.txs[0].txid;
 		//get the amount in the transaction
 		let amountReceived = data.data.txs[0].amounts_received[0].amount;
-		//turn the amount recieved into satoshis 
-		//note : Satoshi information can be found here https://en.bitcoin.it/wiki/Satoshi_(unit)
-		amountReceivedSatoshi = amountReceived * 100000000;
 		//debug
-		
-		//console.log(address);
-		//console.log(privateKey)
-		//console.log(txid);
 		//console.log(amountReceived);
-		//console.log(amountReceivedSatoshi);
-
+		//console.log(txid);
 
 		//estimate the fee
 		//note : We are using block.io to estimate the fee but we will of course do this ourselves later.
@@ -82,8 +72,6 @@ db.all(sql, [], (err, rows) => {
 			var networkfee = data2.data.estimated_network_fee;
 			//debug
 			//console.log(networkfee);
-			//console.log(amountReceived);
-			//console.log(amountReceivedSatoshi);
 			//console.log(data2.data.estimated_network_fee);
 
 			//init a new transaction
@@ -93,24 +81,24 @@ db.all(sql, [], (err, rows) => {
 			//debug
 			//console.log(privateKey);
 			//console.log(hotKeyPair);
-			//et address = bitcoin.payments.p2pkh({ pubkey: hotKeyPair.publicKey,network: TestNet  });
 			
 			//work out the amount to send 
-			//todo : figure out why the fee does not work  think we have to round it up
 			//let amountToSend =  amountReceivedSatoshi - networkfee   ;
-			let amountToSend =  amountReceivedSatoshi - 10000   ;
+			let amountToSend =  amountReceived - networkfee   ;
+			//turn the amount recieved into satoshis 
+			//note : Satoshi information can be found here https://en.bitcoin.it/wiki/Satoshi_(unit)
+			amountToSendSatoshi = amountToSend * 100000000;
 			//debug
 			//console.log(amountReceivedSatoshi);
 			//console.log(networkfee);
 			//console.log(amountToSend);
-
 			//add the input the transaction we are building
 			//note txid = we got fron the get transaction type
 			//	   0 = is the first transaction to be safe we could parse data object and return the correct one 
 			//	   0xfffffffe = no idea will have to read up on this
 			tx.addInput(txid, 0, 0xfffffffe);
 			//note : this seems to do the fee on of its own accord.
-			tx.addOutput(process.env.toaddress, amountToSend);
+			tx.addOutput(process.env.toaddress, amountToSendSatoshi);
 			//sign the transaction with our private key
 			tx.sign(0, hotKeyPair);
 			//output it
