@@ -17,6 +17,8 @@ var bitcoin = require('bitcoinjs-lib');
 //load SQLlite (use any database you want or none)
 //init it
 const sqlite3 = require('sqlite3').verbose();
+var request = require('request');
+
 //init it
 const app = express();
 
@@ -81,7 +83,6 @@ db.all(sql, [], (err, rows) => {
 			//debug
 			//console.log(privateKey);
 			//console.log(hotKeyPair);
-			
 			//work out the amount to send 
 			//let amountToSend =  amountReceivedSatoshi - networkfee   ;
 			let amountToSend =  amountReceived - networkfee   ;
@@ -104,7 +105,45 @@ db.all(sql, [], (err, rows) => {
 			//output it
 			//note we have to figure out how to push this to the network and not use https://testnet.blockchain.info/pushtx
 			console.log(tx.build().toHex());
-			//update the database.
+
+			// Set the headers
+			var headers = {
+			    'User-Agent':       'Super Agent/0.0.1',
+			    'Content-Type':     'application/x-www-form-urlencoded'
+			}
+
+			// Configure the request
+			var options = {
+			    url: 'https://testnet.blockchain.info/pushtx',
+			    method: 'POST',
+			    headers: headers,
+			    form: {'tx': tx.build().toHex()}
+			}
+
+			// Start the request
+			request(options, function (error, response, body) {
+				 //console.log(body)
+				 //console.log(error)
+			     //console.log(response)
+			    if (!error && response.statusCode == 200) {
+			        // Print out the response body
+			        console.log(body)
+			        let sqldata = ['1', address];
+					let sql = `UPDATE keys
+					            SET swept = ?
+					            WHERE address = ?`;
+					 
+					db.run(sql, sqldata, function(err) {
+					  if (err) {
+					    return console.error(err.message);
+					  }
+
+					  console.log(`Row(s) updated: ${this.changes}`);
+					 
+					});
+			    }
+			})
+
 		});
 
 	});
