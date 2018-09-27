@@ -51,6 +51,7 @@ if (err) {
 
 
 //display it to the user
+res.json({ a: 1 });
 console.log('Pay me f00l '+address.address)
 
 
