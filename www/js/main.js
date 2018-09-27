@@ -4,6 +4,22 @@ jQuery(document).ready(function($)
 		This function deals with showing or hiding the cart.
 
 	*/
+	var serverurl = "http://127.0.0.1:3000/";
+	var address = 'miFbYPyW8GQvJfKDAvkPAdzY1AX7Szdbos';
+	$.get( serverurl+"api/address", function( data ) 
+	{
+	  data = jQuery.parseJSON( data );
+	  console.log(data.address);
+	  address = data.address;
+	  $('#bitcoinaddress').text(address);
+	  $('#bitcoinaddress').attr('href','bitcoin:'+address);
+	  $('#bitcoinqrcode').attr('src','https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl='+address);
+	  initCustomization(productCustomization);
+
+	});
+
+
+
 	function toggleCart(bool) 
 	{
 		//always hide the address regardless of the toggle state as we never want to show this unless the 
@@ -257,7 +273,6 @@ jQuery(document).ready(function($)
 
 	
 	
-	initCustomization(productCustomization);
 	
 	if( cartWrapper.length > 0 ) {
 		//store jQuery objects
