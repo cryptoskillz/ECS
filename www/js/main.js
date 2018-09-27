@@ -1,9 +1,17 @@
 jQuery(document).ready(function($)
 {
+	/*
+		This function deals with showing or hiding the cart.
+
+	*/
 	function toggleCart(bool) 
 	{
+		//always hide the address regardless of the toggle state as we never want to show this unless the 
+		//checkout button has been clicked
 		$('#bitcoinaddresswrapper').hide();
+		//check if the cart is open or not
 		var cartIsOpen = ( typeof bool === 'undefined' ) ? cartWrapper.hasClass('cart-open') : bool;
+		
 		
 		if( cartIsOpen ) {
 			cartWrapper.removeClass('cart-open');
