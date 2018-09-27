@@ -1255,12 +1255,22 @@ Product Info (title + price)
 /*
 bitcoin
 */
-
-#bitcoinaddresswrapper {
-   margin: auto;
-    width: 50%;
-    padding: 10px;
+ #bitcoinaddresswrapper  {
+text-align: center;
 }
+#bitcoinaddresswrapper img {
+width: 45%;
+}
+
+/*
+.bitcoinoptions a {
+display: block;
+margin-bottom: 10px;
+}
+*/
+
+
+
 
 .bitcoinaddress {
     border-bottom: 1px dashed gray;

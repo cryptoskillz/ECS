@@ -2,6 +2,9 @@
 
 This is the sweep script that moves payment to our hard wallet.
 
+Please ignore this for now unless you want to manually run it for testing.  
+We will implement an admin that incorporates that.
+
 
 */
 //init block.io

@@ -1,7 +1,11 @@
 /*
 
-This function monitors the block chain to see if out payments have been processed.
+This is the monitor script that moves payment to our hard wallet.
 
+The code is pretty much the same as what is in the monitor endpoint but it does not loop it just checks for one address. 
+
+Please ignore this for now unless you want to manually run it for testing.  
+We will implement an admin that incorporates that.
 */
 
 
