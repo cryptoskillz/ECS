@@ -7,8 +7,9 @@
 	<link rel="stylesheet" href="css/reset.css"> <!-- CSS reset -->
 	<link rel="stylesheet" href="css/style.css"> <!-- Resource style -->
  	<script src="js/modernizr.js"></script> <!-- Modernizr -->
- 	
-	<title>Add to Cart Interaction | CodyHouse</title>
+ 	    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+	<title></title>
 </head>
 <body>
 <main>
@@ -27,15 +28,15 @@
 				</a>
 
 				<div class="cd-customization">
-					<div class="color selected-2" data-type="select">
+					<div class="sr-color selected-2" data-type="select">
 						<ul>
-							<li class="color-1">color-1</li>
-							<li class="color-2 active">color-2</li>
-							<li class="color-3">color-3</li>
+							<li class="sr-color-1">color-1</li>
+							<li class="sr-color-2 active">color-2</li>
+							<li class="sr-color-3">color-3</li>
 						</ul>
 					</div>
 					
-					<div class="size" data-type="select">
+					<div class="sr-size" data-type="select">
 						<ul>
 							<li class="small active">Small</li>
 							<li class="medium">Medium</li>
@@ -43,7 +44,7 @@
 						</ul>
 					</div>
 
-					<button class="add-to-cart" data-price="9.99" data-name='T Shirt' data-id='1'>
+					<button class="sr-add-to-cart" data-price="9.99" data-name='T Shirt' data-id='1'>
 						<em>Add to Cart</em>
 						<svg x="0px" y="0px" width="32px" height="32px" viewBox="0 0 32 32">
 							<path stroke-dasharray="19.79 19.79" stroke-dashoffset="19.79" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" d="M9,17l3.9,3.9c0.1,0.1,0.2,0.1,0.3,0L23,11"/>
@@ -75,12 +76,75 @@
 		<div class="wrapper">
 			<header>
 				<h2>Cart</h2>
+				<span class="bitcoinback" ><a id="checkoutbitocoin" href="#0">Back</a></span>
+
 			</header>
 			
 			<div class="body">
-				<ul>
+				<ul id='cartlistitems'>
 					<!-- products added to the cart will be inserted here using JavaScript -->
 				</ul>
+
+				<div id="bitcoinaddresswrapper">
+					<div >
+				        <a id="bitcoinaddress" class="bitcoinaddress" href="bitcoin:19356KxTs9Bw5AAdxens5hoxDSp5bsUKse" >19356KxTs9Bw5AAdxens5hoxDSp5bsUKse</a>
+				    </div>
+				    <div class="bitcoinoptions" >
+				     <a href="#" class="bitcoinaddresscopy">
+				        <i class="fa fa-copy"></i>
+				        Copy
+				    </a>
+				    
+				    <a href="bitcoin:19356KxTs9Bw5AAdxens5hoxDSp5bsUKse" class="">
+				        <i class="fa fa-btc"></i>
+				        Pay from wallet
+				    </a>
+				    </div>
+
+				 	<img src="https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl= 12kQMUkB9QJu9X5JP9H9M2qMUmrGtDakkV" />
+				</div>
+
+				<div id="bitcoin-address-template" class="bitcoin-address-container center cartlistitems" style="display: none" >
+
+				    <div>
+				        <a href="bitcoin:19356KxTs9Bw5AAdxens5hoxDSp5bsUKse" class="bitcoinaddress">
+				    </div>
+
+				    <a href="bitcoin:19356KxTs9Bw5AAdxens5hoxDSp5bsUKse" class="bitcoin-address-action bitcoin-address-action-send">
+				        <i class="fa fa-btc"></i>
+				        Pay from wallet
+				    </a>
+
+				    <a href="#" class="bitcoin-address-action bitcoin-address-action-copy">
+				        <i class="fa fa-copy"></i>
+				        Copy
+				    </a>
+
+				    <a href="#" class="bitcoin-address-action bitcoin-address-action-qr">
+				        <i class="fa fa-qrcode"></i>
+				        QR code
+				    </a>
+
+				    <div class="bitcoin-action-hint bitcoin-action-hint-send">
+				        Sending payment to the address from locally installed Bitcoin wallet app.
+				    </div>
+
+				    <div class="bitcoin-action-hint bitcoin-action-hint-copy">
+				        Press CTRL + C or &#x2318; + C to copy the Bitcoin address.
+				    </div>
+
+				    <div class="bitcoin-action-hint bitcoin-action-hint-qr">
+				        <p>
+				            Scan the QR code with your mobile Bitcoin app to
+				            make the payment:
+				        </p>
+
+				        <div class="bitcoin-address-qr-container">
+				            <!-- Filled in by JS on action click -->
+				        </div>
+				    </div>
+
+				</div>
 			</div>
 
 			<footer>

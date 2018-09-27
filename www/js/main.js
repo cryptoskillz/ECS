@@ -1,64 +1,17 @@
-jQuery(document).ready(function($){
-
-	var productPrice = 0
-	var cartWrapper = $('.cd-cart-container');
-	//product id - you don't need a counter in your real project but you can use your real product id
-	var productId = 0;
-
-	
-	if( cartWrapper.length > 0 ) {
-		//store jQuery objects
-
-		
-		var cartBody = cartWrapper.find('.body')
-		var cartList = cartBody.find('ul').eq(0);
-		var cartTotal = cartWrapper.find('.checkout').find('span');
-		//console.log(cartTotal);
-		var cartTrigger = cartWrapper.children('.cd-cart-trigger');
-		var cartCount = cartTrigger.children('.count')
-		var addToCartBtn = $('.add-to-cart');
-		var undo = cartWrapper.find('.undo');
-		var undoTimeoutId;
-		
-
-		//add product to cart
-		addToCartBtn.on('click', function(event){
-			event.preventDefault();
-			addToCart($(this));
-		});
-
-		//open/close cart
-		cartTrigger.on('click', function(event){
-			event.preventDefault();
-			toggleCart();
-		});
-
-		//close cart when clicking on the .cd-cart-container::before (bg layer)
-		cartWrapper.on('click', function(event){
-			if( $(event.target).is($(this)) ) toggleCart(true);
-		});
-
-		//delete an item from the cart
-		cartList.on('click', '.delete-item', function(event){
-			event.preventDefault();
-			removeProduct($(event.target).parents('.product'));
-		});
-
-	
-		
-	}
-
+jQuery(document).ready(function($)
+{
 	function toggleCart(bool) 
 	{
-
+		$('#bitcoinaddresswrapper').hide();
 		var cartIsOpen = ( typeof bool === 'undefined' ) ? cartWrapper.hasClass('cart-open') : bool;
 		
 		if( cartIsOpen ) {
 			cartWrapper.removeClass('cart-open');
-			//reset undo
-			clearInterval(undoTimeoutId);
-			undo.removeClass('visible');
+			bitcoinback.removeClass('visible');
 			cartList.find('.deleted').remove();
+			bitcoinback.removeClass('visible');
+			$('#bitcoin-address-template').hide();
+			$('#cartlistitems').show();
 
 			setTimeout(function(){
 				cartBody.scrollTop(0);
@@ -71,7 +24,6 @@ jQuery(document).ready(function($){
 	}
 
 	function addToCart(trigger) {
-		alert('adding');
 		var cartIsEmpty = cartWrapper.hasClass('empty');
 		//update cart product list
 		addProduct(trigger.data('price'),trigger.data('name'),trigger.data('id'));
@@ -153,39 +105,53 @@ jQuery(document).ready(function($){
 		product.css('top', topPosition+'px').addClass('deleted');
 		cartTotal.text(0);
 		productQuantity = 0;
-		updateCartCount(true, -productQuantity);
+		updateCartCount(true, 0);
 	}
 
 
 	function updateCartCount(emptyCart, quantity) {
-		if( typeof quantity === 'undefined' ) {
-			var actual = Number(cartCount.find('li').eq(0).text()) + 1;
-			var next = actual + 1;
-			
-			if( emptyCart ) {
-				cartCount.find('li').eq(0).text(actual);
-				cartCount.find('li').eq(1).text(next);
-			} else {
-				cartCount.addClass('update-count');
-
-				setTimeout(function() {
-					cartCount.find('li').eq(0).text(actual);
-				}, 150);
-
-				setTimeout(function() {
-					cartCount.removeClass('update-count');
-				}, 200);
-
-				setTimeout(function() {
-					cartCount.find('li').eq(1).text(next);
-				}, 230);
-			}
-		} else {
-			var actual = Number(cartCount.find('li').eq(0).text()) + quantity;
-			var next = actual + 1;
-			
+		
+		if ((emptyCart == true) && (quantity == 0))
+		{
+			var actual = 0
+			var next = 1
 			cartCount.find('li').eq(0).text(actual);
 			cartCount.find('li').eq(1).text(next);
+
+		}
+		else
+		{
+
+
+			if( typeof quantity === 'undefined' ) {
+				var actual = Number(cartCount.find('li').eq(0).text()) + 1;
+				var next = actual + 1;
+				
+				if( emptyCart ) {
+					cartCount.find('li').eq(0).text(actual);
+					cartCount.find('li').eq(1).text(next);
+				} else {
+					cartCount.addClass('update-count');
+
+					setTimeout(function() {
+						cartCount.find('li').eq(0).text(actual);
+					}, 150);
+
+					setTimeout(function() {
+						cartCount.removeClass('update-count');
+					}, 200);
+
+					setTimeout(function() {
+						cartCount.find('li').eq(1).text(next);
+					}, 230);
+				}
+			} else {
+				var actual = Number(cartCount.find('li').eq(0).text()) + quantity;
+				var next = actual + 1;
+				
+				cartCount.find('li').eq(0).text(actual);
+				cartCount.find('li').eq(1).text(next);
+			}
 		}
 	}
 
@@ -197,28 +163,24 @@ jQuery(document).ready(function($){
 		//cartTotal.text( (Number(cartTotal.text()) - Number(price)).toFixed(2) );
 
 	}
-});
 
-jQuery(document).ready(function(){
-	var productCustomization = $('.cd-customization'),
-		cart = $('.cd-cart'),
-		animating = false;
-	
-	initCustomization(productCustomization);
+	function updateSlider(actual, index) {
+		var slider = actual.parent('.cd-customization').prev('a').children('.cd-slider-wrapper'),
+			slides = slider.children('li');
 
+		slides.eq(index).removeClass('move-left').addClass('selected').prevAll().removeClass('selected').addClass('move-left').end().nextAll().removeClass('selected move-left');
+	}
 
-	$('body').on('click', function(event){
-		//if user clicks outside the .cd-gallery list items - remove the .hover class and close the open ul.size/ul.color list elements
-		if( $(event.target).is('body') || $(event.target).is('.cd-gallery') ) {
-			deactivateCustomization();
-		}
-	});
-
-	function initCustomization(items) {
+	function resetCustomization(selectOptions) {
+		//close ul.clor/ul.size if they were left open and user is not interacting with them anymore
+		//remove the .hover class from items if user is interacting with a different one
+		selectOptions.siblings('[data-type="select"]').removeClass('is-open').end().parents('.cd-single-item').addClass('hover').parent('li').siblings('li').find('.cd-single-item').removeClass('hover').end().find('[data-type="select"]').removeClass('is-open');
+	}
+		function initCustomization(items) {
 		items.each(function(){
 			var actual = $(this),
 				selectOptions = actual.find('[data-type="select"]'),
-				addToCartBtn = actual.find('.add-to-cart'),
+				addToCartBtn = actual.find('.sr-add-to-cart'),
 				touchSettings = actual.next('.cd-customization-trigger');
 
 			//detect click on ul.size/ul.color list elements 
@@ -236,7 +198,7 @@ jQuery(document).ready(function(){
 					activeItem.addClass('active').siblings().removeClass('active');
 					selected.removeClass('selected-1 selected-2 selected-3').addClass('selected-'+index);
 					// if color has been changed, update the visible product image 
-					selected.hasClass('color') && updateSlider(selected, index-1);
+					selected.hasClass('sr-color') && updateSlider(selected, index-1);
 				}
 			});
 
@@ -277,22 +239,98 @@ jQuery(document).ready(function(){
 		});
 	}
 
-	function updateSlider(actual, index) {
-		var slider = actual.parent('.cd-customization').prev('a').children('.cd-slider-wrapper'),
-			slides = slider.children('li');
+	var productPrice = 0
+	var cartWrapper = $('.cd-cart-container');
+	//product id - you don't need a counter in your real project but you can use your real product id
+	var productId = 0;
+	var productCustomization = $('.cd-customization'),
+	cart = $('.cd-cart'),
+	animating = false;
 
-		slides.eq(index).removeClass('move-left').addClass('selected').prevAll().removeClass('selected').addClass('move-left').end().nextAll().removeClass('selected move-left');
-	}
+	
+	
+	initCustomization(productCustomization);
+	
+	if( cartWrapper.length > 0 ) {
+		//store jQuery objects
 
-	function resetCustomization(selectOptions) {
-		//close ul.clor/ul.size if they were left open and user is not interacting with them anymore
-		//remove the .hover class from items if user is interacting with a different one
-		selectOptions.siblings('[data-type="select"]').removeClass('is-open').end().parents('.cd-single-item').addClass('hover').parent('li').siblings('li').find('.cd-single-item').removeClass('hover').end().find('[data-type="select"]').removeClass('is-open');
-	}
+		
+		var cartBody = cartWrapper.find('.body')
+		var cartList = cartBody.find('ul').eq(0);
+		var cartTotal = cartWrapper.find('.checkout').find('span');
+		//console.log(cartTotal);
+		var cartTrigger = cartWrapper.children('.cd-cart-trigger');
+		var cartCount = cartTrigger.children('.count')
+		var addToCartBtn = $('.sr-add-to-cart');
+		var bitcoinback = cartWrapper.find('.bitcoinback');
+		
+		
 
-	function deactivateCustomization() {
-		productCustomization.parent('.cd-single-item').removeClass('hover').end().find('[data-type="select"]').removeClass('is-open');
+		//add product to cart
+		addToCartBtn.on('click', function(event){
+			event.preventDefault();
+			addToCart($(this));
+		});
+
+		//open/close cart
+		cartTrigger.on('click', function(event){
+			event.preventDefault();
+			toggleCart();
+		});
+
+		//close cart when clicking on the .cd-cart-container::before (bg layer)
+		cartWrapper.on('click', function(event){
+			if( $(event.target).is($(this)) ) toggleCart(true);
+		});
+
+		//delete an item from the cart
+		cartList.on('click', '.delete-item', function(event){
+			event.preventDefault();
+			removeProduct($(event.target).parents('.product'));
+		});
+
+		cartWrapper.on('click', '.checkout', function(event){
+			event.preventDefault();
+			bitcoinback.addClass('visible');
+			///$('#bitcoin-address-template').show();
+			$('#bitcoinaddresswrapper').show();
+
+			$('#cartlistitems').hide();
+
+
+		});
+
+		
+
+		cartWrapper.on('click', '.bitcoinaddresscopy', function(event){
+			event.preventDefault();
+			/* Get the text field */
+  			var element = document.getElementById("bitcoinaddress");
+  			var $temp = $("<input>");
+  			$("body").append($temp);
+  			$temp.val($(element).text()).select();
+ 		 	document.execCommand("copy");
+  			//$temp.remove();
+
+
+		});
+
+
+		cartWrapper.on('click', '#checkoutbitocoin', function(event){
+			event.preventDefault();
+			bitcoinback.removeClass('visible');
+			$('#bitcoinaddresswrapper').hide();
+			//$('#bitcoin-address-template').hide();
+			$('#cartlistitems').show();
+		});
+
+
+		
+
+		
+
 	}
 
 	
 });
+

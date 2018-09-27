@@ -281,7 +281,7 @@ Main Components
   font-weight: 700;
   letter-spacing: .1em;
 }
-.cd-cart .undo {
+.cd-cart .bitcoinback {
   float: right;
   font-size: 1.2rem;
   opacity: 0;
@@ -290,14 +290,14 @@ Main Components
   transition: opacity .2s, visibility .2s;
   color: #808b97;
 }
-.cd-cart .undo a {
+.cd-cart .bitcoinback a {
   text-decoration: underline;
   color: #2b3e51;
 }
-.cd-cart .undo a:hover {
+.cd-cart .bitcoinback a:hover {
   color: #2c97de;
 }
-.cd-cart .undo.visible {
+.cd-cart .bitcoinback.visible {
   opacity: 1;
   visibility: visible;
 }
@@ -938,7 +938,7 @@ Product Customization
 .cd-customization > * {
   float: left;
 }
-.cd-customization .color, .cd-customization .size, .cd-customization .add-to-cart {
+.cd-customization .sr-color, .cd-customization .sr-size, .cd-customization .sr-add-to-cart {
   height: 34px;
   border-radius: 3px;
   position: relative;
@@ -947,7 +947,7 @@ Product Customization
 
 
 
-.cd-customization .color, .cd-customization .size {
+.cd-customization .sr-color, .cd-customization .sr-size {
   /* these are the color and size options */
   display: inline-block;
   cursor: pointer;
@@ -961,10 +961,10 @@ Product Customization
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
-.cd-customization .color:hover, .cd-customization .size:hover {
+.cd-customization .sr-color:hover, .cd-customization .sr-size:hover {
   box-shadow: inset 0 0 0 1px #cccccc;
 }
-.cd-customization .color ul, .cd-customization .size ul {
+.cd-customization .sr-color ul, .cd-customization .sr-size ul {
   display: inline-block;
   position: absolute;
   left: 50%;
@@ -980,11 +980,11 @@ Product Customization
   border-radius: 3px;
   border: 1px solid transparent;
 }
-.cd-customization .color li, .cd-customization .size li {
+.cd-customization .sr-color li, .cd-customization .sr-size li {
   position: relative;
   height: 34px;
 }
-.cd-customization .color ul li:first-of-type, .cd-customization .size ul li:first-of-type {
+.cd-customization .sr-color ul li:first-of-type, .cd-customization .sr-size ul li:first-of-type {
   /* arrange list items according to the selected color/size option */
   -webkit-transform: translateY(100%);
   -moz-transform: translateY(100%);
@@ -993,7 +993,7 @@ Product Customization
   transform: translateY(100%);
   border-radius: 0;
 }
-.cd-customization .color ul li:nth-of-type(2), .cd-customization .size ul li:nth-of-type(2) {
+.cd-customization .sr-color ul li:nth-of-type(2), .cd-customization .sr-size ul li:nth-of-type(2) {
   -webkit-transform: translateY(-100%);
   -moz-transform: translateY(-100%);
   -ms-transform: translateY(-100%);
@@ -1001,7 +1001,7 @@ Product Customization
   transform: translateY(-100%);
   border-radius: 3px 3px 0 0;
 }
-.cd-customization .color ul li:nth-of-type(3), .cd-customization .size ul li:nth-of-type(3) {
+.cd-customization .sr-color ul li:nth-of-type(3), .cd-customization .sr-size ul li:nth-of-type(3) {
   -webkit-transform: translateY(0);
   -moz-transform: translateY(0);
   -ms-transform: translateY(0);
@@ -1009,22 +1009,22 @@ Product Customization
   transform: translateY(0);
   border-radius: 0 0 3px 3px;
 }
-.cd-customization .color.selected-2 ul li:first-of-type, .cd-customization .color.selected-2 ul li:nth-of-type(2), .cd-customization .color.selected-2 ul li:nth-of-type(3), .cd-customization .size.selected-2 ul li:first-of-type, .cd-customization .size.selected-2 ul li:nth-of-type(2), .cd-customization .size.selected-2 ul li:nth-of-type(3) {
-  /* second option selected in the ul.color/ul.size list*/
+.cd-customization .sr-color.selected-2 ul li:first-of-type, .cd-customization .sr-color.selected-2 ul li:nth-of-type(2), .cd-customization .sr-color.selected-2 ul li:nth-of-type(3), .cd-customization .sr-size.selected-2 ul li:first-of-type, .cd-customization .sr-size.selected-2 ul li:nth-of-type(2), .cd-customization .sr-size.selected-2 ul li:nth-of-type(3) {
+  /* second option selected in the ul.sr-color/ul.sr-size list*/
   -webkit-transform: translateY(0);
   -moz-transform: translateY(0);
   -ms-transform: translateY(0);
   -o-transform: translateY(0);
   transform: translateY(0);
 }
-.cd-customization .color.selected-2 ul li:first-of-type, .cd-customization .size.selected-2 ul li:first-of-type {
+.cd-customization .sr-color.selected-2 ul li:first-of-type, .cd-customization .sr-size.selected-2 ul li:first-of-type {
   border-radius: 3px 3px 0 0;
 }
-.cd-customization .color.selected-2 ul li:nth-of-type(2), .cd-customization .size.selected-2 ul li:nth-of-type(2) {
+.cd-customization .sr-color.selected-2 ul li:nth-of-type(2), .cd-customization .sr-size.selected-2 ul li:nth-of-type(2) {
   border-radius: 0;
 }
-.cd-customization .color.selected-3 ul li:first-of-type, .cd-customization .size.selected-3 ul li:first-of-type {
-  /* third option selected in the ul.color/ul.size list */
+.cd-customization .sr-color.selected-3 ul li:first-of-type, .cd-customization .sr-size.selected-3 ul li:first-of-type {
+  /* third option selected in the ul.sr-color/ul.sr-size list */
   -webkit-transform: translateY(0);
   -moz-transform: translateY(0);
   -ms-transform: translateY(0);
@@ -1032,7 +1032,7 @@ Product Customization
   transform: translateY(0);
   border-radius: 3px 3px 0 0;
 }
-.cd-customization .color.selected-3 ul li:nth-of-type(2), .cd-customization .size.selected-3 ul li:nth-of-type(2) {
+.cd-customization .sr-color.selected-3 ul li:nth-of-type(2), .cd-customization .sr-size.selected-3 ul li:nth-of-type(2) {
   -webkit-transform: translateY(100%);
   -moz-transform: translateY(100%);
   -ms-transform: translateY(100%);
@@ -1040,7 +1040,7 @@ Product Customization
   transform: translateY(100%);
   border-radius: 0 0 3px 3px;
 }
-.cd-customization .color.selected-3 ul li:nth-of-type(3), .cd-customization .size.selected-3 ul li:nth-of-type(3) {
+.cd-customization .sr-color.selected-3 ul li:nth-of-type(3), .cd-customization .sr-size.selected-3 ul li:nth-of-type(3) {
   -webkit-transform: translateY(-100%);
   -moz-transform: translateY(-100%);
   -ms-transform: translateY(-100%);
@@ -1048,34 +1048,35 @@ Product Customization
   transform: translateY(-100%);
   border-radius: 0;
 }
-.cd-customization .color.is-open, .cd-customization .size.is-open {
+.cd-customization .sr-color.is-open, .cd-customization .sr-size.is-open {
   /* color/size list open - make ul element visible */
   overflow: visible;
   box-shadow: none;
 }
-.cd-customization .color.is-open::after, .cd-customization .size.is-open::after {
+.cd-customization .sr-color.is-open::after, .cd-customization .sr-size.is-open::after {
   /* remove the arrow icon for the size option element */
   display: none;
 }
-.cd-customization .color.is-open ul, .cd-customization .size.is-open ul {
+.cd-customization .sr-color.is-open ul, .cd-customization .sr-size.is-open ul {
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
   border-color: #e5e5e5;
   background-color: #ffffff;
 }
-.cd-customization .color.is-open li:hover, .cd-customization .color.is-open li.active, .cd-customization .size.is-open li:hover, .cd-customization .size.is-open li.active {
+.cd-customization .sr-color.is-open li:hover, .cd-customization .sr-color.is-open li.active, .cd-customization .sr-size.is-open li:hover, .cd-customization .sr-size.is-open li.active {
   background-color: #f2f2f2;
 }
-.cd-customization .color {
+.cd-customization .sr-color {
   width: 34px;
 }
-.cd-customization .color li {
+.cd-customization .sr-color li {
   /* replace color name with colored circle */
   overflow: hidden;
   text-indent: 100%;
   white-space: nowrap;
   color: transparent;
 }
-.cd-customization .color li::before {
+
+-customization .sr-color li::before {
   /* this is the colored circle */
   content: '';
   position: absolute;
@@ -1092,19 +1093,19 @@ Product Customization
   width: 10px;
   border-radius: 50%;
 }
-.cd-customization .color li.color-1::before {
+.cd-customization .sr-color li.sr-color-1::before {
   background-color: #314d5d;
 }
-.cd-customization .color li.color-2::before {
+.cd-customization .sr-color li.sr-color-2::before {
   background-color: #de5b48;
 }
-.cd-customization .color li.color-3::before {
+.cd-customization .sr-color li.sr-color-3::before {
   background-color: #f0ca4d;
 }
-.cd-customization .size {
+.cd-customization .sr-size {
   margin: 0 6px;
 }
-.cd-customization .size::after {
+.cd-customization .sr-size::after {
   /* arrow icon for the size option element */
   content: '';
   position: absolute;
@@ -1117,28 +1118,28 @@ Product Customization
   background: url("../img/cd-icon-arrow.svg") no-repeat center center;
   pointer-events: none;
 }
-.cd-customization .size li {
+.cd-customization .sr-size li {
   padding: 0 1em;
 }
-.cd-customization .size, .cd-customization .add-to-cart {
+.cd-customization .sr-size, .cd-customization .sr-add-to-cart {
   width: calc(50% - 23px);
 }
-.cd-customization .size li, .cd-customization .add-to-cart {
+.cd-customization .sr-size li, .cd-customization .sr-add-to-cart {
   font-size: 1.2rem;
   font-weight: 600;
   text-transform: uppercase;
   line-height: 34px;
 }
-.cd-customization .add-to-cart {
+.cd-customization .sr-add-to-cart {
   color: #ffffff;
   background-color: #46b29d;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.no-touch .cd-customization .add-to-cart:hover {
+.no-touch .cd-customization .sr-add-to-cart:hover {
   background-color: #55bca8;
 }
-.cd-customization .add-to-cart em {
+.cd-customization .sr-add-to-cart em {
   /* this is the button text message */
   position: absolute;
   top: 0;
@@ -1157,7 +1158,7 @@ Product Customization
   -moz-transition: -moz-transform 0.3s;
   transition: transform 0.3s;
 }
-.cd-customization .add-to-cart svg {
+.cd-customization .sr-add-to-cart svg {
   /* this is the check icon */
   position: absolute;
   left: 50%;
@@ -1173,7 +1174,7 @@ Product Customization
   -moz-transition: -moz-transform 0.3s;
   transition: transform 0.3s;
 }
-.cd-customization .add-to-cart.is-added em {
+.cd-customization .sr-add-to-cart.is-added em {
   /* product added to the cart - hide text message on the left with no transition*/
   color: transparent;
   -webkit-transform: translateX(-100%);
@@ -1185,7 +1186,7 @@ Product Customization
   -moz-transition: -moz-transform 0s;
   transition: transform 0s;
 }
-.cd-customization .add-to-cart.is-added svg {
+.cd-customization .sr-add-to-cart.is-added svg {
   /* product added to the cart - move the svg back inside the button */
   -webkit-transform: translateX(-50%) translateY(-50%);
   -moz-transform: translateX(-50%) translateY(-50%);
@@ -1250,3 +1251,23 @@ Product Info (title + price)
   text-decoration: underline;
 }
 
+
+/*
+bitcoin
+*/
+
+#bitcoinaddresswrapper {
+   margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+
+.bitcoinaddress {
+    border-bottom: 1px dashed gray;
+    cursor: pointer;
+}
+
+.bitcoinoptions {
+  padding-top: 10px;
+  padding-bottom: : 10px;
+}
