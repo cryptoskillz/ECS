@@ -8,6 +8,12 @@ var bitcoin = require('bitcoinjs-lib');
 const sqlite3 = require('sqlite3').verbose();
 //init it
 const app = express();
+//work bitch
+/*
+var path = require('path');
+console.log(path.join(__dirname, 'cdn/'))
+app.use(express.static(path.join(__dirname, 'cdn/'))); //  "public" off of current is root
+*/
 //set up the network we would like to connect to. in this case test net.
 const TestNet = bitcoin.networks.testnet
 
