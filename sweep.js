@@ -90,7 +90,7 @@ db.all(sql, [], (err, rows) => {
 			//note : Satoshi information can be found here https://en.bitcoin.it/wiki/Satoshi_(unit)
 			amountToSendSatoshi = amountToSend * 100000000;
 			//debug
-			//console.log(amountReceivedSatoshi);
+			//console.log(amountToSendSatoshi);
 			//console.log(networkfee);
 			//console.log(amountToSend);
 			//add the input the transaction we are building
@@ -122,12 +122,12 @@ db.all(sql, [], (err, rows) => {
 
 			// Start the request
 			request(options, function (error, response, body) {
-				 //console.log(body)
-				 //console.log(error)
-			     //console.log(response)
+				 console.log(body)
+				// console.log(error)
+			    // console.log(response)
 			    if (!error && response.statusCode == 200) {
 			        // Print out the response body
-			        console.log(body)
+			        //console.log(body)
 			        let sqldata = ['1', address];
 					let sql = `UPDATE keys
 					            SET swept = ?
