@@ -28,13 +28,14 @@ let db = new sqlite3.Database('./db/db.db', (err) => {
   }
 });
 
-
 /*
 	This endpoint is used to check if a payment has been made by www
 	it is not essetial but someone may want to add this to a control pabel or the final ste of the checkout.
 
 
 */
+
+//pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer.
 app.get('/api/monitor', (req, res) => {
 
 	var address = "n36v3wZBnxntAjLT3P1T9XWpX3SmocPpB1"
@@ -92,7 +93,7 @@ app.get('/api/monitor', (req, res) => {
 
 
 
-//display address to the user
+//generate an address and output it
 app.get('/api/address', (req, res) => {
 	//generate the key pair using the makeRandom functions (there a bunch of ways to make an address btw)
 	let keyPair = bitcoin.ECPair.makeRandom({ network: TestNet });
