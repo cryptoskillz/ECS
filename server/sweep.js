@@ -127,6 +127,8 @@ db.all(sql, [], (err, rows) => {
 			request(options, function (error, response, body) {
 				 //console.log(body)
 				 //console.log(error)
+				 //console.log( response.statusCode)
+
 			     //console.log(response)
 			    if (!error && response.statusCode == 200) {
 			        // Print out the response body
