@@ -1,4 +1,7 @@
 
+var serverurl = "http://127.0.0.1:3000/";
+var ajaxdata = '';
+
 function setCookie(cname, cvalue) {
 	document.cookie = cname + "="  +cvalue+ "; path=/";
 }
@@ -17,6 +20,54 @@ function getCookie(cname) {
     }
     return '';
 }
+
+function loginDone()
+{
+	var result = $.parseJSON(ajaxdata);
+	if (result.token != 0)
+	{
+		setCookie('srcookie',result.token);
+		window.location.href = "index.html";
+	}
+	else
+	{
+		alert('invalid login details');
+	}
+
+	//console.log(result.token)
+}
+function ajaxGET(url,parentcallback)
+{
+   // console.log('dddd');
+   //console.log('url'+url);
+
+  //console.log(parentcallback);
+  	$.ajaxSetup ({
+	    cache: false
+	});
+	var jqxhr = $.get(url, function(data) { })
+  	.success(function(result) {
+  		//logIt(result);
+  		ajaxdata = result;
+  		
+  		var tmpFunc = new Function(parentcallback);
+		tmpFunc();
+
+	})
+  	.error(function(result) {
+
+   	})
+  	.complete(function() {
+  	});
+}
+
+$('#login').click(function() 
+{
+  uname = $('#username').val();
+  pass = $('#password').val();
+  var url = serverurl+'admin/login?uname='+uname+'&pass='+pass;
+  ajaxGET(url,"loginDone()");
+});
 
 
 $(document).ready(function() 
