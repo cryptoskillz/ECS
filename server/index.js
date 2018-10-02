@@ -38,7 +38,52 @@ app.get('/admin/login', (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
     res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-	res.send(JSON.stringify({token: "12345"}));
+    //get username and password passed up
+    let data = [req.query.uname, req.query.pass];
+    //build sql
+	let sql = `select * from user
+	            WHERE username = '`+req.query.uname+`' and password = '`+req.query.pass+`'`;
+
+	//run the sql
+	db.all(sql, [], (err, rows) => {
+	  if (err) {
+	    throw err;
+	  }
+	  //check we have a result
+	  if (rows.length != 0)
+	  {
+	  	//make a guid
+	  	var u='';
+	  	var i=0;
+		  while(i++<36) {
+		    var c='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'[i-1],r=Math.random()*16|0,v=c=='x'?r:(r&0x3|0x8);
+		    u+=(c=='-'||c=='4')?c:v.toString(16)
+		  }
+  		sessiontoken = u;
+  		//update the table with the guid
+	  	let data = [sessiontoken,rows[0].id];
+		let sql = `UPDATE user
+		            SET sessiontoken = ?
+		            WHERE id = ? `;
+		 
+		db.run(sql, data, function(err) {
+		  if (err) {
+		    return console.error(err.message);
+		  }
+		  //oupt guid to api request
+		 res.send(JSON.stringify({token: sessiontoken}));
+		});
+	  	
+	  }
+	  else
+	  {
+	  	res.send(JSON.stringify({token: "0"}));	
+	  }
+	 });
+	
+	//console.log(req.query.uname);
+	//console.log(req.query.pass);
+	
 });
 
 /*
