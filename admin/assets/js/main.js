@@ -1,6 +1,7 @@
 
 var serverurl = "http://127.0.0.1:3000/";
 var ajaxdata = '';
+var token = '';
 
 function setCookie(cname, cvalue) {
 	document.cookie = cname + "="  +cvalue+ "; path=/";
@@ -21,11 +22,140 @@ function getCookie(cname) {
     return '';
 }
 
+function settingsDone()
+{
+	var result = $.parseJSON(ajaxdata);
+	//debug
+	//console.log(result.results[0]);
+	if (result.results[0] != '0')
+	{
+		//alert(result.results[0].coldstorageaddress);
+		$('#address').val(result.results[0].coldstorageaddress);
+	}
+	else
+	{
+		alert('settings not updated');
+	}
+	
+}
+
+function updatesettigsDone()
+{
+	var result = $.parseJSON(ajaxdata);
+	console.log(result);
+}
+
+function checkProcessedDone()
+{
+	var result = $.parseJSON(ajaxdata);
+	if (result.status == 'confirmed')
+	{
+		var geturl = serverurl+'admin/payments?token='+token;
+		ajaxGET(geturl,"paymentsDone()");
+	}
+	else
+	{
+		alert('Payment not confirmed');
+	}
+}
+
+function checkProcessed(address)
+{
+	var geturl = serverurl+'api/monitor?address='+address+'&token='+token;
+	//alert(geturl);
+	ajaxGET(geturl,"checkProcessedDone()");
+}
+
+function checkSwept(address)
+{
+	var geturl = serverurl+'api/sweep?address='+address+'&token='+token;
+	//alert(geturl);
+	ajaxGET(geturl,"checkSweptDone()");
+}
+
+
+function checkSweptDone()
+{
+	var result = $.parseJSON(ajaxdata);
+	if (result.status == 'swept')
+	{
+		var geturl = serverurl+'admin/payments?token='+token;
+		ajaxGET(geturl,"paymentsDone()");
+	}
+	else
+	{
+		if (result.status == "already swept")
+		{
+			alert('Payment already swept');
+			var geturl = serverurl+'admin/payments?token='+token;
+			ajaxGET(geturl,"paymentsDone()");
+		}
+		if (result.status == "not swept")
+			alert('Payment not swept');
+	}
+}
+
+
+
+function paymentsDone()
+{
+	var result = $.parseJSON(ajaxdata);
+	//console.log(result.results);
+	//console.log(ajaxdata);
+	var t = $('#example').DataTable();
+	t
+    .clear()
+    .draw();
+	jQuery.each( result.results, function( index, res )
+	{
+		//console.log(res);
+		//net 1 = live 2 = test
+		var processed = 'Yes';
+		var swept = 'No';
+		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
+		//set the block explorer url
+		blockexplorerurl = blockexplorerurl+res.address+'/';
+		var actions = '<a href="'+blockexplorerurl+'" target="_blank"><i class="fas fa-external-link-square-alt"></i>View</a>'
+		if (res.processed == 0)
+		{	
+			//set processed to no
+			processed = 'No';
+			//add the check button
+			actions = actions + '<a href="javascript:checkProcessed(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Process</a>'
+
+		}
+		else
+		{
+			if (res.swept == 0)
+			{
+				actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Sweep</a>'
+			}
+
+		}
+		
+	
+		t.row.add( [
+			res.id,
+			'<a href="'+blockexplorerurl+'" target="_blank">'+res.address+'</a>',
+			processed,
+			swept,
+			res.amount,
+			actions
+		] ).draw( false );
+	});
+	
+ 
+	
+ 
+    
+}
+
 function loginDone()
 {
 	var result = $.parseJSON(ajaxdata);
 	if (result.token != 0)
 	{
+		
 		setCookie('srcookie',result.token);
 		window.location.href = "index.html";
 	}
@@ -61,35 +191,43 @@ function ajaxGET(url,parentcallback)
   	});
 }
 
+
+updatesettings
+
+$('#updatesettings').click(function() 
+{
+  address = $('#address').val();
+  //alert(address);
+ // pass = $('#password').val();
+  var geturl = serverurl+'admin/updatesettigs?address='+address+'&token='+token;
+  ajaxGET(geturl,"updatesettigsDone()");
+});
+
 $('#login').click(function() 
 {
   uname = $('#username').val();
   pass = $('#password').val();
-  var url = serverurl+'admin/login?uname='+uname+'&pass='+pass;
-  ajaxGET(url,"loginDone()");
+  var geturl = serverurl+'admin/login?uname='+uname+'&pass='+pass;
+  ajaxGET(geturl,"loginDone()");
 });
 
 
 $(document).ready(function() 
 {
-    //check for login
-
+	//get the cookie
+    token = getCookie('srcookie');
     //debug
+    //console.log(token);
     //setCookie('srcookie','12345');
     //force login
     //setCookie('srcookie','');
-
-
-    //get the cookie
-    var x = getCookie('srcookie');
-    //debug
-    //console.log(x);
+    //get the url
+    var url = window.location.href;
 
     //check if it is blank
-    if (x == '')
+    if (token == '') 
     {
-    	//get the url
-    	var url = window.location.href;
+    	
     	//check if it is not login and redirect
     	if (url.substr(url.lastIndexOf('/') + 1) != 'login.html')
     	{
@@ -99,20 +237,35 @@ $(document).ready(function()
     }
     else
     {
-    	//check if we are on login page and if so redirect to logged in page
-    	var url = window.location.href;
-    	if (url.substr(url.lastIndexOf('/') + 1) == 'login.html')
-    	{
-    		window.location.href = "index.html";
-    	}
-    	else
-    	{
-	    	//we could look verify here but we may as welll do that when a request to the server is made
-	    	$('#wrapper').removeClass('d-none');
-	    	//load the table
-	    	$('#example').DataTable();
-    	}
+    	//check what page we are on
+		//check if it is the payment page
+		if (url.substr(url.lastIndexOf('/') + 1) == 'payments.html')
+		{
+			//alert(token);
+			//make a server call
+			var geturl = serverurl+'admin/payments?token='+token;
+			ajaxGET(geturl,"paymentsDone()");
+		}
+		if (url.substr(url.lastIndexOf('/') + 1) == 'settings.html')
+		{
+			//make a server call
+			var geturl = serverurl+'admin/settings?token='+token;
+			ajaxGET(geturl,"settingsDone()");
+		}
+    	$('#wrapper').removeClass('d-none');
+    	//load the table
+    	
+    	
     }
+    
+
+	
+
+  
+
+    
+
+
 
 
 } );

@@ -33,6 +33,121 @@ let db = new sqlite3.Database('./db/db.db', (err) => {
 start of admin functions
 */
 
+
+
+app.get('/admin/updatesettigs', (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+     let sql = `select user.id 
+    		    from user
+	            WHERE user.sessiontoken = '`+req.query.token+`'`;
+	//run the sql
+	db.all(sql, [], (err, rows) => {
+	  if (err) {
+	    throw err;
+	  }
+	  ///console.log(rows);
+	  //check we have a result
+	  if (rows.length == 0)
+	  {
+	  	res.send(JSON.stringify({results: "error"}));	
+	  }
+	  else
+	  {
+	  	let data = [req.query.address,rows[0].id];
+		let sql = `UPDATE usersettings
+		            SET coldstorageaddress = ?
+		            WHERE userid = ? `;
+		 
+		db.run(sql, data, function(err) {
+		  if (err) {
+		  res.send(JSON.stringify({results: "error"}));	
+		  }
+		  //oupt guid to api request
+		  res.send(JSON.stringify({results: "ok"}));	
+		});
+		
+
+	  }
+	 }); 
+    
+
+});
+
+
+app.get('/admin/settings', (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+    let sql = `select usersettings.coldstorageaddress 
+    		   from user
+    		   INNER JOIN usersettings ON user.id = usersettings.userid
+	           WHERE user.sessiontoken = '`+req.query.token+`'`;
+	//run the sql
+	var jsonStr = '{"results":[]}';
+	var obj = JSON.parse(jsonStr);
+	db.all(sql, [], (err, rows) => {
+	  if (err) {
+	    throw err;
+	  }
+	  ///console.log(rows);
+	  //check we have a result
+	  if (rows.length == 0)
+	  {
+	  	res.send(JSON.stringify({results: "0"}));	
+	  }
+	  else
+	  {
+		obj['results'].push(rows[0]);
+		jsonStr = JSON.stringify(obj);
+		//console.log('done');
+		//console.log(jsonStr);
+		res.send(jsonStr);
+
+	  }
+	 }); 
+
+    
+
+});
+
+app.get('/admin/payments', (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+
+    let sql = `select keys.id,keys.address,keys.processed,keys.swept,keys.net,keys.amount 
+    		   from user
+    		   INNER JOIN keys ON user.id = keys.userid
+	           WHERE user.sessiontoken = '`+req.query.token+`'`;
+
+	var jsonStr = '{"results":[]}';
+	var obj = JSON.parse(jsonStr);
+	//jsonStr = JSON.stringify(obj)
+	db.all(sql, [], (err, rows) => {
+	  if (err) {
+	    throw err;
+	  }
+	 rows.forEach((row) => {
+	 	//console.log(row);
+	 	//myObj.push(row);
+	 	//obj.push('dsss');
+	 	obj['results'].push(row);
+
+
+	 });
+	 jsonStr = JSON.stringify(obj);
+	 //console.log('done');
+	 //console.log(jsonStr);
+	 res.send(jsonStr);
+
+	});
+});
+
 app.get('/admin/login', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
@@ -99,9 +214,15 @@ end of admin functions
 
 //pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer.
 app.get('/api/monitor', (req, res) => {
-
-	var address = "n36v3wZBnxntAjLT3P1T9XWpX3SmocPpB1"
-	 block_io.get_address_balance({'address': address}, function (error, data)
+	res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+   
+	//var address = "n36v3wZBnxntAjLT3P1T9XWpX3SmocPpB1"
+	//todo check the token is valid to check
+	//console.log(req.query)
+	 block_io.get_address_balance({'address': req.query.address}, function (error, data)
 	{
 		//debug
 		//console.log(data.data);
@@ -119,11 +240,12 @@ app.get('/api/monitor', (req, res) => {
 	  	//console.log(pendingbalance);
 	  	if (balance > 0)
 	  	{
-	  		console.log('we got it');
+	  		//console.log('we got it');
 	  		//update the database that the payment is successful
-	  		let data = ['1', address];
+	  		let data = ['1',balance, req.query.address];
 			let sql = `UPDATE keys
-			            SET processed = ?
+			            SET processed = ?,
+			            	amount = ?
 			            WHERE address = ?`;
 			 
 			db.run(sql, data, function(err) {
@@ -153,6 +275,168 @@ app.get('/api/monitor', (req, res) => {
 	
 })
 
+app.get('/api/sweep', (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+
+    //TODO check token to see if the user is allowed to do this
+    let sql = `SELECT * FROM keys where address = "`+req.query.address+`" and swept = 0`;
+    db.all(sql, [], (err, rows) => {
+	  if (err) {
+	    throw err;
+	  }
+	  //check we have a result
+	  if (rows.length != 0)
+	  {
+	  	    //get the address
+	  	    //console.log(rows[0])
+		    var address =  rows[0].address;
+		    //get the private key
+		    var privateKey = rows[0].privatekey;
+		    //debug
+		    //console.log(row);
+		    //console.log(address);
+		   	//console.log(privateKey);
+		    //get the transactions
+		    //note: We should only have one transaction in this address so we can make some assumpation. We would however harden this 
+				    //		function before it was used in any production enviorment.
+		    block_io.get_transactions({'type': 'received', 'addresses': address}, function (error, data)
+			{
+				//todo : check for no transactions
+				//console.dir(data, { depth: null });
+				//check it is not already confirmed
+				if (data.data.txs[0].confirmations > 3)
+				{
+					let sqldata = ['1', address];
+					let sql = `UPDATE keys
+							   	SET swept = ?
+							    WHERE address = ?`;
+							 
+					db.run(sql, sqldata, function(err) {
+					  if (err) {
+					   // return console.error(err.message);
+					  }
+
+						res.send(JSON.stringify({status: "already swept"}));
+						return;
+					 
+					});
+					
+					
+				}
+				else
+				{
+				
+					//get the tx transaction id
+					var txid = data.data.txs[0].txid;
+					//get the amount in the transaction
+					let amountReceived = data.data.txs[0].amounts_received[0].amount;
+					//debug
+					//console.log(amountReceived);
+					//console.log(txid);
+							//estimate the fee
+					//note : We are using block.io to estimate the fee but we will of course do this ourselves later.
+					block_io.get_network_fee_estimate({'amounts': amountReceived, 'to_addresses': process.env.toaddress}, function (error2, data2)
+					{
+						//console.log(data2);
+									//store the network fee.
+						var networkfee = data2.data.estimated_network_fee;
+						//debug
+						//console.log(networkfee);
+						//console.log(data2.data.estimated_network_fee);
+									//init a new transaction
+
+						let tx = new bitcoin.TransactionBuilder(TestNet);
+						//get the WIF from the private key so we can sign the transaction later.
+						let hotKeyPair = new bitcoin.ECPair.fromWIF(privateKey, TestNet)
+						//debug
+						//console.log(privateKey);
+						//console.log(hotKeyPair);
+						//work out the amount to send 
+						//let amountToSend =  amountReceivedSatoshi - networkfee   ;
+						let amountToSend =  amountReceived - networkfee   ;
+						//turn the amount recieved into satoshis 
+						//note : Satoshi information can be found here https://en.bitcoin.it/wiki/Satoshi_(unit)
+						amountToSendSatoshi = amountToSend * 100000000;
+						//debug
+						//console.log(amountReceivedSatoshi);
+						//console.log(networkfee);
+						//console.log(amountToSend);
+						//add the input the transaction we are building
+						//note txid = we got fron the get transaction type
+						//	   0 = is the first transaction to be safe we could parse data object and return the correct one 
+						//	   0xfffffffe = no idea will have to read up on this
+						tx.addInput(txid, 0, 0xfffffffe);
+						//note : this seems to do the fee on of its own accord.
+						tx.addOutput(process.env.toaddress, amountToSendSatoshi);
+						//sign the transaction with our private key
+						tx.sign(0, hotKeyPair);
+						//output it
+						//note we have to figure out how to push this to the network and not use https://testnet.blockchain.info/pushtx
+						//console.log(tx.build().toHex());
+
+						// Set the headers
+						var headers = {
+						    'User-Agent':       'Super Agent/0.0.1',
+						    'Content-Type':     'application/x-www-form-urlencoded'
+						}
+
+						// Configure the request
+						var options = {
+						    url: 'https://testnet.blockchain.info/pushtx',
+						    method: 'POST',
+						    headers: headers,
+						    form: {'tx': tx.build().toHex()}
+						}
+
+						// Start the request
+						request(options, function (error, response, body) {
+							 //console.log(body)
+							 console.log(error)
+							 //console.log( response.statusCode)
+
+						     //console.log(response)
+						    if (!error && response.statusCode == 200) {
+						        // Print out the response body
+						        //console.log(body)
+						        let sqldata = ['1', address];
+								let sql = `UPDATE keys
+								            SET swept = ?
+								            WHERE address = ?`;
+								 
+								db.run(sql, sqldata, function(err) {
+								  if (err) {
+								    return console.error(err.message);
+								  }
+
+								 res.send(JSON.stringify({status: "swept"}));
+								 
+								});
+						    }
+						})
+
+			
+
+					});
+
+				}
+
+			});
+
+
+
+	  	
+	  }
+	  else
+	  {
+	  	res.send(JSON.stringify({status: "not swept"}));
+	  }
+	})
+
+	
+})
 
 
 //generate an address and output it
