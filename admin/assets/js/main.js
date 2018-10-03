@@ -1,12 +1,18 @@
 
+//server call to make the AJAX calls to
+//note:  we should find to set this less manually
 var serverurl = "http://127.0.0.1:3000/";
+//hold the return from the server
 var ajaxdata = '';
+//hold the session token 
 var token = '';
 
+//set a cookie
 function setCookie(cname, cvalue) {
 	document.cookie = cname + "="  +cvalue+ "; path=/";
 }
 
+//get a cookie
 function getCookie(cname) {
 	var i, c, ca, nameEQ = cname + "=";
     ca = document.cookie.split(';');
@@ -22,6 +28,7 @@ function getCookie(cname) {
     return '';
 }
 
+//process the return from the server settings calls
 function settingsDone()
 {
 	var result = $.parseJSON(ajaxdata);
@@ -39,22 +46,42 @@ function settingsDone()
 	
 }
 
+//process he return form the update settings call
+//note: I know this should be on the post for the settings endpoint but I have been lazy.  Will refactor it later.
 function updatesettigsDone()
 {
+	//get the result
 	var result = $.parseJSON(ajaxdata);
-	console.log(result);
+	//debug
+	//console.log(result.results);
+	//check update status
+	if (result.results == 'ok')
+	{
+		alert('settings updated');
+
+	}
+	else
+	{
+		alert('eror updating settings');
+	}
+	
 }
 
+//check the result from the processed server call
 function checkProcessedDone()
 {
+	//process the result
 	var result = $.parseJSON(ajaxdata);
+	//check the status
 	if (result.status == 'confirmed')
 	{
+		//refresh the payment table
 		var geturl = serverurl+'admin/payments?token='+token;
 		ajaxGET(geturl,"paymentsDone()");
 	}
 	else
 	{
+		//alert the user to an error
 		alert('Payment not confirmed');
 	}
 }
@@ -257,15 +284,5 @@ $(document).ready(function()
     	
     	
     }
-    
-
-	
-
-  
-
-    
-
-
-
 
 } );
