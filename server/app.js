@@ -465,7 +465,7 @@ app.get('/api/address', (req, res) => {
     res.send(JSON.stringify({address: address.address}));
     return;
 })
-//console.log('Pay me f00l '+address.address)
+console.log('up and at em ')
 
 var port = process.env.PORT || 3000;
 	app.listen( port );

@@ -1,7 +1,14 @@
 
 //server call to make the AJAX calls to
-//note:  we should find to set this less manually
-var serverurl = "http://127.0.0.1:3000/";
+//set url to production
+var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
+//check if we are local
+//note : set this whatever your local instance is 127.0.0.1 for example
+if(window.location.href.indexOf("srcrypto") > -1) 
+{
+	serverurl = "http://127.0.0.1:3000/";
+}
+
 //hold the return from the server
 var ajaxdata = '';
 //hold the session token 

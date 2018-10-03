@@ -1,8 +1,14 @@
 jQuery(document).ready(function($)
 {
-
-	//set the server url.
-	var serverurl = "http://127.0.0.1:3000/";
+	//set url to production
+	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
+	//check if we are local
+	//note : set this whatever your local instance is 127.0.0.1 for example
+	if(window.location.href.indexOf("srcryptowww") > -1) 
+	{
+		serverurl = "http://127.0.0.1:3000/";
+	}
+	//alert(serverurl);
 	//set the address
 	var address = '';
 	//init price var
