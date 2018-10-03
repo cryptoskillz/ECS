@@ -37,6 +37,8 @@ function setHeaders(res)
     return(res);
 }
 
+
+
 /*
 ========================
 END OF GENERIC FUNCTION
@@ -53,9 +55,11 @@ START OF ADMIN FUNCTION
 
 
 //update the settings
-app.get('/admin/updatesettigs', (req, res) => {
+app.get('/admin/updatesettings', (req, res) => {
 	//set the headers
 	res = setHeaders(res);
+
+	//check if it is a zero and if so return error
 
 	let sql = `select user.id 
     		   from user
@@ -159,6 +163,8 @@ app.get('/admin/payments', (req, res) => {
 app.get('/admin/login', (req, res) => {
 	//set the headers
 	res = setHeaders(res);
+	
+
 	//get username and password passed up
     let data = [req.query.uname, req.query.pass];
     //build sql
@@ -461,6 +467,6 @@ app.get('/api/address', (req, res) => {
 })
 //console.log('Pay me f00l '+address.address)
 
+var port = process.env.PORT || 3000;
+	app.listen( port );
 
-app.listen(3000, () => {
-});

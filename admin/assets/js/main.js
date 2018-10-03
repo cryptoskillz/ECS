@@ -155,7 +155,7 @@ function paymentsDone()
 
 		//vars 
 		var processed = 'Yes';
-		var swept = 'No';
+		var swept = 'Yes';
 		//set the block explorer url
 		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
 		blockexplorerurl = blockexplorerurl+res.address+'/';
@@ -177,6 +177,7 @@ function paymentsDone()
 			if (res.swept == 0)
 			{
 				//add to the acction 
+				swept = "No";
 				actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Sweep</a>'
 			}
 
