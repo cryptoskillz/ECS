@@ -8,15 +8,8 @@ var bitcoin = require('bitcoinjs-lib');
 const sqlite3 = require('sqlite3').verbose();
 //init it
 const app = express();
-//work bitch
-/*
-var path = require('path');
-console.log(path.join(__dirname, 'cdn/'))
-app.use(express.static(path.join(__dirname, 'cdn/'))); //  "public" off of current is root
-*/
 //set up the network we would like to connect to. in this case test net.
 const TestNet = bitcoin.networks.testnet
-
 var BlockIo = require('block_io');
 var version = 2; // API version
 var block_io = new BlockIo(process.env.blockiokey,process.env.blockiosecret, version);
@@ -30,11 +23,13 @@ let db = new sqlite3.Database('./db/db.db', (err) => {
 
 
 /*
-start of admin functions
+========================
+START OF ADMIN FUNCTION
+========================
 */
 
 
-
+//update the settings
 app.get('/admin/updatesettigs', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
@@ -68,15 +63,12 @@ app.get('/admin/updatesettigs', (req, res) => {
 		  //oupt guid to api request
 		  res.send(JSON.stringify({results: "ok"}));	
 		});
-		
-
 	  }
 	 }); 
-    
-
 });
 
 
+//return the admin settings
 app.get('/admin/settings', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
@@ -109,11 +101,9 @@ app.get('/admin/settings', (req, res) => {
 
 	  }
 	 }); 
-
-    
-
 });
 
+//return a list of payments
 app.get('/admin/payments', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
@@ -148,6 +138,7 @@ app.get('/admin/payments', (req, res) => {
 	});
 });
 
+//login the user in
 app.get('/admin/login', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
@@ -194,21 +185,17 @@ app.get('/admin/login', (req, res) => {
 	  {
 	  	res.send(JSON.stringify({token: "0"}));	
 	  }
-	 });
-	
-	//console.log(req.query.uname);
-	//console.log(req.query.pass);
-	
+	 });	
 });
 
 /*
-end of admin functions
-*/
+========================
+END OF ADMIN FUNCTION
+========================*/
 
 /*
 	This endpoint is used to check if a payment has been made by www
 	it is not essetial but someone may want to add this to a control pabel or the final ste of the checkout.
-
 
 */
 
@@ -275,6 +262,7 @@ app.get('/api/monitor', (req, res) => {
 	
 })
 
+//move a payment to cold storage
 app.get('/api/sweep', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
