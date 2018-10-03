@@ -278,157 +278,149 @@ app.get('/api/sweep', (req, res) => {
 	  //check we have a result
 	  if (rows.length != 0)
 	  {
-	  	    //get the address
-	  	    //console.log(rows[0])
-		    var address =  rows[0].address;
-		    //get the private key
-		    var privateKey = rows[0].privatekey;
-		    //debug
-		    //console.log(row);
-		    //console.log(address);
-		   	//console.log(privateKey);
-		    //get the transactions
-		    //note: We should only have one transaction in this address so we can make some assumpation. We would however harden this 
-				    //		function before it was used in any production enviorment.
-		    block_io.get_transactions({'type': 'received', 'addresses': address}, function (error, data)
+	  	//get the address
+	  	//console.log(rows[0])
+	    var address =  rows[0].address;
+	    //get the private key
+	    var privateKey = rows[0].privatekey;
+	    //debug
+	    //console.log(row);
+	    //console.log(address);
+	   	//console.log(privateKey);
+	    //get the transactions
+	    //note: We should only have one transaction in this address so we can make some assumpation. We would however harden this 
+		//		function before it was used in any production enviorment.
+	    
+	    block_io.get_transactions({'type': 'received', 'addresses': address}, function (error, data)
+		{
+			//todo : check for no transactions
+			//console.dir(data, { depth: null });
+			//check it is not already confirmed
+			if (data.data.txs[0].confirmations > 3)
 			{
-				//todo : check for no transactions
-				//console.dir(data, { depth: null });
-				//check it is not already confirmed
-				if (data.data.txs[0].confirmations > 3)
-				{
-					let sqldata = ['1', address];
-					let sql = `UPDATE keys
-							   	SET swept = ?
-							    WHERE address = ?`;
-							 
-					db.run(sql, sqldata, function(err) {
-					  if (err) {
-					   // return console.error(err.message);
-					  }
+				let sqldata = ['1', address];
+				let sql = `UPDATE keys
+						   	SET swept = ?
+						    WHERE address = ?`;
+						 
+				db.run(sql, sqldata, function(err) {
+				  if (err) {
+				   // return console.error(err.message);
+				  }
 
-						res.send(JSON.stringify({status: "already swept"}));
-						return;
-					 
-					});
-					
-					
-				}
-				else
+					res.send(JSON.stringify({status: "already swept"}));
+					return;
+				 
+				});
+			}
+			else
+			{
+				//get the tx transaction id
+				var txid = data.data.txs[0].txid;
+				//get the amount in the transaction
+				let amountReceived = data.data.txs[0].amounts_received[0].amount;
+				//debug
+				//console.log(amountReceived);
+				//console.log(txid);
+						//estimate the fee
+				//note : We are using block.io to estimate the fee but we will of course do this ourselves later.
+				block_io.get_network_fee_estimate({'amounts': amountReceived, 'to_addresses': process.env.toaddress}, function (error2, data2)
 				{
-				
-					//get the tx transaction id
-					var txid = data.data.txs[0].txid;
-					//get the amount in the transaction
-					let amountReceived = data.data.txs[0].amounts_received[0].amount;
+					//console.log(data2);
+								//store the network fee.
+					var networkfee = data2.data.estimated_network_fee;
 					//debug
-					//console.log(amountReceived);
-					//console.log(txid);
-							//estimate the fee
-					//note : We are using block.io to estimate the fee but we will of course do this ourselves later.
-					block_io.get_network_fee_estimate({'amounts': amountReceived, 'to_addresses': process.env.toaddress}, function (error2, data2)
-					{
-						//console.log(data2);
-									//store the network fee.
-						var networkfee = data2.data.estimated_network_fee;
-						//debug
-						//console.log(networkfee);
-						//console.log(data2.data.estimated_network_fee);
-									//init a new transaction
+					//console.log(networkfee);
+					//console.log(data2.data.estimated_network_fee);
+								//init a new transaction
 
-						let tx = new bitcoin.TransactionBuilder(TestNet);
-						//get the WIF from the private key so we can sign the transaction later.
-						let hotKeyPair = new bitcoin.ECPair.fromWIF(privateKey, TestNet)
-						//debug
-						//console.log(privateKey);
-						//console.log(hotKeyPair);
-						//work out the amount to send 
-						//let amountToSend =  amountReceivedSatoshi - networkfee   ;
-						let amountToSend =  amountReceived - networkfee   ;
-						//turn the amount recieved into satoshis 
-						//note : Satoshi information can be found here https://en.bitcoin.it/wiki/Satoshi_(unit)
-						amountToSendSatoshi = amountToSend * 100000000;
-						//debug
-						//console.log(amountReceivedSatoshi);
-						//console.log(networkfee);
-						//console.log(amountToSend);
-						//add the input the transaction we are building
-						//note txid = we got fron the get transaction type
-						//	   0 = is the first transaction to be safe we could parse data object and return the correct one 
-						//	   0xfffffffe = no idea will have to read up on this
-						tx.addInput(txid, 0, 0xfffffffe);
-						//note : this seems to do the fee on of its own accord.
-						tx.addOutput(process.env.toaddress, amountToSendSatoshi);
-						//sign the transaction with our private key
-						tx.sign(0, hotKeyPair);
-						//output it
-						//note we have to figure out how to push this to the network and not use https://testnet.blockchain.info/pushtx
-						//console.log(tx.build().toHex());
+					let tx = new bitcoin.TransactionBuilder(TestNet);
+					//get the WIF from the private key so we can sign the transaction later.
+					let hotKeyPair = new bitcoin.ECPair.fromWIF(privateKey, TestNet)
+					//debug
+					//console.log(privateKey);
+					//console.log(hotKeyPair);
+					//work out the amount to send 
+					//let amountToSend =  amountReceivedSatoshi - networkfee   ;
+					let amountToSend =  amountReceived - networkfee   ;
+					//turn the amount recieved into satoshis 
+					//note : Satoshi information can be found here https://en.bitcoin.it/wiki/Satoshi_(unit)
+					amountToSendSatoshi = amountToSend * 100000000;
+					//debug
+					//console.log(amountReceivedSatoshi);
+					//console.log(networkfee);
+					//console.log(amountToSend);
+					//add the input the transaction we are building
+					//note txid = we got fron the get transaction type
+					//	   0 = is the first transaction to be safe we could parse data object and return the correct one 
+					//	   0xfffffffe = no idea will have to read up on this
+					tx.addInput(txid, 0, 0xfffffffe);
+					//note : this seems to do the fee on of its own accord.
+					tx.addOutput(process.env.toaddress, amountToSendSatoshi);
+					//sign the transaction with our private key
+					tx.sign(0, hotKeyPair);
+					//output it
+					//note we have to figure out how to push this to the network and not use https://testnet.blockchain.info/pushtx
+					//console.log(tx.build().toHex());
 
-						// Set the headers
-						var headers = {
-						    'User-Agent':       'Super Agent/0.0.1',
-						    'Content-Type':     'application/x-www-form-urlencoded'
-						}
+					// Set the headers
+					var headers = {
+					    'User-Agent':       'Super Agent/0.0.1',
+					    'Content-Type':     'application/x-www-form-urlencoded'
+					}
 
-						// Configure the request
-						var options = {
-						    url: 'https://testnet.blockchain.info/pushtx',
-						    method: 'POST',
-						    headers: headers,
-						    form: {'tx': tx.build().toHex()}
-						}
+					// Configure the request
+					var options = {
+					    url: 'https://testnet.blockchain.info/pushtx',
+					    method: 'POST',
+					    headers: headers,
+					    form: {'tx': tx.build().toHex()}
+					}
 
-						// Start the request
-						request(options, function (error, response, body) {
-							 //console.log(body)
-							 console.log(error)
-							 //console.log( response.statusCode)
+					// Start the request
+					request(options, function (error, response, body) {
+						 //console.log(body)
+						 console.log(error)
+						 //console.log( response.statusCode)
 
-						     //console.log(response)
-						    if (!error && response.statusCode == 200) {
-						        // Print out the response body
-						        //console.log(body)
-						        let sqldata = ['1', address];
-								let sql = `UPDATE keys
-								            SET swept = ?
-								            WHERE address = ?`;
-								 
-								db.run(sql, sqldata, function(err) {
-								  if (err) {
-								    return console.error(err.message);
-								  }
+					     //console.log(response)
+					    if (!error && response.statusCode == 200) {
+					        // Print out the response body
+					        //console.log(body)
+					        let sqldata = ['1', address];
+							let sql = `UPDATE keys
+							            SET swept = ?
+							            WHERE address = ?`;
+							 
+							db.run(sql, sqldata, function(err) {
+							  if (err) {
+							    return console.error(err.message);
+							  }
 
-								 res.send(JSON.stringify({status: "swept"}));
-								 
-								});
-						    }
-						})
-
-			
-
-					});
-
-				}
-
-			});
-
-
-
-	  	
+							 res.send(JSON.stringify({status: "swept"}));
+							 
+							});
+					    }
+					})
+				});
+			}
+		});
 	  }
 	  else
 	  {
 	  	res.send(JSON.stringify({status: "not swept"}));
 	  }
 	})
-
-	
 })
 
 
 //generate an address and output it
 app.get('/api/address', (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+
 	//generate the key pair using the makeRandom functions (there a bunch of ways to make an address btw)
 	let keyPair = bitcoin.ECPair.makeRandom({ network: TestNet });
 	//extract the publickey
@@ -448,7 +440,6 @@ app.get('/api/address', (req, res) => {
 	//debug
 	//console.log(address);
 
-
 	//store it in the database
 	//note: Not 100% sure that we have to store the public kkey
 	db.run(`INSERT INTO keys(address,privatekey,publickey) VALUES(?,?,?)`, [address.address,privateKey,publicKey], function(err) {
@@ -459,13 +450,6 @@ app.get('/api/address', (req, res) => {
 	//debug
 	//console.log(this.lastID);
 	});
-
-
-	res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-
     res.send(JSON.stringify({address: address.address}));
     return;
 })
