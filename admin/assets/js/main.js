@@ -86,6 +86,7 @@ function checkProcessedDone()
 	}
 }
 
+//call the server to see if the payment has been processed
 function checkProcessed(address)
 {
 	var geturl = serverurl+'api/monitor?address='+address+'&token='+token;
@@ -93,6 +94,7 @@ function checkProcessed(address)
 	ajaxGET(geturl,"checkProcessedDone()");
 }
 
+//call the server and move the payment to cold storage.
 function checkSwept(address)
 {
 	var geturl = serverurl+'api/sweep?address='+address+'&token='+token;
@@ -100,67 +102,87 @@ function checkSwept(address)
 	ajaxGET(geturl,"checkSweptDone()");
 }
 
-
+//check the results of the sever 
 function checkSweptDone()
 {
+	//process results
 	var result = $.parseJSON(ajaxdata);
+	//check if it ws swept
 	if (result.status == 'swept')
 	{
+		//reload the payments page
 		var geturl = serverurl+'admin/payments?token='+token;
 		ajaxGET(geturl,"paymentsDone()");
 	}
 	else
 	{
+		//check the error
 		if (result.status == "already swept")
 		{
+			//already moved to cold storage
 			alert('Payment already swept');
 			var geturl = serverurl+'admin/payments?token='+token;
 			ajaxGET(geturl,"paymentsDone()");
 		}
 		if (result.status == "not swept")
+		{
+			//unknown error
 			alert('Payment not swept');
+		}
 	}
 }
 
 
-
+//process the payments done 
 function paymentsDone()
 {
+	//parse the result
 	var result = $.parseJSON(ajaxdata);
 	//console.log(result.results);
 	//console.log(ajaxdata);
+
+	//grab the table
 	var t = $('#example').DataTable();
+	//empty the table
 	t
     .clear()
     .draw();
+    //loop through the results returned from the server
 	jQuery.each( result.results, function( index, res )
 	{
 		//console.log(res);
 		//net 1 = live 2 = test
+
+		//vars 
 		var processed = 'Yes';
 		var swept = 'No';
-		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
 		//set the block explorer url
+		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
 		blockexplorerurl = blockexplorerurl+res.address+'/';
+		//actions column
 		var actions = '<a href="'+blockexplorerurl+'" target="_blank"><i class="fas fa-external-link-square-alt"></i>View</a>'
+		//check if the payment was processed
 		if (res.processed == 0)
 		{	
 			//set processed to no
 			processed = 'No';
-			//add the check button
+			//add to the action
 			actions = actions + '<a href="javascript:checkProcessed(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Process</a>'
 
 		}
 		else
 		{
+			//check if it was swept
+			//note: you should never have an unprocessed payment that was swept but it does not harm to have this additional check.
 			if (res.swept == 0)
 			{
+				//add to the acction 
 				actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Sweep</a>'
 			}
 
 		}
 		
-	
+		//add the row to the table
 		t.row.add( [
 			res.id,
 			'<a href="'+blockexplorerurl+'" target="_blank">'+res.address+'</a>',
@@ -171,69 +193,84 @@ function paymentsDone()
 		] ).draw( false );
 	});
 	
- 
-	
- 
-    
 }
 
+//process the server return call from login
 function loginDone()
 {
+	//parse the results
 	var result = $.parseJSON(ajaxdata);
+	//debug	
+	//console.log(result.token)
+
+	//check for token
 	if (result.token != 0)
 	{
-		
+		//get the cookie
 		setCookie('srcookie',result.token);
+		//redirect to index page
 		window.location.href = "index.html";
 	}
 	else
 	{
+		//issue with login
 		alert('invalid login details');
 	}
 
-	//console.log(result.token)
 }
+
+//generic ajax call function
 function ajaxGET(url,parentcallback)
 {
-   // console.log('dddd');
-   //console.log('url'+url);
+	//debug
+	//console.log('url'+url);
+	//console.log(parentcallback);
 
-  //console.log(parentcallback);
-  	$.ajaxSetup ({
-	    cache: false
+	//setup
+	$.ajaxSetup ({
+   	 cache: false
 	});
+	//make the call
 	var jqxhr = $.get(url, function(data) { })
-  	.success(function(result) {
-  		//logIt(result);
-  		ajaxdata = result;
-  		
-  		var tmpFunc = new Function(parentcallback);
-		tmpFunc();
+		.success(function(result) {
+			//logIt(result);
+
+			//store the result
+			ajaxdata = result;
+			//set the done funtion
+			var tmpFunc = new Function(parentcallback);
+			//call the done funtion
+			tmpFunc();
+	})
+	.error(function(result) {
 
 	})
-  	.error(function(result) {
-
-   	})
-  	.complete(function() {
-  	});
+	.complete(function() {
+	});
 }
 
-
+//update settings click
 $('#updatesettings').click(function() 
 {
-  address = $('#address').val();
-  //alert(address);
- // pass = $('#password').val();
-  var geturl = serverurl+'admin/updatesettigs?address='+address+'&token='+token;
-  ajaxGET(geturl,"updatesettigsDone()");
+	//get the address
+  	address = $('#address').val();
+  	//debug
+  	//alert(address);
+
+  	//call the server updatesettings url
+  	var geturl = serverurl+'admin/updatesettigs?address='+address+'&token='+token;
+  	ajaxGET(geturl,"updatesettigsDone()");
 });
 
+//login click
 $('#login').click(function() 
 {
-  uname = $('#username').val();
-  pass = $('#password').val();
-  var geturl = serverurl+'admin/login?uname='+uname+'&pass='+pass;
-  ajaxGET(geturl,"loginDone()");
+	//get detals
+ 	uname = $('#username').val();
+ 	pass = $('#password').val();
+ 	//call the login server url
+  	var geturl = serverurl+'admin/login?uname='+uname+'&pass='+pass;
+  	ajaxGET(geturl,"loginDone()");
 });
 
 
@@ -279,8 +316,6 @@ $(document).ready(function()
 		}
     	$('#wrapper').removeClass('d-none');
     	//load the table
-    	
-    	
     }
 
 } );
