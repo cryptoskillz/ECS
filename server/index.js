@@ -24,6 +24,29 @@ let db = new sqlite3.Database('./db/db.db', (err) => {
 
 /*
 ========================
+START OF GENERIC FUNCTION
+========================
+*/
+
+function setHeaders(res)
+{
+	res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+    return(res);
+}
+
+/*
+========================
+END OF GENERIC FUNCTION
+========================
+*/
+
+
+
+/*
+========================
 START OF ADMIN FUNCTION
 ========================
 */
@@ -31,13 +54,12 @@ START OF ADMIN FUNCTION
 
 //update the settings
 app.get('/admin/updatesettigs', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-     let sql = `select user.id 
-    		    from user
-	            WHERE user.sessiontoken = '`+req.query.token+`'`;
+	//set the headers
+	res = setHeaders(res);
+
+	let sql = `select user.id 
+    		   from user
+	           WHERE user.sessiontoken = '`+req.query.token+`'`;
 	//run the sql
 	db.all(sql, [], (err, rows) => {
 	  if (err) {
@@ -70,11 +92,9 @@ app.get('/admin/updatesettigs', (req, res) => {
 
 //return the admin settings
 app.get('/admin/settings', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-    let sql = `select usersettings.coldstorageaddress 
+	//set the headers
+	res = setHeaders(res);    
+	let sql = `select usersettings.coldstorageaddress 
     		   from user
     		   INNER JOIN usersettings ON user.id = usersettings.userid
 	           WHERE user.sessiontoken = '`+req.query.token+`'`;
@@ -105,11 +125,8 @@ app.get('/admin/settings', (req, res) => {
 
 //return a list of payments
 app.get('/admin/payments', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-
+	//set the headers
+	res = setHeaders(res);
     let sql = `select keys.id,keys.address,keys.processed,keys.swept,keys.net,keys.amount 
     		   from user
     		   INNER JOIN keys ON user.id = keys.userid
@@ -140,11 +157,9 @@ app.get('/admin/payments', (req, res) => {
 
 //login the user in
 app.get('/admin/login', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-    //get username and password passed up
+	//set the headers
+	res = setHeaders(res);
+	//get username and password passed up
     let data = [req.query.uname, req.query.pass];
     //build sql
 	let sql = `select * from user
@@ -201,11 +216,8 @@ END OF ADMIN FUNCTION
 
 //pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer.
 app.get('/api/monitor', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-   
+	//set the headers
+	res = setHeaders(res);   
 	//var address = "n36v3wZBnxntAjLT3P1T9XWpX3SmocPpB1"
 	//todo check the token is valid to check
 	//console.log(req.query)
@@ -264,11 +276,8 @@ app.get('/api/monitor', (req, res) => {
 
 //move a payment to cold storage
 app.get('/api/sweep', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-
+	//set the headers
+	res = setHeaders(res);
     //TODO check token to see if the user is allowed to do this
     let sql = `SELECT * FROM keys where address = "`+req.query.address+`" and swept = 0`;
     db.all(sql, [], (err, rows) => {
@@ -416,11 +425,8 @@ app.get('/api/sweep', (req, res) => {
 
 //generate an address and output it
 app.get('/api/address', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-
+	//set the headers
+	res = setHeaders(res);
 	//generate the key pair using the makeRandom functions (there a bunch of ways to make an address btw)
 	let keyPair = bitcoin.ECPair.makeRandom({ network: TestNet });
 	//extract the publickey
