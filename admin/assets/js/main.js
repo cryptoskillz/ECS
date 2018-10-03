@@ -219,8 +219,6 @@ function ajaxGET(url,parentcallback)
 }
 
 
-updatesettings
-
 $('#updatesettings').click(function() 
 {
   address = $('#address').val();
