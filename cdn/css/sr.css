@@ -6,8 +6,14 @@ Primary style
 *, *::after, *::before {
   box-sizing: border-box;
 }
+/* -------------------------------- 
 
+Primary style
 
+-------------------------------- */
+*, *::after, *::before {
+  box-sizing: border-box;
+}
 
 html {
   font-size: 62.5%;
@@ -15,6 +21,50 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  font-size: 1.6rem;
+  font-family: "Source Sans Pro", sans-serif;
+  color: #2b3e51;
+  background-color: #ecf0f1;
+}
+
+a {
+  color: #2c97de;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+main {
+  text-align: center;
+  padding: 2em 5%;
+}
+
+h1 {
+  font-size: 2rem;
+  padding: 3em 0 .8em;
+}
+@media only screen and (min-width: 768px) {
+  h1 {
+    font-size: 3.2rem;
+  }
+}
+
+
+
+/*
+html {
+  font-size: 62.5%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+*/
+
+.cd-cart-container {
+font-size: 62.5%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
+}
 
 
 
@@ -142,7 +192,7 @@ Main Components
       -ms-transform: translateX(-50%) translateY(-50%);
           transform: translateX(-50%) translateY(-50%);
 }
-.cd-cart-trigger .count {
+.cd-cart-trigger .cd-count {
   /* number of items indicator */
   position: absolute;
   top: -10px;
@@ -160,7 +210,7 @@ Main Components
   transition: transform .2s .5s;
   transition: transform .2s .5s, -webkit-transform .2s .5s;
 }
-.cd-cart-trigger .count li {
+.cd-cart-trigger .cd-count li {
   /* this is the number of items in the cart */
   position: absolute;
   -webkit-transform: translateZ(0);
@@ -173,22 +223,22 @@ Main Components
       -ms-transform: translateX(-50%) translateY(-50%);
           transform: translateX(-50%) translateY(-50%);
 }
-.cd-cart-trigger .count li:last-of-type {
+.cd-cart-trigger .cd-count li:last-of-type {
   visibility: hidden;
 }
-.cd-cart-trigger .count.update-count li:last-of-type {
+.cd-cart-trigger .cd-count.update-count li:last-of-type {
   -webkit-animation: cd-qty-enter .15s;
           animation: cd-qty-enter .15s;
   -webkit-animation-direction: forwards;
           animation-direction: forwards;
 }
-.cd-cart-trigger .count.update-count li:first-of-type {
+.cd-cart-trigger .cd-count.update-count li:first-of-type {
   -webkit-animation: cd-qty-leave .15s;
           animation: cd-qty-leave .15s;
   -webkit-animation-direction: forwards;
           animation-direction: forwards;
 }
-.cart-open .cd-cart-trigger .count {
+.cart-open .cd-cart-trigger .cd-count {
   -webkit-transition: -webkit-transform .2s 0s;
   transition: -webkit-transform .2s 0s;
   transition: transform .2s 0s;
@@ -197,7 +247,7 @@ Main Components
       -ms-transform: scale(0);
           transform: scale(0);
 }
-.empty .cd-cart-trigger .count {
+.empty .cd-cart-trigger .cd-count {
   /* fix bug - when cart is empty, do not animate count */
   -webkit-transform: scale(1);
       -ms-transform: scale(1);
