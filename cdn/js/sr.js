@@ -132,7 +132,7 @@ function showClass(elements)
 	//loop the elements
 	for (var i=0; i<elements.length; i++) 
 	{
-		elements[i].style.display="block";      	
+		elements[i].style.display="";      	
 	}
 }
 
@@ -231,11 +231,23 @@ function showClass(elements)
 	//add it to the dom
 	document.body.insertAdjacentHTML("beforeend", carthtml);
 
+	//back click
+	
+
+	document.querySelector('.bitcoinback').addEventListener('click', function () 
+	{
+		showClass(document.getElementById('cartlistitems'));
+		hideClass(document.getElementById('bitcoinaddresswrapper'));
+		hideClass(document.querySelector('.bitcoinback'));
+	});
+
 	
 	//add to cart click element
 	document.querySelector('.checkout').addEventListener('click', function () 
 	{
-		alert('lllll');
+		hideClass(document.getElementById('cartlistitems'));
+		showClass(document.getElementById('bitcoinaddresswrapper'));
+		showClass(document.querySelector('.bitcoinback'));
 	});
 
 	
