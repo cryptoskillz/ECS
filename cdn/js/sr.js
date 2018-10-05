@@ -156,41 +156,51 @@ var SR = SR || (function(){
 	  	var productlist = document.getElementById('cartlistitems');
 		var itemlist  = document.createElement('li');
 		itemlist.className = 'product ';
+
+
+		//<li class="product"><div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div><div class=""><h3><a href="#0">Product Name</a></h3><span class="price">$25.99</span><div class="actions"><a href="#0" class="delete-item">Delete</a><div class="quantity"><label for="cd-product-1">Qty</label><span class="select"><select id="cd-product-1" name="quantity"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></span></div></div></div></li>
+		//var prodcuthtml = '<div class="actions"><a href="#0" class="delete-item">Delete</a><div class="quantity"><label for="cd-product-1">Qty</label><span class="select"><select id="cd-product-1" name="quantity"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></span></div></div></div></li>';
 		var prodcuthtml = '';
 		//var prodcuthtml = prodcuthtml +'<li class="product">';
 		//product image
+		
 		var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
-		//product details div
-		var prodcuthtml = prodcuthtml + '<div class="product-details">';
 		//product name
-		var prodcuthtml = prodcuthtml + '<h3><a href="#0">'+name+'</a></h3>';
+		prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
 		//product price
-		var prodcuthtml = prodcuthtml + '<span class="productprice">$'+price+'</span>';
-		//delete option
-		var prodcuthtml = prodcuthtml + '<a href="#0" class="delete-item">Delete</a>';
+		prodcuthtml = prodcuthtml + '<span class="price">$'+price+'</span>';
 		//actions div
-		var prodcuthtml = prodcuthtml + '<div class="actions">';
+		prodcuthtml = prodcuthtml + '<div class="actions">';
+
+		//delete option
+		prodcuthtml = prodcuthtml + '<a href="#0" class="delete-item">Delete</a>';
+		prodcuthtml = prodcuthtml + '<div class="quantity">';
 		//quantity label
-		var prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
+		prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
 		//quantity select
-		var prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity">';
+		prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity">';
 		var i = 0;
 		for (i = 1; i < 11; i++) 
 		{ 
 			if (i == itemcount)
-				var prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
+				prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
 
 			else
-				var prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
+				prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
 		}
+
+		prodcuthtml = prodcuthtml +'</select></span>';
+		//end of quantiy div
+		var prodcuthtml = prodcuthtml + '</div>';
 		//end of actions div
 		var prodcuthtml = prodcuthtml + '</div>';
 		//end of products details div
 		var prodcuthtml = prodcuthtml + '</div>';
 		//end of product div
-		var prodcuthtml = prodcuthtml + '</div>';
+		//var prodcuthtml = prodcuthtml + '</div>';
 		//end of li
-		var prodcuthtml = prodcuthtml + '</li>';
+		//var prodcuthtml = prodcuthtml + '</li>';
+		
 		itemlist.innerHTML = prodcuthtml;
 		// append  to the end of theParent
 		productlist.innerHTML = "";
