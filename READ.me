@@ -1,0 +1,66 @@
+/*
+
+This is a general guide on how to code BTC to accept payments on a website. I am pretty much learning from scratch so
+with each branch you will my knowledge grow and the software evolve. I have pretty much gone on sabbatical and moved to Asia 
+to really deep dive this tech and  I am not coming back until I have a very deep understanding. 
+
+Treat the branches as a chronological order of  development
+
+master
+
+First code commits using the most basic implementation by integrating into a 3rd party API.
+
+generateaddress
+
+Remove the dependency of the 3rd party API (block.io) and store the details in a database. 
+
+
+monitor
+
+This branch Monitors the blockchain and waits for a payment to be processed
+
+sweep
+
+This branch moves the Bitcoin from the hotwallet we created for the transaction to the Cold storage we have.
+
+
+TODO:
+
+Turn it into a REST API
+Add the listen script that checks for payments made
+Store the keys more securely
+Create a WWW which generate bar code etc
+Create a back office script that deals with orders etc
+Create a sweeping script that sweeps the funds into cold storage
+Investigate lighting
+Investigate side chains
+Investigate RSK
+
+
+Tools used
+
+http://sqlitebrowser.org/ : Sql browser for mac
+https://testnet.blockchain.info/ : blockchain explorer for testnet 
+https://www.blockchain.com/explorer :  live blockchain explorer 
+https://bitcoin.org/en/download : Bitcoin client used (for testnet)
+
+Resources
+
+https://github.com/bitcoinjs/bitcoinjs-lib
+https://medium.com/@cruzw/crafting-a-blockchain-transaction-with-javascript-3946bda1df7b
+https://medium.com/@orweinberger/how-to-create-a-raw-transaction-using-bitcoinjs-lib-1347a502a3a
+http://www.sqlitetutorial.net/sqlite-nodejs/
+https://awebanalysis.com/en/bitcoin-address-validate/ 
+https://medium.com/ibm-watson-data-lab/environment-variables-or-keeping-your-secrets-secret-in-a-node-js-app-99019dfff716
+http://satoshitobitcoin.co/bitcoin-to-satoshi/
+https://en.bitcoin.it/wiki/Satoshi_(unit)
+https://testnet.blockchain.info/pushtx
+
+Notes
+	Why on earth do I have to specify the testnet in every method just let me call it once and be done with it.
+	I would assume it is wise to check the origin of the request here to stop potential dossing  I will read up on best practices. 
+	I have yet to read the best practices to store these in a safe manner (keys)
+	I will also look into striking back to FIAT (for funsies)
+	I will look into how to generate a bitcoin address
+	I will lastly look at using hardware wallets to control this (most likely ledger)
+*/
