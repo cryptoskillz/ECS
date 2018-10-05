@@ -169,6 +169,7 @@ function showClass(elements)
 	{
 		
 		var producttotal = price * itemcount;
+		producttotal = parseFloat(producttotal).toFixed(8);
 		changeClassText(document.getElementById('checkouttotal'),producttotal);
 		//update counter
 	  	changeClassText(document.querySelector('.cd-count'),itemcount);	
@@ -225,7 +226,7 @@ function showClass(elements)
 	carthtml = carthtml +'<img id="bitcoinqrcode" src="" />';
 	carthtml = carthtml +'</div>';
 	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<footer><a href="#0" class="checkout btn"><em>Checkout - $<span id="checkouttotal">0</span></em></a></footer>';
+	carthtml = carthtml +'<footer><a href="#0" class="checkout btn"><em>Checkout - <span id="checkouttotal">0</span> BTC</em></a></footer>';
 	carthtml = carthtml +'</div>';
 	carthtml = carthtml +'</div>';
 	carthtml = carthtml +'</div>';
@@ -264,7 +265,7 @@ function showClass(elements)
 		var previewpic = '';
 
 		//increment count (quantity)
-		if (itemcount < quantity)
+		if (itemcount <= quantity)
 		{
 			itemcount = itemcount+1;
 			carttotal(price)
@@ -284,7 +285,7 @@ function showClass(elements)
 			//product name
 			prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
 			//product price
-			prodcuthtml = prodcuthtml + '<span class="price">$'+price+'</span>';
+			prodcuthtml = prodcuthtml + '<span class="price">'+price+' BTC</span>';
 			//actions div
 			prodcuthtml = prodcuthtml + '<div class="actions">';
 
