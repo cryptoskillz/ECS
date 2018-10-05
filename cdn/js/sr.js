@@ -112,7 +112,27 @@ function hideClass(elements)
 	//loop the elements
 	for (var i=0; i<elements.length; i++) 
 	{
-		elements[i].style.visibility="hidden";      	
+		elements[i].style.display="none";      	
+	}
+}
+
+function showClass(elements) 
+{
+	// if there are no elements, we're done
+	if (!elements) { return; }
+
+	// if we have a selector, get the chosen elements
+	if (typeof(elements) === 'string') {
+	elements = document.querySelectorAll(elements);
+	}
+
+	// if we have a single DOM element, make it an array to simplify behavior
+	else if (elements.tagName) { elements=[elements]; }
+
+	//loop the elements
+	for (var i=0; i<elements.length; i++) 
+	{
+		elements[i].style.display="block";      	
 	}
 }
 
@@ -140,7 +160,48 @@ var SR = SR || (function(){
 	//hold the animating flag
 	var animating = false;
 
-	//add to cart element
+	//build the cart and hide it
+    var carthtml = '';
+    carthtml = carthtml +'<div class="cd-cart-container" style="display:none">';
+    carthtml = carthtml +'<a href="#0" class="cd-cart-trigger">';
+    carthtml = carthtml +'Cart';
+    carthtml = carthtml +'<span class="cd-count">0</span>';
+    carthtml = carthtml +'</a>';
+    carthtml = carthtml +'<div class="cd-cart">';
+    carthtml = carthtml +'<div class="wrapper">';
+    carthtml = carthtml +'<header>';
+    carthtml = carthtml +'<h2>Cart</h2>';
+    carthtml = carthtml +'<span class="bitcoinback" ><a id="checkoutbitocoin" href="#0">Back</a></span>';
+    carthtml = carthtml +'</header>';
+	carthtml = carthtml +'<div class="body">';
+	carthtml = carthtml +'<ul id="cartlistitems">';
+	carthtml = carthtml +'</ul>';
+	carthtml = carthtml +'<div id="bitcoinaddresswrapper"><div>';
+	carthtml = carthtml +'<a id="bitcoinaddress" class="bitcoinaddress" href=""></a>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'<div class="bitcoinoptions" >';
+	carthtml = carthtml +'<a href="#" class="bitcoinaddresscopy">';
+	carthtml = carthtml +'<i class="fa fa-copy"></i>';
+	carthtml = carthtml +' Copy';
+	carthtml = carthtml +'</a>';
+	carthtml = carthtml +'<a href="bitcoin:2N3Xtg7pBjUG4RPaiwfc2t3wftvLGWv6i2K" class="">';
+	carthtml = carthtml +'<i class="fa fa-btc"></i>';
+	carthtml = carthtml +'Pay from wallet';
+	carthtml = carthtml +'</a>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'<img id="bitcoinqrcode" src="" />';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'<footer><a href="#0" class="checkout btn"><em>Checkout - $<span>0</span></em></a></footer>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'</div>';
+	//add it to the dom
+	document.body.insertAdjacentHTML("beforeend", carthtml);
+
+
+
+	//add to cart click element
 	var elem = document.getElementsByClassName('.cd-add-to-cart');
 	document.querySelector('.cd-add-to-cart').addEventListener('click', function () 
 	{
@@ -152,18 +213,17 @@ var SR = SR || (function(){
 
 		//increment count (quantity)
   		itemcount = itemcount+1;
+  		//show it
+  		showClass(document.querySelector('.cd-cart-container'))	
+	  	
 	  	//add item to cart
 	  	var productlist = document.getElementById('cartlistitems');
 		var itemlist  = document.createElement('li');
 		itemlist.className = 'product ';
 
-
-		//<li class="product"><div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div><div class=""><h3><a href="#0">Product Name</a></h3><span class="price">$25.99</span><div class="actions"><a href="#0" class="delete-item">Delete</a><div class="quantity"><label for="cd-product-1">Qty</label><span class="select"><select id="cd-product-1" name="quantity"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></span></div></div></div></li>
-		//var prodcuthtml = '<div class="actions"><a href="#0" class="delete-item">Delete</a><div class="quantity"><label for="cd-product-1">Qty</label><span class="select"><select id="cd-product-1" name="quantity"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></span></div></div></div></li>';
+		//build produt
 		var prodcuthtml = '';
-		//var prodcuthtml = prodcuthtml +'<li class="product">';
-		//product image
-		
+		//product image		
 		var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
 		//product name
 		prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
@@ -188,7 +248,6 @@ var SR = SR || (function(){
 			else
 				prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
 		}
-
 		prodcuthtml = prodcuthtml +'</select></span>';
 		//end of quantiy div
 		var prodcuthtml = prodcuthtml + '</div>';
@@ -197,22 +256,17 @@ var SR = SR || (function(){
 		//end of products details div
 		var prodcuthtml = prodcuthtml + '</div>';
 		//end of product div
-		//var prodcuthtml = prodcuthtml + '</div>';
-		//end of li
-		//var prodcuthtml = prodcuthtml + '</li>';
-		
+		//add to the list		
 		itemlist.innerHTML = prodcuthtml;
 		// append  to the end of theParent
 		productlist.innerHTML = "";
 		productlist.appendChild(itemlist);
-  		
   		//update counter
   		changeClassText(document.querySelector('.cd-count'),itemcount);
 
 	});
 
 	//cart clicked element
-	
 	var elem = document.getElementsByClassName('.cd-add-to-cart');
 	document.querySelector('.cd-cart-trigger').addEventListener('click', function () {
   		//check if cart shoud be shown
@@ -238,24 +292,15 @@ var SR = SR || (function(){
   				//hide back element
   				hideClass(document.querySelector('.bitcoinback'))
   				//hide btc stuff
-  				hideClass(document.getElementById('bitcoinaddresswrapper'));	
+  				hideClass(document.getElementById('bitcoinaddresswrapper'));
   				//open it
   				addClass(document.querySelector('.cd-cart-container'),'cart-open');
+  				
   			}
   			
   		}
-  		//add item to cart
 	});
 
-   
-	//init price var
-	//var productPrice = 0;
-	//var cartWrapper = document.getElementsByClassName('.cd-cart-container');
-
-	//set the cart wrapper
-	//var productCustomization = document.getElementsByClassName('.cd-customization');
-	//set the cart
-	//var cart = document.getElementsByClassName('.cd-cart');
 
     return {
         init : function(Args) {
@@ -308,10 +353,13 @@ var SR = SR || (function(){
 				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
 		    	//debug
 			    //console.log(elbtcqr)
-			    //document.head.appendChild('<link href="'+serverurl+'sr.css" rel="stylesheet">');
+
+			    //load the CSS
 			    document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'css/sr.css" rel="stylesheet">'
 
-			  } else {
+			  } 
+			  else
+			  {
 			    // We reached our target server, but it returned an error
 
 			  }
