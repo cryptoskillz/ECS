@@ -136,17 +136,49 @@ function showClass(elements)
 	}
 }
 
+
+
 /*
 *=========================
 *END OF GENERIC FUNCTIONS
 *=========================
 */
 
+	var itemcount = 0;
+	var price = '';
 
-var SR = SR || (function(){
+	function deleteitem()
+	{
+		itemcount = 0;
+		var productlist = document.getElementById('cartlistitems');
+		productlist.innerHTML = "";
+		carttotal();
+		//close it
+  		removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	}
+
+	function changequantity()
+	{
+		var elquantity = document.getElementById('productquantity');
+		itemcountq = elquantity.options[elquantity.selectedIndex];
+		itemcount = parseInt(itemcountq.value);
+		carttotal();		
+	}
+
+	function carttotal()
+	{
+		
+		var producttotal = price * itemcount;
+		changeClassText(document.getElementById('checkouttotal'),producttotal);
+		//update counter
+	  	changeClassText(document.querySelector('.cd-count'),itemcount);	
+	}
+
+
+	var SR = SR || (function(){
 
 	var _args = {}; // private
-    var itemcount = 0;
+    
     //set url to production
 	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
 	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
@@ -182,7 +214,7 @@ var SR = SR || (function(){
 	carthtml = carthtml +'<div class="bitcoinoptions" >';
 	carthtml = carthtml +'<a href="#" class="bitcoinaddresscopy">';
 	carthtml = carthtml +'<i class="fa fa-copy"></i>';
-	carthtml = carthtml +' Copy';
+	carthtml = carthtml +'Copy';
 	carthtml = carthtml +'</a>';
 	carthtml = carthtml +'<a href="bitcoin:2N3Xtg7pBjUG4RPaiwfc2t3wftvLGWv6i2K" class="">';
 	carthtml = carthtml +'<i class="fa fa-btc"></i>';
@@ -192,82 +224,92 @@ var SR = SR || (function(){
 	carthtml = carthtml +'<img id="bitcoinqrcode" src="" />';
 	carthtml = carthtml +'</div>';
 	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<footer><a href="#0" class="checkout btn"><em>Checkout - $<span>0</span></em></a></footer>';
+	carthtml = carthtml +'<footer><a href="#0" class="checkout btn"><em>Checkout - $<span id="checkouttotal">0</span></em></a></footer>';
 	carthtml = carthtml +'</div>';
 	carthtml = carthtml +'</div>';
 	carthtml = carthtml +'</div>';
 	//add it to the dom
 	document.body.insertAdjacentHTML("beforeend", carthtml);
 
-
-
+	
 	//add to cart click element
-	var elem = document.getElementsByClassName('.cd-add-to-cart');
+	document.querySelector('.checkout').addEventListener('click', function () 
+	{
+		alert('lllll');
+	});
+
+	
+	//add to cart click element
 	document.querySelector('.cd-add-to-cart').addEventListener('click', function () 
 	{
 		//get details
-		var name = 'lll';
-		var price = '66.88';
+		
+		var elproduct = document.getElementById('cd-add-to-cart');
+		price =elproduct.getAttribute('data-price');
+		var name =elproduct.getAttribute('data-name');
 		var productid = 1;
 		var previewpic = '';
 
 		//increment count (quantity)
-  		itemcount = itemcount+1;
-  		//show it
-  		showClass(document.querySelector('.cd-cart-container'))	
-	  	
-	  	//add item to cart
-	  	var productlist = document.getElementById('cartlistitems');
-		var itemlist  = document.createElement('li');
-		itemlist.className = 'product ';
+		if (itemcount < 9)
+		{
+			itemcount = itemcount+1;
+			carttotal(price)
+			
+	  		//show it
+	  		showClass(document.querySelector('.cd-cart-container'))	
+		  	
+		  	//add item to cart
+		  	var productlist = document.getElementById('cartlistitems');
+			var itemlist  = document.createElement('li');
+			itemlist.className = 'product ';
 
-		//build produt
-		var prodcuthtml = '';
-		//product image		
-		var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
-		//product name
-		prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
-		//product price
-		prodcuthtml = prodcuthtml + '<span class="price">$'+price+'</span>';
-		//actions div
-		prodcuthtml = prodcuthtml + '<div class="actions">';
+			//build produt
+			var prodcuthtml = '';
+			//product image		
+			var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
+			//product name
+			prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
+			//product price
+			prodcuthtml = prodcuthtml + '<span class="price">$'+price+'</span>';
+			//actions div
+			prodcuthtml = prodcuthtml + '<div class="actions">';
 
-		//delete option
-		prodcuthtml = prodcuthtml + '<a href="#0" class="delete-item">Delete</a>';
-		prodcuthtml = prodcuthtml + '<div class="quantity">';
-		//quantity label
-		prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
-		//quantity select
-		prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity">';
-		var i = 0;
-		for (i = 1; i < 11; i++) 
-		{ 
-			if (i == itemcount)
-				prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
+			//delete option
+			prodcuthtml = prodcuthtml + '<a href="javascript:deleteitem()" class="delete-item">Delete</a>';
+			prodcuthtml = prodcuthtml + '<div class="quantity">';
+			//quantity label
+			prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
+			//quantity select
+			prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="changequantity()">';
+			var i = 0;
+			for (i = 1; i < 10; i++) 
+			{ 
+				if (i == itemcount)
+					prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
 
-			else
-				prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
-		}
-		prodcuthtml = prodcuthtml +'</select></span>';
-		//end of quantiy div
-		var prodcuthtml = prodcuthtml + '</div>';
-		//end of actions div
-		var prodcuthtml = prodcuthtml + '</div>';
-		//end of products details div
-		var prodcuthtml = prodcuthtml + '</div>';
-		//end of product div
-		//add to the list		
-		itemlist.innerHTML = prodcuthtml;
-		// append  to the end of theParent
-		productlist.innerHTML = "";
-		productlist.appendChild(itemlist);
-  		//update counter
-  		changeClassText(document.querySelector('.cd-count'),itemcount);
+				else
+					prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
+			}
+			prodcuthtml = prodcuthtml +'</select></span>';
+			//end of quantiy div
+			var prodcuthtml = prodcuthtml + '</div>';
+			//end of actions div
+			var prodcuthtml = prodcuthtml + '</div>';
+			//end of products details div
+			var prodcuthtml = prodcuthtml + '</div>';
+			//end of product div
+			//add to the list		
+			itemlist.innerHTML = prodcuthtml;
+			// append  to the end of theParent
+			productlist.innerHTML = "";
+			productlist.appendChild(itemlist);
+
+  		}
 
 	});
 
 	//cart clicked element
-	var elem = document.getElementsByClassName('.cd-add-to-cart');
 	document.querySelector('.cd-cart-trigger').addEventListener('click', function () {
   		//check if cart shoud be shown
   		//debug
