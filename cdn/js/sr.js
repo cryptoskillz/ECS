@@ -33,6 +33,14 @@ var SR = SR || (function(){
 
     return {
         init : function(Args) {
+        	/*
+
+        	Server vars you can pass set to "" to ignore
+        	0 = server url. string
+        	1 = animating.  True or false
+
+        	*/
+
 			_args = Args;
 
 			//override the server url
