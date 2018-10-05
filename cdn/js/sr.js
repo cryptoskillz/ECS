@@ -179,6 +179,7 @@ function showClass(elements)
 
 	var _args = {}; // private
     
+    var quantity = 9;
     //set url to production
 	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
 	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
@@ -263,7 +264,7 @@ function showClass(elements)
 		var previewpic = '';
 
 		//increment count (quantity)
-		if (itemcount < 9)
+		if (itemcount < quantity)
 		{
 			itemcount = itemcount+1;
 			carttotal(price)
@@ -295,7 +296,7 @@ function showClass(elements)
 			//quantity select
 			prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="changequantity()">';
 			var i = 0;
-			for (i = 1; i < 10; i++) 
+			for (i = 1; i < quantity; i++) 
 			{ 
 				if (i == itemcount)
 					prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
@@ -379,6 +380,11 @@ function showClass(elements)
 			{
 				animating = _args[1]
 			}
+			if (typeof(_args[2]) != "")
+			{
+				quantity = _args[2]
+			}
+
 
 			//get an address
 			var request = new XMLHttpRequest();
