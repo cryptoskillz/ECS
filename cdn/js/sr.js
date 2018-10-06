@@ -6,7 +6,6 @@
 
 todo :
 
-send product details + product detail sto the server either as a new product
 clean up css 
 all functions inside the namespace
 
@@ -156,8 +155,9 @@ function showClass(elements)
 	var price = '';
 	var name = '';
 	var address = '';
+	var uid = '';
 	//server url
-	var serverurl = "";
+	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
 	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
 	
 
@@ -471,7 +471,6 @@ function showClass(elements)
   		{
   			//always remove as its 0
   			removeClass(document.querySelector('.cd-cart-container'),'cart-open');
-  			
   		}
   		else
   		{
@@ -485,9 +484,7 @@ function showClass(elements)
   			else
   			{
   				cartstate(1);
-  				
   			}
-  			
   		}
 	});
 
@@ -499,6 +496,9 @@ function showClass(elements)
         	Server vars you can pass set to "" to ignore
         	0 = server url. string
         	1 = animating.  True or false
+        	2 = quantity
+			3 = cdnurl
+			4 = uid
 
         	*/
 
@@ -510,21 +510,28 @@ function showClass(elements)
 				serverurl = _args[0];
 				//alert(serverurl);
 			}
-				//check if it is a boolean and if so then set it.
+			//check if it is a boolean and if so then set it.
 			if (typeof(_args[1]) === "boolean")
 			{
 				animating = _args[1]
 			}
+			//quantity
 			if (typeof(_args[2]) != "")
 			{
 				quantity = _args[2]
 			}
+			//cdn url
 			if (typeof(_args[3]) != "")
 			{
 				cdnurl = _args[3]
-			}			
+			}	
+			//uid
+			if (typeof(_args[4]) != "")
+			{
+				uid = _args[4]
+			}						
 			//get an address
-			var url = serverurl+"api/address";
+			var url = serverurl+"api/address?uid="+uid;
 			fetchurl(url,'getaddress')
         }
     };

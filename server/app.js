@@ -516,7 +516,7 @@ app.get('/api/address', (req, res) => {
 
 	//store it in the database
 	//note: Not 100% sure that we have to store the public kkey
-	db.run(`INSERT INTO keys(address,privatekey,publickey) VALUES(?,?,?)`, [address.address,privateKey,publicKey], function(err) {
+	db.run(`INSERT INTO keys(address,privatekey,publickey,userid) VALUES(?,?,?,?)`, [address.address,privateKey,publicKey,req.query.uid], function(err) {
 	if (err) {
 	  return console.log(err.message);
 	}

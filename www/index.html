@@ -27,19 +27,20 @@
 <script>
 	if( !window.jQuery ) document.write('<script src="js/jquery-3.0.0.min.js"><\/script>');
 </script>
-<!-- this is were we host the js file that andles cart interaction etc you can dwnloadself host this if you prefer-->
-<script type="text/javascript" src="https://s3.eu-west-1.amazonaws.com/srcrypto/js/sr.js"></script>
-<!--<script type="text/javascript" src="../cdn/js/sr.js"></script>-->
+<!-- this is were we host the js file that andles cart interaction etc you can dwnloadself host this if you prefer
+<script type="text/javascript" src="https://s3.eu-west-1.amazonaws.com/srcrypto/js/sr.js"></script>-->
+<script type="text/javascript" src="../cdn/js/sr.js"></script>
 <script type="text/javascript">
    /*
    		0 = server url
    		1 = animated
    		2 = quantity count
    		3 = cdn url
+   		4 = uid
 
    */
-   SR.init(["http://srcryptoapi.eu-west-1.elasticbeanstalk.com/", false,15,"http://s3.eu-west-1.amazonaws.com/srcrypto/"]);
-   //SR.init(["http://127.0.0.1:3000/", false,15,"../cdn/"]);
+   //SR.init(["http://srcryptoapi.eu-west-1.elasticbeanstalk.com/", false,15,"http://s3.eu-west-1.amazonaws.com/srcrypto/","3"]);
+   SR.init(["http://127.0.0.1:3000/", false,15,"../cdn/","3"]);
 </script>
 
 </body>
