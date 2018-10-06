@@ -155,6 +155,7 @@ function showClass(elements)
 	var itemcount = 0;
 	var price = '';
 	var name = '';
+	var address = '';
 	//server url
 	var serverurl = "";
 	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
