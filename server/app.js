@@ -214,6 +214,68 @@ app.get('/admin/login', (req, res) => {
 END OF ADMIN FUNCTION
 ========================*/
 
+//storeproduct
+app.get('/api/storeproduct', (req, res) => {
+	//set the headers
+	res = setHeaders(res); 
+	//check if it is in the product table
+	if (req.query.quantity == 0)
+	{
+		//delete the record
+		let data = [req.query.address];
+		let sql = `delete FROM product WHERE address = ?`;
+		db.run(sql, data, function(err) 
+		{
+		  if (err) {
+		    return console.error(err.message);
+		  }		 
+		});
+			 
+	}
+	else
+	{
+		//see if we have it already 
+		let sql = `SELECT * FROM product where address = "`+req.query.address+`"`;
+		//debug
+		//console.log(sql);
+
+	    db.all(sql, [], (err, rows) => {
+		  if (err) {
+		    throw err;
+		  }
+		  //check we have a result
+		  if (rows.length == 0)
+		  {
+		  	//insert it
+		  	//delete the record
+			db.run(`INSERT INTO product(address,name,price,quantity) VALUES(?,?,?,?)`, [req.query.address,req.query.name,req.query.price,req.query.quantity], function(err) {
+				if (err) {
+				  return console.log(err.message);
+				}
+			});
+		  }
+		  else
+		  {
+		  	//update it
+		  	let data = [req.query.quantity,req.query.address];
+			let sql = `UPDATE product SET quantity = ? WHERE address = ?`;
+			db.run(sql, data, function(err) {
+			  if (err) {
+			    return console.error(err.message);
+			  }
+			  
+			});
+
+		  }
+		});
+	}
+	//debug
+	//console.log(req.query.name);
+	//console.log(req.query.price);
+	//console.log(req.query.quantity);
+	//console.log(req.query.address);
+	res.send(JSON.stringify({status: "ok"}));
+})
 /*
 	This endpoint is used to check if a payment has been made by www
 	it is not essetial but someone may want to add this to a control pabel or the final ste of the checkout.

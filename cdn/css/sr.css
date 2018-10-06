@@ -54,21 +54,20 @@ h1 {
 
 
 
-/*
+
 html {
   font-size: 62.5%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-*/
+
 
 .cd-cart-container {
-font-size: 62.5%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
+font-size: 62.5%; 
+-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 }
 
-
-
-.cd-add-to-cart {
+.sr-button {
   display: inline-block;
   padding: 1.2em 1.8em;
   background: #2c97de;
@@ -81,14 +80,17 @@ font-size: 62.5%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: 
   -webkit-transition: all .2s;
   transition: all .2s;
 }
-.cd-add-to-cart:hover {
+.sr-button:hover {
   background: #42a2e1;
 }
-.cd-add-to-cart:active {
+.sr-button:active {
   -webkit-transform: scale(0.9);
       -ms-transform: scale(0.9);
           transform: scale(0.9);
 }
+
+
+
 
 /* -------------------------------- 
 

@@ -2,6 +2,14 @@
 **=========================
 *START OF GENERIC FUNCTIONS
 *=========================
+
+
+todo :
+
+send product details + product detail sto the server either as a new product
+clean up css 
+all functions inside the namespace
+
 */
 
 function addClass(elements, myClass) {
@@ -146,6 +154,11 @@ function showClass(elements)
 
 	var itemcount = 0;
 	var price = '';
+	var name = '';
+	//server url
+	var serverurl = "";
+	//var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
+	var cdnurl = '../cdn/';
 
 	function deleteitem()
 	{
@@ -173,24 +186,133 @@ function showClass(elements)
 		changeClassText(document.getElementById('checkouttotal'),producttotal);
 		//update counter
 	  	changeClassText(document.querySelector('.cd-count'),itemcount);	
+	  	//store product
+		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
+		fetchurl(url,'storeproduct')
+
+	}
+
+	function fetchurl(url,method)
+	{
+		var request = new XMLHttpRequest();
+		request.open('GET',url, true);
+		//call it
+		request.onload = function() {
+		  if (request.status >= 200 && request.status < 400) {
+		    // parse the data
+		    var data = JSON.parse(request.responseText);
+		    //debug
+		    //console.log(data)
+
+		    if (method == "getaddress")
+		    {
+			    //set the address
+			    address = data.address;
+			    //set the address in the checkout
+			    var elbtcaddress = document.getElementById('bitcoinaddress');
+			    //set the href
+			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
+			    //set the address
+	    		elbtcaddress.innerText =address;
+	    		//debug
+			    //console.log(elbtcaddress)
+
+			    //generate the qr code
+			    var elbtcqr = document.getElementById('bitcoinqrcode');
+				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
+		    	//debug
+			    //console.log(elbtcqr)
+		    }
+		    if (method == "storeproduct")
+		    {
+		    	//do stuff if you want.
+		    }
+
+		  } 
+		  else
+		  {
+		    // We reached our target server, but it returned an error
+
+		  }
+		};
+		request.onerror = function() {
+			  // There was a connection error of some sort
+		};
+		request.send();
 	}
 
 
-	var SR = SR || (function(){
+
+
+	var SR = SR || (function()
+	{
+
+
+
+
+	function cartstate(state)
+	{
+		
+
+		/*
+			1 = show cart product details
+			2 = show customer details screen
+			3 = customer detals back
+			4 = custmer details pay click
+			5 = bitcoin details back click
+		*/
+
+		switch (state) {
+		    case 1:
+		        hideClass(document.getElementById('checkoutbitocoin'));
+				//hide btc stuff
+				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				//hide the customer details
+				hideClass(document.getElementById('customerdetailswrapper'));
+				//hide customer detals back
+				hideClass(document.getElementById('checkoutcustomerdetailsback'));
+				//open it
+				addClass(document.querySelector('.cd-cart-container'),'cart-open');
+				//show the product details
+				showClass(document.getElementById('cartlistitems'));
+		        break;
+		    case 2:
+				hideClass(document.getElementById('cartlistitems'));
+				showClass(document.getElementById('customerdetailswrapper'));
+				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				showClass(document.getElementById('checkoutcustomerdetailsback'));
+		        break;
+		    case 3:
+		       	showClass(document.getElementById('cartlistitems'));
+			  	hideClass(document.getElementById('bitcoinaddresswrapper'));
+			  	//hideClass(document.querySelector('.bitcoinback'));
+			    hideClass(document.getElementById('customerdetailswrapper'));
+			   	hideClass(document.getElementById('checkoutcustomerdetailsback'));
+		        break;
+		    case 4:
+		    	hideClass(document.getElementById('cartlistitems'));
+				showClass(document.getElementById('bitcoinaddresswrapper'));
+				showClass(document.getElementById('checkoutbitocoin'));
+				hideClass(document.getElementById('checkoutcustomerdetailsback'));
+				hideClass(document.getElementById('customerdetailswrapper'));
+		        break;
+		    case 5:
+		    	hideClass(document.getElementById('cartlistitems'));
+				showClass(document.getElementById('customerdetailswrapper'));
+				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				showClass(document.getElementById('checkoutcustomerdetailsback'));
+				hideClass(document.getElementById('checkoutbitocoin'));
+		        break;
+		   
+		}
+	}
 
 	var _args = {}; // private
     
     var quantity = 9;
-    //set url to production
-	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
-	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
-	//var cdnurl = '../cdn/';
-	//check if we are local
-	//note : set this whatever your local instance is 127.0.0.1 for example
-	if(window.location.href.indexOf("srcryptowww") > -1) 
-	{
-		serverurl = "http://127.0.0.1:3000/";
-	}
+  
+	
+
 	//hold the animating flag
 	var animating = false;
 
@@ -205,11 +327,16 @@ function showClass(elements)
     carthtml = carthtml +'<div class="wrapper">';
     carthtml = carthtml +'<header>';
     carthtml = carthtml +'<h2>Cart</h2>';
-    carthtml = carthtml +'<span class="bitcoinback" ><a id="checkoutbitocoin" href="#0">Back</a></span>';
+    carthtml = carthtml +'<span class="backbutton" ><a id="checkoutcustomerdetailsback" href="#0">Back</a></span>';
+    carthtml = carthtml +'<span class="backbutton" ><a id="checkoutbitocoin" href="#0">Back</a></span>';
     carthtml = carthtml +'</header>';
 	carthtml = carthtml +'<div class="body">';
 	carthtml = carthtml +'<ul id="cartlistitems">';
 	carthtml = carthtml +'</ul>';
+	carthtml = carthtml +'<div id="customerdetailswrapper">';
+	carthtml = carthtml +'<label>Email</label>  <input type="text" name="sr-email" id="sr-email">';
+	carthtml = carthtml +'<a href="#0" id="sr-pay" class="sr-button">Pay</a>';
+	carthtml = carthtml +'</div>';
 	carthtml = carthtml +'<div id="bitcoinaddresswrapper"><div>';
 	carthtml = carthtml +'<a id="bitcoinaddress" class="bitcoinaddress" href=""></a>';
 	carthtml = carthtml +'</div>';
@@ -232,24 +359,36 @@ function showClass(elements)
 	carthtml = carthtml +'</div>';
 	//add it to the dom
 	document.body.insertAdjacentHTML("beforeend", carthtml);
+	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'css/sr.css" rel="stylesheet">'
 
-	//back click
+	//pay click
+
+	//bitcoin back click
+	document.getElementById('checkoutbitocoin').addEventListener('click', function () 
+	{
+		cartstate(5);
+	});
 	
 
-	document.querySelector('.bitcoinback').addEventListener('click', function () 
+	//payment click
+	document.getElementById('sr-pay').addEventListener('click', function () 
 	{
-		showClass(document.getElementById('cartlistitems'));
-		hideClass(document.getElementById('bitcoinaddresswrapper'));
-		hideClass(document.querySelector('.bitcoinback'));
+		//todo :send it to the server either as a new product or a quantity update along with the customer detail
+		cartstate(4);
+	});
+
+
+	//customer back click
+	document.getElementById('checkoutcustomerdetailsback').addEventListener('click', function () 
+	{
+		cartstate(3);
 	});
 
 	
 	//add to cart click element
 	document.querySelector('.checkout').addEventListener('click', function () 
 	{
-		hideClass(document.getElementById('cartlistitems'));
-		showClass(document.getElementById('bitcoinaddresswrapper'));
-		showClass(document.querySelector('.bitcoinback'));
+		cartstate(2);
 	});
 
 	
@@ -257,10 +396,9 @@ function showClass(elements)
 	document.querySelector('.cd-add-to-cart').addEventListener('click', function () 
 	{
 		//get details
-		
 		var elproduct = document.getElementById('cd-add-to-cart');
 		price =elproduct.getAttribute('data-price');
-		var name =elproduct.getAttribute('data-name');
+		name =elproduct.getAttribute('data-name');
 		var productid = 1;
 		var previewpic = '';
 
@@ -345,12 +483,7 @@ function showClass(elements)
   			}
   			else
   			{
-  				//hide back element
-  				hideClass(document.querySelector('.bitcoinback'))
-  				//hide btc stuff
-  				hideClass(document.getElementById('bitcoinaddresswrapper'));
-  				//open it
-  				addClass(document.querySelector('.cd-cart-container'),'cart-open');
+  				cartstate(1);
   				
   			}
   			
@@ -385,52 +518,9 @@ function showClass(elements)
 			{
 				quantity = _args[2]
 			}
-
-
 			//get an address
-			var request = new XMLHttpRequest();
-			request.open('GET', serverurl+"api/address", true);
-			//call it
-			request.onload = function() {
-			  if (request.status >= 200 && request.status < 400) {
-			    // parse the data
-			    var data = JSON.parse(request.responseText);
-			    //debug
-			    //console.log(data)
-
-			    //set the address
-			    address = data.address;
-			    //set the address in the checkout
-			    var elbtcaddress = document.getElementById('bitcoinaddress');
-			    //set the href
-			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
-			    //set the address
-        		elbtcaddress.innerText =address;
-        		//debug
-			    //console.log(elbtcaddress)
-
-			    //generate the qr code
-			    var elbtcqr = document.getElementById('bitcoinqrcode');
-				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
-		    	//debug
-			    //console.log(elbtcqr)
-
-			    //load the CSS
-			    document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'css/sr.css" rel="stylesheet">'
-
-			  } 
-			  else
-			  {
-			    // We reached our target server, but it returned an error
-
-			  }
-			};
-
-			request.onerror = function() {
-			  // There was a connection error of some sort
-			};
-			request.send();
-
+			var url = serverurl+"api/address";
+			fetchurl(url,'getaddress')
         }
     };
 }());
