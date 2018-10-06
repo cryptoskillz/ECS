@@ -157,8 +157,8 @@ function showClass(elements)
 	var name = '';
 	//server url
 	var serverurl = "";
-	//var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
-	var cdnurl = '../cdn/';
+	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
+	
 
 	function deleteitem()
 	{
@@ -518,6 +518,10 @@ function showClass(elements)
 			{
 				quantity = _args[2]
 			}
+			if (typeof(_args[3]) != "")
+			{
+				cdnurl = _args[3]
+			}			
 			//get an address
 			var url = serverurl+"api/address";
 			fetchurl(url,'getaddress')
