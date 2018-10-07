@@ -29,6 +29,8 @@ var SR = SR || (function()
 
 	//hold the animating flag
 	var animating = false;
+
+	var theme = 'cart';
 	/*
 	**=========================
 	*END OF GLOBAL FUNCTIONS
@@ -469,6 +471,7 @@ var SR = SR || (function()
         	2 = quantity
 			3 = cdnurl
 			4 = uid
+			5 = theme
 
         	*/
 			_args = Args;
@@ -485,25 +488,32 @@ var SR = SR || (function()
 				animating = _args[1]
 			}
 			//quantity
-			if (typeof(_args[2]) != "")
+			if (_args[2] != "")
 			{
 				quantity = _args[2]
 			}
 			//cdn url
-			if (typeof(_args[3]) != "")
+			if (_args[3] != "")
 			{
 				cdnurl = _args[3]
 			}	
 			//uid
-			if (typeof(_args[4]) != "")
+			if (_args[4] != "")
 			{
 				uid = _args[4]
 			}
+			//theme
+			if (_args[5] != "")
+			{
+				theme = _args[5]
+			}
+
 			//load css
-        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'css/sr.css" rel="stylesheet">'	
+
+        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
 
 			//fetch the template so we can use themes 
-			fetchurl('http://s3.eu-west-1.amazonaws.com/srcrypto/html/carttemplate.html','carttemplate');
+			fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
         }
         ,
         //this function changes the quantity of the item in the cart
