@@ -1,198 +1,253 @@
-/*
-**=========================
-*START OF GENERIC FUNCTIONS
-*=========================
 
-
-todo :
-
-clean up css 
-all functions inside the namespace
-
-*/
-
-function addClass(elements, myClass) {
-
-  // if there are no elements, we're done
-  if (!elements) { return; }
-
-  // if we have a selector, get the chosen elements
-  if (typeof(elements) === 'string') {
-    elements = document.querySelectorAll(elements);
-  }
-
-  // if we have a single DOM element, make it an array to simplify behavior
-  else if (elements.tagName) { elements=[elements]; }
-
-  // add class to all chosen elements
-  for (var i=0; i<elements.length; i++) {
-
-    // if class is not already found
-    if ( (' '+elements[i].className+' ').indexOf(' '+myClass+' ') < 0 ) {
-
-      // add class
-      elements[i].className += ' ' + myClass;
-    }
-  }
-}
-
-function removeClass(elements, myClass) {
-
-  // if there are no elements, we're done
-  if (!elements) { return; }
-
-  // if we have a selector, get the chosen elements
-  if (typeof(elements) === 'string') {
-    elements = document.querySelectorAll(elements);
-  }
-
-  // if we have a single DOM element, make it an array to simplify behavior
-  else if (elements.tagName) { elements=[elements]; }
-
-  // create pattern to find class name
-  var reg = new RegExp('(^| )'+myClass+'($| )','g');
-
-  // remove class from all chosen elements
-  for (var i=0; i<elements.length; i++) {
-    elements[i].className = elements[i].className.replace(reg,' ');
-  }
-}
-
-function changeClassText(elements, value) {
-
-  // if there are no elements, we're done
-  if (!elements) { return; }
-
-  // if we have a selector, get the chosen elements
-  if (typeof(elements) === 'string') {
-    elements = document.querySelectorAll(elements);
-  }
-
-  // if we have a single DOM element, make it an array to simplify behavior
-  else if (elements.tagName) { elements=[elements]; }
-
-  // add class to all chosen elements
-  for (var i=0; i<elements.length; i++) {
-      elements[i].innerHTML = value;
-  }
-}
-
-function hasClass(elements, value) {
-  // if there are no elements, we're done
-  if (!elements) { return; }
-
-  // if we have a selector, get the chosen elements
-  if (typeof(elements) === 'string') {
-    elements = document.querySelectorAll(elements);
-  }
-
-  // if we have a single DOM element, make it an array to simplify behavior
-  else if (elements.tagName) { elements=[elements]; }
-
-  //loop the elements
-  for (var i=0; i<elements.length; i++) {
-  		//check if it is the one
-  		//debug
-  		//console.log(elements[i].className)
-  		//console.log(value);
-  		if (elements[i].className.indexOf(value) !=-1) 
-      	{
-      		return(1);
-      	}
-  }
-  return(0);
-}
-
-function hideClass(elements) 
+var SR = SR || (function()
 {
-	// if there are no elements, we're done
-	if (!elements) { return; }
 
-	// if we have a selector, get the chosen elements
-	if (typeof(elements) === 'string') {
-	elements = document.querySelectorAll(elements);
-	}
+	/*
+	**=========================
+	*START OF GLOBAL FUNCTIONS
+	*=========================
+	*/
 
-	// if we have a single DOM element, make it an array to simplify behavior
-	else if (elements.tagName) { elements=[elements]; }
-
-	//loop the elements
-	for (var i=0; i<elements.length; i++) 
-	{
-		elements[i].style.display="none";      	
-	}
-}
-
-function showClass(elements) 
-{
-	// if there are no elements, we're done
-	if (!elements) { return; }
-
-	// if we have a selector, get the chosen elements
-	if (typeof(elements) === 'string') {
-	elements = document.querySelectorAll(elements);
-	}
-
-	// if we have a single DOM element, make it an array to simplify behavior
-	else if (elements.tagName) { elements=[elements]; }
-
-	//loop the elements
-	for (var i=0; i<elements.length; i++) 
-	{
-		elements[i].style.display="";      	
-	}
-}
-
-
-
-/*
-*=========================
-*END OF GENERIC FUNCTIONS
-*=========================
-*/
-
+	//holdthe number of product
 	var itemcount = 0;
+	//hold the price of the product
 	var price = '';
+	//hold the name of the product
 	var name = '';
+	//hold the addres of the product
 	var address = '';
+	//hold the user id 
+	//note : Right now we only allow one user but we will expand this later to make it more of a SAAS product.
 	var uid = '';
-	//server url
+	//hold the server url can be overridden in init
 	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
+	//hold the cdn url can be overridden in init
 	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
-	
 
-	function deleteitem()
-	{
-		itemcount = 0;
-		var productlist = document.getElementById('cartlistitems');
-		productlist.innerHTML = "";
-		carttotal();
-		//close it
-  		removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+		//var to hold the arguments passed in from init
+	var _args = {}; // private
+    
+    var quantity = 9;
+
+	//hold the animating flag
+	var animating = false;
+
+	/*
+	**=========================
+	*END OF GLOBAL FUNCTIONS
+	*=========================
+	*/
+
+	//build the cart and hide it
+	//note : we should include this to make the js a little cleaner
+    var carthtml = '';
+    carthtml = carthtml +'<div class="cd-cart-container" style="display:none">';
+    carthtml = carthtml +'<a href="#0" class="cd-cart-trigger">';
+    carthtml = carthtml +'Cart';
+    carthtml = carthtml +'<span class="cd-count">0</span>';
+    carthtml = carthtml +'</a>';
+    carthtml = carthtml +'<div class="cd-cart">';
+    carthtml = carthtml +'<div class="wrapper">';
+    carthtml = carthtml +'<header>';
+    carthtml = carthtml +'<h2>Cart</h2>';
+    carthtml = carthtml +'<span class="backbutton" ><a id="checkoutcustomerdetailsback" href="#0">Back</a></span>';
+    carthtml = carthtml +'<span class="backbutton" ><a id="checkoutbitocoin" href="#0">Back</a></span>';
+    carthtml = carthtml +'</header>';
+	carthtml = carthtml +'<div class="body">';
+	carthtml = carthtml +'<ul id="cartlistitems">';
+	carthtml = carthtml +'</ul>';
+	carthtml = carthtml +'<div id="customerdetailswrapper">';
+	carthtml = carthtml +'<label>Email</label>  <input type="text" name="sr-email" id="sr-email">';
+	carthtml = carthtml +'<a href="#0" id="sr-pay" class="sr-button">Pay</a>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'<div id="bitcoinaddresswrapper"><div>';
+	carthtml = carthtml +'<a id="bitcoinaddress" class="bitcoinaddress" href=""></a>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'<div class="bitcoinoptions" >';
+	carthtml = carthtml +'<a href="#" class="bitcoinaddresscopy">';
+	carthtml = carthtml +'<i class="fa fa-copy"></i>';
+	carthtml = carthtml +'Copy';
+	carthtml = carthtml +'</a>';
+	carthtml = carthtml +'<a href="bitcoin:2N3Xtg7pBjUG4RPaiwfc2t3wftvLGWv6i2K" class="">';
+	carthtml = carthtml +'<i class="fa fa-btc"></i>';
+	carthtml = carthtml +'Pay from wallet';
+	carthtml = carthtml +'</a>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'<img id="bitcoinqrcode" src="" />';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'<footer><a href="#0" class="checkout btn"><em>Checkout - <span id="checkouttotal">0</span> BTC</em></a></footer>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'</div>';
+	carthtml = carthtml +'</div>';
+	//add it to the dom
+	document.body.insertAdjacentHTML("beforeend", carthtml);
+
+
+	/*
+	**=========================
+	*START OF GENERIC FUNCTIONS
+	*=========================
+	*/
+
+
+	//this function adds a class using a  class or id
+	function addClass(elements, myClass) {
+
+	  // if there are no elements, we're done
+	  if (!elements) { return; }
+
+	  // if we have a selector, get the chosen elements
+	  if (typeof(elements) === 'string') {
+	    elements = document.querySelectorAll(elements);
+	  }
+
+	  // if we have a single DOM element, make it an array to simplify behavior
+	  else if (elements.tagName) { elements=[elements]; }
+
+	  // add class to all chosen elements
+	  for (var i=0; i<elements.length; i++) {
+
+	    // if class is not already found
+	    if ( (' '+elements[i].className+' ').indexOf(' '+myClass+' ') < 0 ) {
+
+	      // add class
+	      elements[i].className += ' ' + myClass;
+	    }
+	  }
 	}
 
-	function changequantity()
-	{
-		var elquantity = document.getElementById('productquantity');
-		itemcountq = elquantity.options[elquantity.selectedIndex];
-		itemcount = parseInt(itemcountq.value);
-		carttotal();		
+	//this function removes a class using a class or id
+	function removeClass(elements, myClass) {
+
+	  // if there are no elements, we're done
+	  if (!elements) { return; }
+
+	  // if we have a selector, get the chosen elements
+	  if (typeof(elements) === 'string') {
+	    elements = document.querySelectorAll(elements);
+	  }
+
+	  // if we have a single DOM element, make it an array to simplify behavior
+	  else if (elements.tagName) { elements=[elements]; }
+
+	  // create pattern to find class name
+	  var reg = new RegExp('(^| )'+myClass+'($| )','g');
+
+	  // remove class from all chosen elements
+	  for (var i=0; i<elements.length; i++) {
+	    elements[i].className = elements[i].className.replace(reg,' ');
+	  }
 	}
 
+	//this function chnages the text of a div/span etc using a class or id
+	function changeClassText(elements, value) {
+
+	  // if there are no elements, we're done
+	  if (!elements) { return; }
+
+	  // if we have a selector, get the chosen elements
+	  if (typeof(elements) === 'string') {
+	    elements = document.querySelectorAll(elements);
+	  }
+
+	  // if we have a single DOM element, make it an array to simplify behavior
+	  else if (elements.tagName) { elements=[elements]; }
+
+	  // add class to all chosen elements
+	  for (var i=0; i<elements.length; i++) {
+	      elements[i].innerHTML = value;
+	  }
+	}
+
+	//this function checks if an element has class
+	function hasClass(elements, value) {
+	  // if there are no elements, we're done
+	  if (!elements) { return; }
+
+	  // if we have a selector, get the chosen elements
+	  if (typeof(elements) === 'string') {
+	    elements = document.querySelectorAll(elements);
+	  }
+
+	  // if we have a single DOM element, make it an array to simplify behavior
+	  else if (elements.tagName) { elements=[elements]; }
+
+	  //loop the elements
+	  for (var i=0; i<elements.length; i++) {
+	  		//check if it is the one
+	  		//debug
+	  		//console.log(elements[i].className)
+	  		//console.log(value);
+	  		if (elements[i].className.indexOf(value) !=-1) 
+	      	{
+	      		return(1);
+	      	}
+	  }
+	  return(0);
+	}
+
+	//this function hides an element 
+	function hideClass(elements) 
+	{
+		// if there are no elements, we're done
+		if (!elements) { return; }
+
+		// if we have a selector, get the chosen elements
+		if (typeof(elements) === 'string') {
+		elements = document.querySelectorAll(elements);
+		}
+
+		// if we have a single DOM element, make it an array to simplify behavior
+		else if (elements.tagName) { elements=[elements]; }
+
+		//loop the elements
+		for (var i=0; i<elements.length; i++) 
+		{
+			elements[i].style.display="none";      	
+		}
+	}
+
+	//this function shows an element
+	function showClass(elements) 
+	{
+		// if there are no elements, we're done
+		if (!elements) { return; }
+
+		// if we have a selector, get the chosen elements
+		if (typeof(elements) === 'string') {
+		elements = document.querySelectorAll(elements);
+		}
+
+		// if we have a single DOM element, make it an array to simplify behavior
+		else if (elements.tagName) { elements=[elements]; }
+
+		//loop the elements
+		for (var i=0; i<elements.length; i++) 
+		{
+			elements[i].style.display="";      	
+		}
+	}
+
+	//this functions updates the totals for the cart
 	function carttotal()
 	{
-		
+		//multipily the price by the number of items in the cart
 		var producttotal = price * itemcount;
+		//set it to 8 decimal places as it's Bitcoin
 		producttotal = parseFloat(producttotal).toFixed(8);
 		changeClassText(document.getElementById('checkouttotal'),producttotal);
 		//update counter
 	  	changeClassText(document.querySelector('.cd-count'),itemcount);	
 	  	//store product
 		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
+		//call the store produt endpoint
 		fetchurl(url,'storeproduct')
-
 	}
 
+	//this function calls endpoints on the server
+	//note : This has to be extended to handle post, put etc it only uses GET at the moment.  
+	//		 Also it would be good to have proper called backs for the method if we add many more we will make it asynv
 	function fetchurl(url,method)
 	{
 		var request = new XMLHttpRequest();
@@ -242,15 +297,7 @@ function showClass(elements)
 		request.send();
 	}
 
-
-
-
-	var SR = SR || (function()
-	{
-
-
-
-
+	//this function works with how the cart should look and sets the correct viusal elements
 	function cartstate(state)
 	{
 		
@@ -265,8 +312,8 @@ function showClass(elements)
 
 		switch (state) {
 		    case 1:
+		    	//hide btc stuff
 		        hideClass(document.getElementById('checkoutbitocoin'));
-				//hide btc stuff
 				hideClass(document.getElementById('bitcoinaddresswrapper'));
 				//hide the customer details
 				hideClass(document.getElementById('customerdetailswrapper'));
@@ -278,91 +325,61 @@ function showClass(elements)
 				showClass(document.getElementById('cartlistitems'));
 		        break;
 		    case 2:
+				//hide the product details
 				hideClass(document.getElementById('cartlistitems'));
+				//show the customer details
 				showClass(document.getElementById('customerdetailswrapper'));
-				hideClass(document.getElementById('bitcoinaddresswrapper'));
 				showClass(document.getElementById('checkoutcustomerdetailsback'));
+		    	//hide btc stuff
+				hideClass(document.getElementById('bitcoinaddresswrapper'));
 		        break;
 		    case 3:
+				//show the product details
 		       	showClass(document.getElementById('cartlistitems'));
+		    	//hide btc stuff
 			  	hideClass(document.getElementById('bitcoinaddresswrapper'));
-			  	//hideClass(document.querySelector('.bitcoinback'));
+				//hide the customer details			  	
 			    hideClass(document.getElementById('customerdetailswrapper'));
 			   	hideClass(document.getElementById('checkoutcustomerdetailsback'));
 		        break;
 		    case 4:
+				//hide the product details
 		    	hideClass(document.getElementById('cartlistitems'));
+		    	//show btc stuff		    	
 				showClass(document.getElementById('bitcoinaddresswrapper'));
 				showClass(document.getElementById('checkoutbitocoin'));
+				//hide the customer details			  					
 				hideClass(document.getElementById('checkoutcustomerdetailsback'));
 				hideClass(document.getElementById('customerdetailswrapper'));
 		        break;
 		    case 5:
+		    	//hide the product details
 		    	hideClass(document.getElementById('cartlistitems'));
-				showClass(document.getElementById('customerdetailswrapper'));
-				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				//show the customer details
 				showClass(document.getElementById('checkoutcustomerdetailsback'));
+				showClass(document.getElementById('customerdetailswrapper'));
+		    	//show btc stuff
+				hideClass(document.getElementById('bitcoinaddresswrapper'));
 				hideClass(document.getElementById('checkoutbitocoin'));
 		        break;
 		   
 		}
 	}
 
-	var _args = {}; // private
-    
-    var quantity = 9;
-  
-	
 
-	//hold the animating flag
-	var animating = false;
 
-	//build the cart and hide it
-    var carthtml = '';
-    carthtml = carthtml +'<div class="cd-cart-container" style="display:none">';
-    carthtml = carthtml +'<a href="#0" class="cd-cart-trigger">';
-    carthtml = carthtml +'Cart';
-    carthtml = carthtml +'<span class="cd-count">0</span>';
-    carthtml = carthtml +'</a>';
-    carthtml = carthtml +'<div class="cd-cart">';
-    carthtml = carthtml +'<div class="wrapper">';
-    carthtml = carthtml +'<header>';
-    carthtml = carthtml +'<h2>Cart</h2>';
-    carthtml = carthtml +'<span class="backbutton" ><a id="checkoutcustomerdetailsback" href="#0">Back</a></span>';
-    carthtml = carthtml +'<span class="backbutton" ><a id="checkoutbitocoin" href="#0">Back</a></span>';
-    carthtml = carthtml +'</header>';
-	carthtml = carthtml +'<div class="body">';
-	carthtml = carthtml +'<ul id="cartlistitems">';
-	carthtml = carthtml +'</ul>';
-	carthtml = carthtml +'<div id="customerdetailswrapper">';
-	carthtml = carthtml +'<label>Email</label>  <input type="text" name="sr-email" id="sr-email">';
-	carthtml = carthtml +'<a href="#0" id="sr-pay" class="sr-button">Pay</a>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<div id="bitcoinaddresswrapper"><div>';
-	carthtml = carthtml +'<a id="bitcoinaddress" class="bitcoinaddress" href=""></a>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<div class="bitcoinoptions" >';
-	carthtml = carthtml +'<a href="#" class="bitcoinaddresscopy">';
-	carthtml = carthtml +'<i class="fa fa-copy"></i>';
-	carthtml = carthtml +'Copy';
-	carthtml = carthtml +'</a>';
-	carthtml = carthtml +'<a href="bitcoin:2N3Xtg7pBjUG4RPaiwfc2t3wftvLGWv6i2K" class="">';
-	carthtml = carthtml +'<i class="fa fa-btc"></i>';
-	carthtml = carthtml +'Pay from wallet';
-	carthtml = carthtml +'</a>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<img id="bitcoinqrcode" src="" />';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<footer><a href="#0" class="checkout btn"><em>Checkout - <span id="checkouttotal">0</span> BTC</em></a></footer>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'</div>';
-	//add it to the dom
-	document.body.insertAdjacentHTML("beforeend", carthtml);
-	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'css/sr.css" rel="stylesheet">'
+	/*
+	*=========================
+	*END OF GENERIC FUNCTIONS
+	*=========================
+	*/
 
-	//pay click
+
+	/*
+	**===============================
+	*START OF ELEMENT CLICK FUNCTIONS
+	*================================
+	*/
 
 	//bitcoin back click
 	document.getElementById('checkoutbitocoin').addEventListener('click', function () 
@@ -429,12 +446,12 @@ function showClass(elements)
 			prodcuthtml = prodcuthtml + '<div class="actions">';
 
 			//delete option
-			prodcuthtml = prodcuthtml + '<a href="javascript:deleteitem()" class="delete-item">Delete</a>';
+			prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="delete-item">Delete</a>';
 			prodcuthtml = prodcuthtml + '<div class="quantity">';
 			//quantity label
 			prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
 			//quantity select
-			prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="changequantity()">';
+			prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="SR.changequantity()">';
 			var i = 0;
 			for (i = 1; i < quantity; i++) 
 			{ 
@@ -488,6 +505,12 @@ function showClass(elements)
   		}
 	});
 
+	/*
+	**===============================
+	*END OF ELEMENT CLICK FUNCTIONS
+	*================================
+	*/
+
 
     return {
         init : function(Args) {
@@ -529,10 +552,41 @@ function showClass(elements)
 			if (typeof(_args[4]) != "")
 			{
 				uid = _args[4]
-			}						
+			}				
+
+			document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'css/sr.css" rel="stylesheet">'
 			//get an address
 			var url = serverurl+"api/address?uid="+uid;
 			fetchurl(url,'getaddress')
+			//addClass2();
+			//this.helloWorld()
         }
-    };
+        ,
+        //this function changes the quantity of the item in the cart
+        //note : it is in the name space like this as the cart items are created dynamically so the dom does not always know about it's existence 
+       	//		 which means that we have to call it from the onchange in the select old school I.E javascript:SR.chanagequantity() which is not ideal
+       	//		 and we will fix it later.
+        changequantity : function() {
+        	var elquantity = document.getElementById('productquantity');
+			itemcountq = elquantity.options[elquantity.selectedIndex];
+			itemcount = parseInt(itemcountq.value);
+			carttotal();	
+        }
+        ,
+        //this function deletes an item in the cart
+        //note : it is in the name space like this as the cart items are created dynamically so the dom does not always know about it's existence 
+       	//		 which means that we have to call it from the onchange in the select old school I.E javascript:SR.chanagequantity() which is not ideal
+       	//		 and we will fix it later.        
+        deleteitem : function ()
+		{
+			itemcount = 0;
+			var productlist = document.getElementById('cartlistitems');
+			productlist.innerHTML = "";
+			carttotal();
+			//close it
+	  		removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+		}
+
+
+   };
 }());

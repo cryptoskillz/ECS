@@ -3,17 +3,12 @@
 Primary style
 
 -------------------------------- */
+/*
 *, *::after, *::before {
   box-sizing: border-box;
 }
-/* -------------------------------- 
 
-Primary style
 
--------------------------------- */
-*, *::after, *::before {
-  box-sizing: border-box;
-}
 
 html {
   font-size: 62.5%;
@@ -60,12 +55,34 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+*/
+
 
 
 .cd-cart-container {
-font-size: 62.5%; 
--webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
+  font-size: 62.5%;
+  font-family: "Source Sans Pro", sans-serif;
+  color: #2b3e51;
+  background-color: #ecf0f1; 
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+
+.cd-cart-container img {
+    max-width: 100%;
+}
+
+
+.cd-cart-container h1 {
+  font-size: 2rem;
+  padding: 3em 0 .8em;
+}
+
+
+
+
+
 
 .sr-button {
   display: inline-block;
@@ -197,13 +214,16 @@ Main Components
 .cd-cart-trigger .cd-count {
   /* number of items indicator */
   position: absolute;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   top: -10px;
   right: -10px;
   height: 28px;
   width: 28px;
   background: #e94b35;
   color: #ffffff;
-  font-size: 2.5rem;
   font-weight: bold;
   border-radius: 50%;
   text-indent: 7px;
@@ -215,6 +235,7 @@ Main Components
 .cd-cart-trigger .cd-count li {
   /* this is the number of items in the cart */
   position: absolute;
+  
   -webkit-transform: translateZ(0);
           transform: translateZ(0);
   left: 50%;
