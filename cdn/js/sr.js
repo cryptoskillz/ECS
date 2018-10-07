@@ -1,7 +1,5 @@
-
 var SR = SR || (function()
 {
-
 	/*
 	**=========================
 	*START OF GLOBAL FUNCTIONS
@@ -31,65 +29,17 @@ var SR = SR || (function()
 
 	//hold the animating flag
 	var animating = false;
-
 	/*
 	**=========================
 	*END OF GLOBAL FUNCTIONS
 	*=========================
 	*/
 
-	//build the cart and hide it
-	//note : we should include this to make the js a little cleaner
-    var carthtml = '';
-    carthtml = carthtml +'<div class="cd-cart-container" style="display:none">';
-    carthtml = carthtml +'<a href="#0" class="cd-cart-trigger">';
-    carthtml = carthtml +'Cart';
-    carthtml = carthtml +'<span class="cd-count">0</span>';
-    carthtml = carthtml +'</a>';
-    carthtml = carthtml +'<div class="cd-cart">';
-    carthtml = carthtml +'<div class="wrapper">';
-    carthtml = carthtml +'<header>';
-    carthtml = carthtml +'<h2>Cart</h2>';
-    carthtml = carthtml +'<span class="backbutton" ><a id="checkoutcustomerdetailsback" href="#0">Back</a></span>';
-    carthtml = carthtml +'<span class="backbutton" ><a id="checkoutbitocoin" href="#0">Back</a></span>';
-    carthtml = carthtml +'</header>';
-	carthtml = carthtml +'<div class="body">';
-	carthtml = carthtml +'<ul id="cartlistitems">';
-	carthtml = carthtml +'</ul>';
-	carthtml = carthtml +'<div id="customerdetailswrapper">';
-	carthtml = carthtml +'<label>Email</label>  <input type="text" name="sr-email" id="sr-email">';
-	carthtml = carthtml +'<a href="#0" id="sr-pay" class="sr-button">Pay</a>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<div id="bitcoinaddresswrapper"><div>';
-	carthtml = carthtml +'<a id="bitcoinaddress" class="bitcoinaddress" href=""></a>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<div class="bitcoinoptions" >';
-	carthtml = carthtml +'<a href="#" class="bitcoinaddresscopy">';
-	carthtml = carthtml +'<i class="fa fa-copy"></i>';
-	carthtml = carthtml +'Copy';
-	carthtml = carthtml +'</a>';
-	carthtml = carthtml +'<a href="bitcoin:2N3Xtg7pBjUG4RPaiwfc2t3wftvLGWv6i2K" class="">';
-	carthtml = carthtml +'<i class="fa fa-btc"></i>';
-	carthtml = carthtml +'Pay from wallet';
-	carthtml = carthtml +'</a>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<img id="bitcoinqrcode" src="" />';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'<footer><a href="#0" class="checkout btn"><em>Checkout - <span id="checkouttotal">0</span> BTC</em></a></footer>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'</div>';
-	carthtml = carthtml +'</div>';
-	//add it to the dom
-	document.body.insertAdjacentHTML("beforeend", carthtml);
-
-
 	/*
 	**=========================
 	*START OF GENERIC FUNCTIONS
 	*=========================
 	*/
-
 
 	//this function adds a class using a  class or id
 	function addClass(elements, myClass) {
@@ -255,8 +205,6 @@ var SR = SR || (function()
 		//call it
 		request.onload = function() {
 		  if (request.status >= 200 && request.status < 400) {
-		    
-
 		    if (method == "getaddress")
 		    {
 		    	// parse the data
@@ -279,6 +227,7 @@ var SR = SR || (function()
 				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
 		    	//debug
 			    //console.log(elbtcqr)
+			    clickElements()
 		    }
 		    if (method == "storeproduct")
 		    {
@@ -286,7 +235,14 @@ var SR = SR || (function()
 		    }
 		    if (method == "carttemplate")
 		    {
-		    	console.log(data);
+		    	//debug
+		    	//console.log(request.responseText);
+
+		    	//add the cart templatehtml
+				document.body.insertAdjacentHTML("beforeend", request.responseText);
+				//get an address
+				var url = serverurl+"api/address?uid="+uid;
+				fetchurl(url,'getaddress')
 		    }
 
 		  } 
@@ -305,8 +261,6 @@ var SR = SR || (function()
 	//this function works with how the cart should look and sets the correct viusal elements
 	function cartstate(state)
 	{
-		
-
 		/*
 			1 = show cart product details
 			2 = show customer details screen
@@ -314,7 +268,6 @@ var SR = SR || (function()
 			4 = custmer details pay click
 			5 = bitcoin details back click
 		*/
-
 		switch (state) {
 		    case 1:
 		    	//hide btc stuff
@@ -366,159 +319,147 @@ var SR = SR || (function()
 		    	//show btc stuff
 				hideClass(document.getElementById('bitcoinaddresswrapper'));
 				hideClass(document.getElementById('checkoutbitocoin'));
-		        break;
-		   
+		        break;  
 		}
 	}
-
-
 
 	/*
 	*=========================
 	*END OF GENERIC FUNCTIONS
 	*=========================
 	*/
-
-
-	/*
-	**===============================
-	*START OF ELEMENT CLICK FUNCTIONS
-	*================================
-	*/
-
-	//bitcoin back click
-	document.getElementById('checkoutbitocoin').addEventListener('click', function () 
-	{
-		cartstate(5);
-	});
 	
-
-	//payment click
-	document.getElementById('sr-pay').addEventListener('click', function () 
+	function clickElements()
 	{
-		//todo :send it to the server either as a new product or a quantity update along with the customer detail
-		cartstate(4);
-	});
+		/*
+		*===============================
+		*START OF ELEMENT CLICK FUNCTIONS
+		*================================
+		*/
 
-
-	//customer back click
-	document.getElementById('checkoutcustomerdetailsback').addEventListener('click', function () 
-	{
-		cartstate(3);
-	});
-
-	
-	//add to cart click element
-	document.querySelector('.checkout').addEventListener('click', function () 
-	{
-		cartstate(2);
-	});
-
-	
-	//add to cart click element
-	document.querySelector('.cd-add-to-cart').addEventListener('click', function () 
-	{
-		//get details
-		var elproduct = document.getElementById('cd-add-to-cart');
-		price =elproduct.getAttribute('data-price');
-		name =elproduct.getAttribute('data-name');
-		var productid = 1;
-		var previewpic = '';
-
-		//increment count (quantity)
-		if (itemcount <= quantity)
+		//bitcoin back click
+		document.getElementById('checkoutbitocoin').addEventListener('click', function () 
 		{
-			itemcount = itemcount+1;
-			carttotal(price)
-			
-	  		//show it
-	  		showClass(document.querySelector('.cd-cart-container'))	
-		  	
-		  	//add item to cart
-		  	var productlist = document.getElementById('cartlistitems');
-			var itemlist  = document.createElement('li');
-			itemlist.className = 'product ';
+			cartstate(5);
+		});
+		//payment click
+		document.getElementById('sr-pay').addEventListener('click', function () 
+		{
+			//todo :send it to the server either as a new product or a quantity update along with the customer detail
+			cartstate(4);
+		});
+		//customer back click
+		document.getElementById('checkoutcustomerdetailsback').addEventListener('click', function () 
+		{
+			cartstate(3);
+		});
+		//add to cart click element
+		document.querySelector('.checkout').addEventListener('click', function () 
+		{
+			cartstate(2);
+		});
 
-			//build produt
-			var prodcuthtml = '';
-			//product image		
-			var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
-			//product name
-			prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
-			//product price
-			prodcuthtml = prodcuthtml + '<span class="price">'+price+' BTC</span>';
-			//actions div
-			prodcuthtml = prodcuthtml + '<div class="actions">';
+		//add to cart click element
+		document.querySelector('.cd-add-to-cart').addEventListener('click', function () 
+		{
+			//get details
+			var elproduct = document.getElementById('cd-add-to-cart');
+			price =elproduct.getAttribute('data-price');
+			name =elproduct.getAttribute('data-name');
+			//will update when we use multipile products
+			var productid = 1;
+			//todo
+			var previewpic = '';
+			//increment count (quantity)
+			if (itemcount <= quantity)
+			{
+				itemcount = itemcount+1;
+				carttotal(price)
+				
+		  		//show it
+		  		showClass(document.querySelector('.cd-cart-container'))	
+			  	
+			  	//add item to cart
+			  	var productlist = document.getElementById('cartlistitems');
+				var itemlist  = document.createElement('li');
+				itemlist.className = 'product ';
 
-			//delete option
-			prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="delete-item">Delete</a>';
-			prodcuthtml = prodcuthtml + '<div class="quantity">';
-			//quantity label
-			prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
-			//quantity select
-			prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="SR.changequantity()">';
-			var i = 0;
-			for (i = 1; i < quantity; i++) 
-			{ 
-				if (i == itemcount)
-					prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
+				//build produt
+				var prodcuthtml = '';
+				//product image		
+				var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
+				//product name
+				prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
+				//product price
+				prodcuthtml = prodcuthtml + '<span class="price">'+price+' BTC</span>';
+				//actions div
+				prodcuthtml = prodcuthtml + '<div class="actions">';
 
-				else
-					prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
-			}
-			prodcuthtml = prodcuthtml +'</select></span>';
-			//end of quantiy div
-			var prodcuthtml = prodcuthtml + '</div>';
-			//end of actions div
-			var prodcuthtml = prodcuthtml + '</div>';
-			//end of products details div
-			var prodcuthtml = prodcuthtml + '</div>';
-			//end of product div
-			//add to the list		
-			itemlist.innerHTML = prodcuthtml;
-			// append  to the end of theParent
-			productlist.innerHTML = "";
-			productlist.appendChild(itemlist);
+				//delete option
+				prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="delete-item">Delete</a>';
+				prodcuthtml = prodcuthtml + '<div class="quantity">';
+				//quantity label
+				prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
+				//quantity select
+				prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="SR.changequantity()">';
+				var i = 0;
+				for (i = 1; i < quantity; i++) 
+				{ 
+					if (i == itemcount)
+						prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
 
-  		}
-
-	});
-
-	//cart clicked element
-	document.querySelector('.cd-cart-trigger').addEventListener('click', function () {
-  		//check if cart shoud be shown
-  		//debug
-  		//itemcount = 1;
-  		if (itemcount == 0)
-  		{
-  			//always remove as its 0
-  			removeClass(document.querySelector('.cd-cart-container'),'cart-open');
-  		}
-  		else
-  		{
-  			//see if the cart is open and toggle it
-  			var res = hasClass(document.querySelector('.cd-cart-container'),'cart-open');
-  			if (res == 1)
-  			{
-  				//close it
-  				removeClass(document.querySelector('.cd-cart-container'),'cart-open');
-  			}
-  			else
-  			{
-  				cartstate(1);
-  			}
-  		}
-	});
-
-	/*
-	**===============================
-	*END OF ELEMENT CLICK FUNCTIONS
-	*================================
-	*/
-
-
+					else
+						prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
+				}
+				prodcuthtml = prodcuthtml +'</select></span>';
+				//end of quantiy div
+				var prodcuthtml = prodcuthtml + '</div>';
+				//end of actions div
+				var prodcuthtml = prodcuthtml + '</div>';
+				//end of products details div
+				var prodcuthtml = prodcuthtml + '</div>';
+				//end of product div
+				//add to the list		
+				itemlist.innerHTML = prodcuthtml;
+				// append  to the end of theParent
+				productlist.innerHTML = "";
+				productlist.appendChild(itemlist);
+	  		}
+		});
+		//cart clicked element
+		document.querySelector('.cd-cart-trigger').addEventListener('click', function () {
+	  		//check if cart shoud be shown
+	  		//debug
+	  		//itemcount = 1;
+	  		if (itemcount == 0)
+	  		{
+	  			//always remove as its 0
+	  			removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  		}
+	  		else
+	  		{
+	  			//see if the cart is open and toggle it
+	  			var res = hasClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  			if (res == 1)
+	  			{
+	  				//close it
+	  				removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  			}
+	  			else
+	  			{
+	  				cartstate(1);
+	  			}
+	  		}
+		});
+		/*
+		*===============================
+		*END OF ELEMENT CLICK FUNCTIONS
+		*================================
+		*/
+	}
     return {
-        init : function(Args) {
+        init : function(Args) 
+        {
         	/*
 
         	Server vars you can pass set to "" to ignore
@@ -529,7 +470,6 @@ var SR = SR || (function()
 			4 = uid
 
         	*/
-
 			_args = Args;
 
 			//override the server url
@@ -557,21 +497,12 @@ var SR = SR || (function()
 			if (typeof(_args[4]) != "")
 			{
 				uid = _args[4]
-			}	
+			}
+			//load css
+        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'css/sr.css" rel="stylesheet">'	
 
-			//const text = fetchTemplateSomehowAsText('html/carttemplate.html')
-			//console.log(text);
 			//fetch the template so we can use themes 
-			//todo
-			//fetchurl('http://s3.eu-west-1.amazonaws.com/srcrypto/html/carttemplate.html','carttemplate');
-
-
-			document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'css/sr.css" rel="stylesheet">'
-			//get an address
-			var url = serverurl+"api/address?uid="+uid;
-			fetchurl(url,'getaddress')
-			//addClass2();
-			//this.helloWorld()
+			fetchurl('http://s3.eu-west-1.amazonaws.com/srcrypto/html/carttemplate.html','carttemplate');
         }
         ,
         //this function changes the quantity of the item in the cart
@@ -598,7 +529,5 @@ var SR = SR || (function()
 			//close it
 	  		removeClass(document.querySelector('.cd-cart-container'),'cart-open');
 		}
-
-
    };
 }());
