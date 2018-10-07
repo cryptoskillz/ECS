@@ -227,7 +227,6 @@ var SR = SR || (function()
 				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
 		    	//debug
 			    //console.log(elbtcqr)
-			    clickElements()
 		    }
 		    if (method == "storeproduct")
 		    {
@@ -240,6 +239,8 @@ var SR = SR || (function()
 
 		    	//add the cart templatehtml
 				document.body.insertAdjacentHTML("beforeend", request.responseText);
+				//add the click elements listeners
+				clickElements()
 				//get an address
 				var url = serverurl+"api/address?uid="+uid;
 				fetchurl(url,'getaddress')
