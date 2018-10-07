@@ -255,13 +255,14 @@ var SR = SR || (function()
 		//call it
 		request.onload = function() {
 		  if (request.status >= 200 && request.status < 400) {
-		    // parse the data
-		    var data = JSON.parse(request.responseText);
-		    //debug
-		    //console.log(data)
+		    
 
 		    if (method == "getaddress")
 		    {
+		    	// parse the data
+			    var data = JSON.parse(request.responseText);
+			    //debug
+			    //console.log(data)
 			    //set the address
 			    address = data.address;
 			    //set the address in the checkout
@@ -282,6 +283,10 @@ var SR = SR || (function()
 		    if (method == "storeproduct")
 		    {
 		    	//do stuff if you want.
+		    }
+		    if (method == "carttemplate")
+		    {
+		    	console.log(data);
 		    }
 
 		  } 
@@ -552,7 +557,14 @@ var SR = SR || (function()
 			if (typeof(_args[4]) != "")
 			{
 				uid = _args[4]
-			}				
+			}	
+
+			//const text = fetchTemplateSomehowAsText('html/carttemplate.html')
+			//console.log(text);
+			//fetch the template so we can use themes 
+			//todo
+			//fetchurl('http://s3.eu-west-1.amazonaws.com/srcrypto/html/carttemplate.html','carttemplate');
+
 
 			document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'css/sr.css" rel="stylesheet">'
 			//get an address
