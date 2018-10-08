@@ -510,10 +510,17 @@ var SR = SR || (function()
 
 			//load css
 
-        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
+			//debug for test
+			clickElements()
+			//get an address
+			var url = serverurl+"api/address?uid="+uid;
+			fetchurl(url,'getaddress')
+
+			//for live
+        	//document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
 
 			//fetch the template so we can use themes 
-			fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
+			//fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
         }
         ,
         //this function changes the quantity of the item in the cart

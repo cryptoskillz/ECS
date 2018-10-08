@@ -244,6 +244,8 @@ Main Components
   width: 100%;
 }
 .cd-cart header, .cd-cart .body {
+    font-size: 1.2rem;
+
   opacity: 0;
 }
 .cd-cart header {
@@ -258,17 +260,20 @@ Main Components
   border-bottom: 1px solid #e6e6e6;
 }
 .cd-cart header::after {
+  font-size: 1.2rem;
   clear: both;
   content: "";
   display: block;
 }
 .cd-cart footer {
+  font-size: 32.5% !important;
   bottom: 0;
   border-radius: 0 0 6px 6px;
   box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.15);
   background: #ffffff;
 }
 .cd-cart h2 {
+  font-size: 62.5% !important;
   text-transform: uppercase;
   display: inline-block;
   font-size: 1.4rem;
@@ -312,6 +317,7 @@ Main Components
   background: #399ee0;
 }
 .cd-cart .checkout em {
+  font-size: 62.5% !important;
   position: relative;
   display: inline-block;
   -webkit-transform: translateX(40px);
@@ -422,6 +428,7 @@ Main Components
   display: block;
 }
 .cd-cart h3, .cd-cart .price {
+
   font-weight: bold;
 }
 .cd-cart h3 {
@@ -444,7 +451,6 @@ Main Components
   text-align: right;
 }
 .cd-cart .actions {
-  font-size: 1.4rem;
   height: 1.6em;
   line-height: 1.6em;
 }
