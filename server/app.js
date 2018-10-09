@@ -93,6 +93,37 @@ app.get('/admin/updatesettings', (req, res) => {
 	 }); 
 });
 
+//orders
+app.get('/admin/order', (req, res) => {
+	//set the headers
+	res = setHeaders(res);
+	    let sql = `select *
+    		   from product
+	           WHERE product.address = '`+req.query.address+`'`;
+
+	var jsonStr = '{"results":[]}';
+	var obj = JSON.parse(jsonStr);
+	//jsonStr = JSON.stringify(obj)
+	db.all(sql, [], (err, rows) => {
+	  if (err) {
+	    throw err;
+	  }
+	 rows.forEach((row) => {
+	 	//console.log(row);
+	 	//myObj.push(row);
+	 	//obj.push('dsss');
+	 	obj['results'].push(row);
+
+
+	 });
+	 jsonStr = JSON.stringify(obj);
+	 //console.log('done');
+	 //console.log(jsonStr);
+	 res.send(jsonStr);
+
+	});
+});
+
 
 //return the admin settings
 app.get('/admin/settings', (req, res) => {
@@ -131,7 +162,7 @@ app.get('/admin/settings', (req, res) => {
 app.get('/admin/payments', (req, res) => {
 	//set the headers
 	res = setHeaders(res);
-    let sql = `select keys.id,keys.address,keys.processed,keys.swept,keys.net,keys.amount 
+    let sql = `select keys.id,keys.address,keys.processed,keys.swept,keys.net,keys.amount
     		   from user
     		   INNER JOIN keys ON user.id = keys.userid
 	           WHERE user.sessiontoken = '`+req.query.token+`'`;
@@ -213,6 +244,26 @@ app.get('/admin/login', (req, res) => {
 ========================
 END OF ADMIN FUNCTION
 ========================*/
+
+			//var url = serverurl+"api/storeuserdetails?email="+email+"&address="+address;
+
+//store user details
+app.get('/api/storeuserdetails', (req, res) => {
+	//set the headers
+	res = setHeaders(res); 
+	let data = [req.query.email,req.query.address];
+	let sql = `UPDATE product
+	            SET email = ?
+	           	WHERE address = ?`;
+	 
+	db.run(sql, data, function(err) {
+	  if (err) {
+	    return console.error(err.message);
+	  }
+	  //console.log(`Row(s) updated: ${this.changes}`);
+	 res.send(JSON.stringify({status: "ok"}));
+	});
+});
 
 //storeproduct
 app.get('/api/storeproduct', (req, res) => {

@@ -6,7 +6,6 @@ var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
 //note : set this whatever your local instance is 127.0.0.1 for example
 if(window.location.href.indexOf("srcryptoadmin") > -1) 
 {
-	alert('dd');
 	serverurl = "http://127.0.0.1:3000/";
 }
 
@@ -61,7 +60,7 @@ function updatesettigsDone()
 	//get the result
 	var result = $.parseJSON(ajaxdata);
 	//debug
-	//console.log(result.results);
+	console.log(result.results);
 	//check update status
 	if (result.results == 'ok')
 	{
@@ -72,6 +71,22 @@ function updatesettigsDone()
 	{
 		alert('eror updating settings');
 	}
+	
+}
+
+function orderDone()
+{
+	//get the result
+	var result = $.parseJSON(ajaxdata);
+	//debug
+	//console.log(result.results[0].address);
+	$('#address').text(result.results[0].address);
+	$('#name').text(result.results[0].name);
+	$('#quantity').text(result.results[0].quantity);
+	$('#price').text(result.results[0].price);
+
+	//check update status
+	
 	
 }
 
@@ -178,22 +193,20 @@ function paymentsDone()
 			actions = actions + '<a href="javascript:checkProcessed(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Process</a>'
 
 		}
-		else
+		//check if it was swept
+		//note: you should never have an unprocessed payment that was swept but it does not harm to have this additional check.
+		if (res.swept == 0)
 		{
-			//check if it was swept
-			//note: you should never have an unprocessed payment that was swept but it does not harm to have this additional check.
-			if (res.swept == 0)
-			{
-				//add to the acction 
-				swept = "No";
-				actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Sweep</a>'
-			}
-
+			//add to the acction 
+			swept = "No";
+			actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Sweep</a>'
 		}
+
+		
 		
 		//add the row to the table
 		t.row.add( [
-			res.id,
+			'<a href="order.html?address='+res.address+'" >'+res.id+'</a>',
 			'<a href="'+blockexplorerurl+'" target="_blank">'+res.address+'</a>',
 			processed,
 			swept,
@@ -267,7 +280,7 @@ $('#updatesettings').click(function()
   	//alert(address);
 
   	//call the server updatesettings url
-  	var geturl = serverurl+'admin/updatesettigs?address='+address+'&token='+token;
+  	var geturl = serverurl+'admin/updatesettings?address='+address+'&token='+token;
   	ajaxGET(geturl,"updatesettigsDone()");
 });
 
@@ -295,6 +308,7 @@ $(document).ready(function()
     //get the url
     var url = window.location.href;
 
+
     //check if it is blank
     if (token == '') 
     {
@@ -308,6 +322,7 @@ $(document).ready(function()
     }
     else
     {
+
     	//check what page we are on
 		//check if it is the payment page
 		if (url.substr(url.lastIndexOf('/') + 1) == 'payments.html')
@@ -323,6 +338,14 @@ $(document).ready(function()
 			var geturl = serverurl+'admin/settings?token='+token;
 			ajaxGET(geturl,"settingsDone()");
 		}
+		if (url.indexOf("order.html") !=-1)
+		{
+			//make a server call
+			var urls = new URL(url);
+			var geturl = serverurl+'admin/order?token='+token+'&address='+urls.searchParams.get("address");
+			//alert(geturl);
+			ajaxGET(geturl,"orderDone()");
+		}		
     	$('#wrapper').removeClass('d-none');
     	//load the table
     }

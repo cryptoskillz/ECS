@@ -14,6 +14,9 @@ var SR = SR || (function()
 	var name = '';
 	//hold the addres of the product
 	var address = '';
+
+	//hold the email
+	var email = '';
 	//hold the user id 
 	//note : Right now we only allow one user but we will expand this later to make it more of a SAAS product.
 	var uid = '';
@@ -247,6 +250,10 @@ var SR = SR || (function()
 				var url = serverurl+"api/address?uid="+uid;
 				fetchurl(url,'getaddress')
 		    }
+		    if (method == "storeuserdetails")
+		    {
+		    	cartstate(4);
+		    }
 
 		  } 
 		  else
@@ -348,8 +355,23 @@ var SR = SR || (function()
 		//payment click
 		document.getElementById('sr-pay').addEventListener('click', function () 
 		{
-			//todo :send it to the server either as a new product or a quantity update along with the customer detail
-			cartstate(4);
+			//get the email
+			//note: We want to update this when we collect more than email, shipping address etc. 
+			var useremail = document.getElementById('sr-email').value; 
+			//only send the email if it has not been sent
+			if (email != useremail)
+			{
+				email = useremail
+				var url = serverurl+"api/storeuserdetails?email="+email+"&address="+address;
+				//call the store produt endpoint
+				fetchurl(url,'storeuserdetails')		
+			}
+			else
+			{
+				cartstate(4);
+			}
+							
+			
 		});
 		//customer back click
 		document.getElementById('checkoutcustomerdetailsback').addEventListener('click', function () 
@@ -510,17 +532,10 @@ var SR = SR || (function()
 
 			//load css
 
-			//debug for test
-			clickElements()
-			//get an address
-			var url = serverurl+"api/address?uid="+uid;
-			fetchurl(url,'getaddress')
-
-			//for live
-        	//document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
+        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
 
 			//fetch the template so we can use themes 
-			//fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
+			fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
         }
         ,
         //this function changes the quantity of the item in the cart
