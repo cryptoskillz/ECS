@@ -1,27 +1,23 @@
 
-const express = require('express');
+const Client = require('bitcoin-core');
 
-var bitcoin = require('bitcoin');
-var client = new bitcoin.Client({
-  host: 'localhost',
-  port: 18332,
-  user: 'test',
-  pass: 'test'
-});
-
-client.getDifficulty(function(err, difficulty) {
-  if (err) {
-    return console.error(err);
+const client = new Client(
+  {   
+    host: '127.0.0.1',
+    port: 18332,
+    username: 'test',
+    password: 'test'
   }
+);
 
-  console.log('Difficulty: ' + difficulty);
+client.estimateSmartFee(6).then((res) => {
+  console.log(res)
 });
 
- const app = express();
 
 
-var port = process.env.PORT || 3000;
-app.listen( port );
+
+
   
 
 

@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bitcoin": "^3.0.1",
+    "bitcoin-core": "^2.0.0",
     "bitcoinjs-lib": "^4.0.2",
     "block_io": "^1.0.9",
     "body-parser": "^1.18.3",
