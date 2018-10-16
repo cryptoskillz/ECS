@@ -1,0 +1,87 @@
+<!--
+This is a test html file to check the cart css and html easier withouth having to run all the servers etc.
+It is not required for you to look at this at all.
+-->
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="http://srcryptocdn/theme/cart.css"> 
+
+
+	<link rel="stylesheet" href="css/reset.css"> 
+ 	<script src="js/modernizr.js"></script> <!-- Modernizr -->
+
+	<title></title>
+</head>
+<body>
+<main>
+	<h1>Add to Cart Interaction</h1>
+	<a href="#0" id="cd-add-to-cart" class="cd-add-to-cart" data-price="0.1" data-name="a product">Add To Cart</a>
+</main>
+
+<div class="cd-cart-container"  style="display:none">
+   <a href="#0" class="cd-cart-trigger">
+      Cart
+      <span class="cd-count"> 
+         0
+      </span> 
+   </a>
+   <div class="cd-cart">
+      <div class="wrapper">
+         <header>
+            <h2>Cart</h2>
+            <span><a class="back"  id="checkoutbitocoin" href="#0">Back</a></span>
+            <span><a class="back"  id="checkoutcustomerdetailsback" href="#0">Back</a></span>
+         </header>
+         <div class="body">
+            <ul id='cartlistitems'>
+            </ul>
+            <div id="customerdetailswrapper">
+               <label>Email</label>  
+               <input type="text" name="sr-email" id="sr-email">
+               <a href="#0" id="sr-pay" class="sr-button">Pay</a>
+            </div>
+            <div id="bitcoinaddresswrapper">
+               <div>
+                    <a id="bitcoinaddress" class="bitcoinaddress" href=""></a>
+                </div>
+                <div class="bitcoinoptions" >
+                  <a href="#" class="bitcoinaddresscopy">
+                       <i class="fa fa-copy"></i>
+                       Copy
+                   </a>
+                   <a href="" class="">
+                       <i class="fa fa-btc"></i>
+                       Pay from wallet
+                   </a>
+                </div>
+               <img id="bitcoinqrcode" src="" />
+            </div>
+         </div>
+            <footer><a href="#0" class="checkout btn"><em>Checkout - <span id="checkouttotal">0</span> BTC</em></a></footer>
+      </div>
+   </div> 
+</div> 
+
+
+<!-- this is were we host the js file that andles cart interaction etc you can dwnload and self host this if you prefer
+<script type="text/javascript" src="https://s3.eu-west-1.amazonaws.com/srcrypto/js/sr.js"></script>-->
+<script type="text/javascript" src="http://srcryptocdn/js/sr.js"></script>
+<script type="text/javascript">
+   /*
+   		0 = server url
+   		1 = animated
+   		2 = quantity count
+   		3 = cdn url
+   		4 = uid
+   */
+   //SR.init(["http://srcryptoapi.eu-west-1.elasticbeanstalk.com/", false,15,"http://s3.eu-west-1.amazonaws.com/srcrypto/","3",""]);
+   SR.init(["http://127.0.0.1:3000/", false,15,"http://srcryptocdn/","3",""]);
+</script>
+
+
+
+</body>
+</html>

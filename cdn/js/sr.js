@@ -1,362 +1,566 @@
-jQuery(document).ready(function($)
+var SR = SR || (function()
 {
-	//set url to production
-	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
-	//check if we are local
-	//note : set this whatever your local instance is 127.0.0.1 for example
-	if(window.location.href.indexOf("srcryptowww") > -1) 
-	{
-		serverurl = "http://127.0.0.1:3000/";
-	}
-	//alert(serverurl);
-	//set the address
+	/*
+	**=========================
+	*START OF GLOBAL FUNCTIONS
+	*=========================
+	*/
+
+	//holdthe number of product
+	var itemcount = 0;
+	//hold the price of the product
+	var price = '';
+	//hold the name of the product
+	var name = '';
+	//hold the addres of the product
 	var address = '';
-	//init price var
-	var productPrice = 0;
-	var cartWrapper = $('.cd-cart-container');
-	//set the cart wrapper
-	var productCustomization = $('.cd-customization'),
-	//set the cart
-	cart = $('.cd-cart'),
-	//set animating boolean
-	animating = false;
 
-	//call the server to get a btc address
-	$.get( serverurl+"api/address", function( data ) 
-	{
-		//get the data
-	  	data = jQuery.parseJSON( data );
-	  	//console.log(data.address);
-	  	address = data.address;
-	  	//set the address
-	  	$('#bitcoinaddress').text(address);
-	  	//set the href of the bitcoin address
-	  	$('#bitcoinaddress').attr('href','bitcoin:'+address);
-	  	//generate the qr code
-	  	$('#bitcoinqrcode').attr('src','https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl='+address);
-	  	//init the product
-	});
+	//hold the email
+	var email = '';
+	//hold the user id 
+	//note : Right now we only allow one user but we will expand this later to make it more of a SAAS product.
+	var uid = '';
+	//hold the server url can be overridden in init
+	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
+	//hold the cdn url can be overridden in init
+	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
 
-	initCustomization(productCustomization);
+		//var to hold the arguments passed in from init
+	var _args = {}; // private
+    
+    var quantity = 9;
 
-	//check we have a cart
-	if( cartWrapper.length > 0 ) 
-	{
-		//store jQuery objects for later use
-		var cartBody = cartWrapper.find('.body')
-		var cartList = cartBody.find('ul').eq(0);
-		var cartTotal = cartWrapper.find('.checkout').find('span');
-		//console.log(cartTotal);
-		var cartTrigger = cartWrapper.children('.cd-cart-trigger');
-		var cartCount = cartTrigger.children('.count')
-		var addToCartBtn = $('.sr-add-to-cart');
-		var bitcoinback = cartWrapper.find('.bitcoinback');
-		
-		//add product to cart
-		addToCartBtn.on('click', function(event){
-			event.preventDefault();
-			addToCart($(this));
-		});
+	//hold the animating flag
+	var animating = false;
 
-		//open/close cart
-		cartTrigger.on('click', function(event){
-			event.preventDefault();
-			toggleCart();
-		});
-
-		//close cart when clicking on the .cd-cart-container::before (bg layer)
-		cartWrapper.on('click', function(event){
-			if( $(event.target).is($(this)) ) toggleCart(true);
-		});
-
-		//delete an item from the cart
-		cartList.on('click', '.delete-item', function(event){
-			event.preventDefault();
-			//remove the product
-			removeProduct($(event.target).parents('.product'));
-		});
-
-		//load btc address for payment
-		cartWrapper.on('click', '.checkout', function(event){
-			event.preventDefault();
-			bitcoinback.addClass('visible');
-			///$('#bitcoin-address-template').show();
-			$('#bitcoinaddresswrapper').show();
-			//hide the cart items
-			$('#cartlistitems').hide();
-		});
-
-		
-		//copy the btc address to the clipboard
-		cartWrapper.on('click', '.bitcoinaddresscopy', function(event){
-			event.preventDefault();
-			/* Get the text field */
-  			var element = document.getElementById("bitcoinaddress");
-  			var $temp = $("<input>");
-  			$("body").append($temp);
-  			$temp.val($(element).text()).select();
- 		 	document.execCommand("copy");
-  			//$temp.remove();
-
-
-		});
-
-		//back button is clicked so show items
-		cartWrapper.on('click', '#checkoutbitocoin', function(event){
-			event.preventDefault();
-			bitcoinback.removeClass('visible');
-			$('#bitcoinaddresswrapper').hide();
-			//$('#bitcoin-address-template').hide();
-			$('#cartlistitems').show();
-		});
-
-	}
-
-	function initCustomization(items) 
-	{
-		items.each(function()
-		{
-			var actual = $(this),
-				selectOptions = actual.find('[data-type="select"]'),
-				addToCartBtn = actual.find('.sr-add-to-cart'),
-				touchSettings = actual.next('.cd-customization-trigger');
-
-			//detect click on ul.size/ul.color list elements 
-			selectOptions.on('click', function(event) { 
-				var selected = $(this);
-				//open/close options list
-				selected.toggleClass('is-open');
-				resetCustomization(selected);
-				
-				if($(event.target).is('li')) {
-					// update selected option
-					var activeItem = $(event.target),
-						index = activeItem.index() + 1;
-					
-					activeItem.addClass('active').siblings().removeClass('active');
-					selected.removeClass('selected-1 selected-2 selected-3').addClass('selected-'+index);
-					// if color has been changed, update the visible product image 
-					selected.hasClass('sr-color') && updateSlider(selected, index-1);
-				}
-			});
-
-			//detect click on the add-to-cart button
-			addToCartBtn.on('click', function() {	
-				if(!animating) {
-					//animate if not already animating
-					animating =  true;
-					resetCustomization(addToCartBtn);
-
-					addToCartBtn.addClass('is-added').find('path').eq(0).animate({
-						//draw the check icon
-						'stroke-dashoffset':0
-					}, 300, function(){
-						setTimeout(function(){
-							//updateCart();
-							addToCartBtn.removeClass('is-added').find('em').on('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function(){
-								//wait for the end of the transition to reset the check icon
-								addToCartBtn.find('path').eq(0).css('stroke-dashoffset', '19.79');
-								animating =  false;
-							});
-
-							if( $('.no-csstransitions').length > 0 ) {
-								// check if browser doesn't support css transitions
-								addToCartBtn.find('path').eq(0).css('stroke-dashoffset', '19.79');
-								animating =  false;
-							}
-						}, 600);
-					});	
-				}
-			});
-
-			//detect click on the settings icon - touch devices only
-			touchSettings.on('click', function(event){
-				event.preventDefault();
-				resetCustomization(addToCartBtn);
-			});
-		});
-	}
-
+	var theme = 'cart';
+	/*
+	**=========================
+	*END OF GLOBAL FUNCTIONS
+	*=========================
+	*/
 
 	/*
-		This function deals with showing or hiding the cart.
+	**=========================
+	*START OF GENERIC FUNCTIONS
+	*=========================
 	*/
-	function toggleCart(bool) 
-	{
-		//always hide the address regardless of the toggle state as we never want to show this unless the 
-		//checkout button has been clicked
-		$('#bitcoinaddresswrapper').hide();
-		//check if the cart is open or not
-		var cartIsOpen = ( typeof bool === 'undefined' ) ? cartWrapper.hasClass('cart-open') : bool;
-		
-		
-		if( cartIsOpen ) {
-			cartWrapper.removeClass('cart-open');
-			bitcoinback.removeClass('visible');
-			cartList.find('.deleted').remove();
-			bitcoinback.removeClass('visible');
-			$('#bitcoin-address-template').hide();
-			$('#cartlistitems').show();
 
-			setTimeout(function(){
-				cartBody.scrollTop(0);
-				//check if cart empty to hide it
-				if( Number(cartCount.find('li').eq(0).text()) == 0) cartWrapper.addClass('empty');
-			}, 500);
-		} else {
-			cartWrapper.addClass('cart-open');
+	//this function adds a class using a  class or id
+	function addClass(elements, myClass) {
+
+	  // if there are no elements, we're done
+	  if (!elements) { return; }
+
+	  // if we have a selector, get the chosen elements
+	  if (typeof(elements) === 'string') {
+	    elements = document.querySelectorAll(elements);
+	  }
+
+	  // if we have a single DOM element, make it an array to simplify behavior
+	  else if (elements.tagName) { elements=[elements]; }
+
+	  // add class to all chosen elements
+	  for (var i=0; i<elements.length; i++) {
+
+	    // if class is not already found
+	    if ( (' '+elements[i].className+' ').indexOf(' '+myClass+' ') < 0 ) {
+
+	      // add class
+	      elements[i].className += ' ' + myClass;
+	    }
+	  }
+	}
+
+	//this function removes a class using a class or id
+	function removeClass(elements, myClass) {
+
+	  // if there are no elements, we're done
+	  if (!elements) { return; }
+
+	  // if we have a selector, get the chosen elements
+	  if (typeof(elements) === 'string') {
+	    elements = document.querySelectorAll(elements);
+	  }
+
+	  // if we have a single DOM element, make it an array to simplify behavior
+	  else if (elements.tagName) { elements=[elements]; }
+
+	  // create pattern to find class name
+	  var reg = new RegExp('(^| )'+myClass+'($| )','g');
+
+	  // remove class from all chosen elements
+	  for (var i=0; i<elements.length; i++) {
+	    elements[i].className = elements[i].className.replace(reg,' ');
+	  }
+	}
+
+	//this function chnages the text of a div/span etc using a class or id
+	function changeClassText(elements, value) {
+
+	  // if there are no elements, we're done
+	  if (!elements) { return; }
+
+	  // if we have a selector, get the chosen elements
+	  if (typeof(elements) === 'string') {
+	    elements = document.querySelectorAll(elements);
+	  }
+
+	  // if we have a single DOM element, make it an array to simplify behavior
+	  else if (elements.tagName) { elements=[elements]; }
+
+	  // add class to all chosen elements
+	  for (var i=0; i<elements.length; i++) {
+	      elements[i].innerHTML = value;
+	  }
+	}
+
+	//this function checks if an element has class
+	function hasClass(elements, value) {
+	  // if there are no elements, we're done
+	  if (!elements) { return; }
+
+	  // if we have a selector, get the chosen elements
+	  if (typeof(elements) === 'string') {
+	    elements = document.querySelectorAll(elements);
+	  }
+
+	  // if we have a single DOM element, make it an array to simplify behavior
+	  else if (elements.tagName) { elements=[elements]; }
+
+	  //loop the elements
+	  for (var i=0; i<elements.length; i++) {
+	  		//check if it is the one
+	  		//debug
+	  		//console.log(elements[i].className)
+	  		//console.log(value);
+	  		if (elements[i].className.indexOf(value) !=-1) 
+	      	{
+	      		return(1);
+	      	}
+	  }
+	  return(0);
+	}
+
+	//this function hides an element 
+	function hideClass(elements) 
+	{
+		// if there are no elements, we're done
+		if (!elements) { return; }
+
+		// if we have a selector, get the chosen elements
+		if (typeof(elements) === 'string') {
+		elements = document.querySelectorAll(elements);
 		}
-	}
 
-	function addToCart(trigger) {
-		var cartIsEmpty = cartWrapper.hasClass('empty');
-		//update cart product list
-		addProduct(trigger.data('price'),trigger.data('name'),trigger.data('id'));
-		//update number of items 
-		updateCartCount(cartIsEmpty);
-		//update total price
-		updateCartTotal(trigger.data('price'), true);
-		//show cart
-		cartWrapper.removeClass('empty');
-	}
+		// if we have a single DOM element, make it an array to simplify behavior
+		else if (elements.tagName) { elements=[elements]; }
 
-	function addProduct(price,name,productId) 
-	{
-		//get the product quantity
-		prodcutquantity= $('#productquantity').val();
-		//check if its set or not if not then set it 
-		if (prodcutquantity == undefined)
-			prodcutquantity = 0;
-		//increment it by 1
-		prodcutquantity++;
-		//empty  the car contents
-		cartList.empty();
-		//build the row html
-		//main product div
-		var prodcuthtml = '';
-		var prodcuthtml = prodcuthtml +'<li class="product">';
-		//product image
-		var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
-		//product details div
-		var prodcuthtml = prodcuthtml + '<div class="product-details">';
-		//product name
-		var prodcuthtml = prodcuthtml + '<h3><a href="#0">'+name+'</a></h3>';
-		//product price
-		var prodcuthtml = prodcuthtml + '<span class="productprice">$'+price+'</span>';
-		//delete option
-		var prodcuthtml = prodcuthtml + '<a href="#0" class="delete-item">Delete</a>';
-		//actions div
-		var prodcuthtml = prodcuthtml + '<div class="actions">';
-		//quantity label
-		var prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productId +'">Qty</label>';
-		//quantity select
-		var prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity">';
-		var i = 0;
-		for (i = 1; i < 11; i++) 
-		{ 
-			if (i == prodcutquantity)
-				var prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
-
-			else
-				var prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
-		}
-		//end of actions div
-		var prodcuthtml = prodcuthtml + '</div>';
-		//end of products details div
-		var prodcuthtml = prodcuthtml + '</div>';
-		//end of product div
-		var prodcuthtml = prodcuthtml + '</div>';
-		//end of li
-		var prodcuthtml = prodcuthtml + '</li>';
-		//add it
-		//console.log(prodcuthtml);
-		cartList.prepend(prodcuthtml);
-		//updateCart()
-	}
-
-	//remove the product
-	function removeProduct(product) 
-	{		
-		var topPosition = product.offset().top - cartBody.children('ul').offset().top ,
-		productTotPrice = productPrice;
-		product.css('top', topPosition+'px').addClass('deleted');
-		cartTotal.text(0);
-		productQuantity = 0;
-		updateCartCount(true, 0);
-	}
-
-	//update the counter
-	function updateCartCount(emptyCart, quantity) 
-	{
-		//check if cart is empty
-		if ((emptyCart == true) && (quantity == 0))
+		//loop the elements
+		for (var i=0; i<elements.length; i++) 
 		{
-			var actual = 0
-			var next = 1
-			cartCount.find('li').eq(0).text(actual);
-			cartCount.find('li').eq(1).text(next);
-
+			elements[i].style.display="none";      	
 		}
-		else
+	}
+
+	//this function shows an element
+	function showClass(elements) 
+	{
+		// if there are no elements, we're done
+		if (!elements) { return; }
+
+		// if we have a selector, get the chosen elements
+		if (typeof(elements) === 'string') {
+		elements = document.querySelectorAll(elements);
+		}
+
+		// if we have a single DOM element, make it an array to simplify behavior
+		else if (elements.tagName) { elements=[elements]; }
+
+		//loop the elements
+		for (var i=0; i<elements.length; i++) 
 		{
-			//check if it is the first time the cart is launched
-			if( typeof quantity === 'undefined' ) 
-			{
-				var actual = Number(cartCount.find('li').eq(0).text()) + 1;
-				var next = actual + 1;
-				
-				if( emptyCart ) {
-					cartCount.find('li').eq(0).text(actual);
-					cartCount.find('li').eq(1).text(next);
-				} else {
-					cartCount.addClass('update-count');
-
-					setTimeout(function() {
-						cartCount.find('li').eq(0).text(actual);
-					}, 150);
-
-					setTimeout(function() {
-						cartCount.removeClass('update-count');
-					}, 200);
-
-					setTimeout(function() {
-						cartCount.find('li').eq(1).text(next);
-					}, 230);
-				}
-			} 
-			else 
-			{
-				var actual = Number(cartCount.find('li').eq(0).text()) + quantity;
-				var next = actual + 1;
-				
-				cartCount.find('li').eq(0).text(actual);
-				cartCount.find('li').eq(1).text(next);
-			}
+			elements[i].style.display="";      	
 		}
 	}
 
-	function updateCartTotal(price, bool) 
+	//this functions updates the totals for the cart
+	function carttotal()
 	{
-		//console.log(cartTotal);
-		bool ? cartTotal.text( (Number(cartTotal.text()) + Number(price)).toFixed(2) )  : cartTotal.text( (Number(cartTotal.text()) - Number(price)).toFixed(2) );
-		//cartTotal.text( (Number(cartTotal.text()) + Number(price)).toFixed(2);
-		//cartTotal.text( (Number(cartTotal.text()) - Number(price)).toFixed(2) );
+		//multipily the price by the number of items in the cart
+		var producttotal = price * itemcount;
+		//set it to 8 decimal places as it's Bitcoin
+		producttotal = parseFloat(producttotal).toFixed(8);
+		changeClassText(document.getElementById('checkouttotal'),producttotal);
+		//update counter
+	  	changeClassText(document.querySelector('.cd-count'),itemcount);	
+	  	//store product
+		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
+		//call the store produt endpoint
+		fetchurl(url,'storeproduct')
 	}
 
-	function updateSlider(actual, index) 
+	//this function calls endpoints on the server
+	//note : This has to be extended to handle post, put etc it only uses GET at the moment.  
+	//		 Also it would be good to have proper called backs for the method if we add many more we will make it asynv
+	function fetchurl(url,method)
 	{
-		var slider = actual.parent('.cd-customization').prev('a').children('.cd-slider-wrapper'),
-			slides = slider.children('li');
-		slides.eq(index).removeClass('move-left').addClass('selected').prevAll().removeClass('selected').addClass('move-left').end().nextAll().removeClass('selected move-left');
+		var request = new XMLHttpRequest();
+		request.open('GET',url, true);
+		//call it
+		request.onload = function() {
+		  if (request.status >= 200 && request.status < 400) {
+		    if (method == "getaddress")
+		    {
+		    	// parse the data
+			    var data = JSON.parse(request.responseText);
+			    //debug
+			    //console.log(data)
+			    //set the address
+			    address = data.address;
+			    //set the address in the checkout
+			    var elbtcaddress = document.getElementById('bitcoinaddress');
+			    //set the href
+			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
+			    //set the address
+	    		elbtcaddress.innerText =address;
+	    		//debug
+			    //console.log(elbtcaddress)
+
+			    //generate the qr code
+			    var elbtcqr = document.getElementById('bitcoinqrcode');
+				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
+		    	//debug
+			    //console.log(elbtcqr)
+		    }
+		    if (method == "storeproduct")
+		    {
+		    	//do stuff if you want.
+		    }
+		    if (method == "carttemplate")
+		    {
+		    	//debug
+		    	//console.log(request.responseText);
+
+		    	//add the cart templatehtml
+				document.body.insertAdjacentHTML("beforeend", request.responseText);
+				//add the click elements listeners
+				clickElements()
+				//get an address
+				var url = serverurl+"api/address?uid="+uid;
+				fetchurl(url,'getaddress')
+		    }
+		    if (method == "storeuserdetails")
+		    {
+		    	cartstate(4);
+		    }
+
+		  } 
+		  else
+		  {
+		    // We reached our target server, but it returned an error
+
+		  }
+		};
+		request.onerror = function() {
+			  // There was a connection error of some sort
+		};
+		request.send();
 	}
 
-	function resetCustomization(selectOptions) 
+	//this function works with how the cart should look and sets the correct viusal elements
+	function cartstate(state)
 	{
-		//close ul.clor/ul.size if they were left open and user is not interacting with them anymore
-		//remove the .hover class from items if user is interacting with a different one
-		selectOptions.siblings('[data-type="select"]').removeClass('is-open').end().parents('.cd-single-item').addClass('hover').parent('li').siblings('li').find('.cd-single-item').removeClass('hover').end().find('[data-type="select"]').removeClass('is-open');
+		/*
+			1 = show cart product details
+			2 = show customer details screen
+			3 = customer detals back
+			4 = custmer details pay click
+			5 = bitcoin details back click
+		*/
+		switch (state) {
+		    case 1:
+		    	//hide btc stuff
+		        hideClass(document.getElementById('checkoutbitocoin'));
+				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				//hide the customer details
+				hideClass(document.getElementById('customerdetailswrapper'));
+				//hide customer detals back
+				hideClass(document.getElementById('checkoutcustomerdetailsback'));
+				//open it
+				addClass(document.querySelector('.cd-cart-container'),'cart-open');
+				//show the product details
+				showClass(document.getElementById('cartlistitems'));
+		        break;
+		    case 2:
+				//hide the product details
+				hideClass(document.getElementById('cartlistitems'));
+				//show the customer details
+				showClass(document.getElementById('customerdetailswrapper'));
+				showClass(document.getElementById('checkoutcustomerdetailsback'));
+		    	//hide btc stuff
+				hideClass(document.getElementById('bitcoinaddresswrapper'));
+		        break;
+		    case 3:
+				//show the product details
+		       	showClass(document.getElementById('cartlistitems'));
+		    	//hide btc stuff
+			  	hideClass(document.getElementById('bitcoinaddresswrapper'));
+				//hide the customer details			  	
+			    hideClass(document.getElementById('customerdetailswrapper'));
+			   	hideClass(document.getElementById('checkoutcustomerdetailsback'));
+		        break;
+		    case 4:
+				//hide the product details
+		    	hideClass(document.getElementById('cartlistitems'));
+		    	//show btc stuff		    	
+				showClass(document.getElementById('bitcoinaddresswrapper'));
+				showClass(document.getElementById('checkoutbitocoin'));
+				//hide the customer details			  					
+				hideClass(document.getElementById('checkoutcustomerdetailsback'));
+				hideClass(document.getElementById('customerdetailswrapper'));
+		        break;
+		    case 5:
+		    	//hide the product details
+		    	hideClass(document.getElementById('cartlistitems'));
+				//show the customer details
+				showClass(document.getElementById('checkoutcustomerdetailsback'));
+				showClass(document.getElementById('customerdetailswrapper'));
+		    	//show btc stuff
+				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				hideClass(document.getElementById('checkoutbitocoin'));
+		        break;  
+		}
 	}
 
+	/*
+	*=========================
+	*END OF GENERIC FUNCTIONS
+	*=========================
+	*/
 	
-});
+	function clickElements()
+	{
+		/*
+		*===============================
+		*START OF ELEMENT CLICK FUNCTIONS
+		*================================
+		*/
 
+		//bitcoin back click
+		document.getElementById('checkoutbitocoin').addEventListener('click', function () 
+		{
+			cartstate(5);
+		});
+		//payment click
+		document.getElementById('sr-pay').addEventListener('click', function () 
+		{
+			//get the email
+			//note: We want to update this when we collect more than email, shipping address etc. 
+			var useremail = document.getElementById('sr-email').value; 
+			//only send the email if it has not been sent
+			if (email != useremail)
+			{
+				email = useremail
+				var url = serverurl+"api/storeuserdetails?email="+email+"&address="+address;
+				//call the store produt endpoint
+				fetchurl(url,'storeuserdetails')		
+			}
+			else
+			{
+				cartstate(4);
+			}
+							
+			
+		});
+		//customer back click
+		document.getElementById('checkoutcustomerdetailsback').addEventListener('click', function () 
+		{
+			cartstate(3);
+		});
+		//add to cart click element
+		document.querySelector('.checkout').addEventListener('click', function () 
+		{
+			cartstate(2);
+		});
+
+		//add to cart click element
+		document.querySelector('.cd-add-to-cart').addEventListener('click', function () 
+		{
+			//get details
+			var elproduct = document.getElementById('cd-add-to-cart');
+			price =elproduct.getAttribute('data-price');
+			name =elproduct.getAttribute('data-name');
+			//will update when we use multipile products
+			var productid = 1;
+			//todo
+			var previewpic = '';
+			//increment count (quantity)
+			if (itemcount <= quantity)
+			{
+				itemcount = itemcount+1;
+				carttotal(price)
+				
+		  		//show it
+		  		showClass(document.querySelector('.cd-cart-container'))	
+			  	
+			  	//add item to cart
+			  	var productlist = document.getElementById('cartlistitems');
+				var itemlist  = document.createElement('li');
+				itemlist.className = 'product ';
+
+				//build produt
+				var prodcuthtml = '';
+				//product image		
+				var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
+				//product name
+				prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
+				//product price
+				prodcuthtml = prodcuthtml + '<span class="price">'+price+' BTC</span>';
+				//actions div
+				prodcuthtml = prodcuthtml + '<div class="actions">';
+
+				//delete option
+				prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="delete-item">Delete</a>';
+				prodcuthtml = prodcuthtml + '<div class="quantity">';
+				//quantity label
+				prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
+				//quantity select
+				prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="SR.changequantity()">';
+				var i = 0;
+				for (i = 1; i < quantity; i++) 
+				{ 
+					if (i == itemcount)
+						prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
+
+					else
+						prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
+				}
+				prodcuthtml = prodcuthtml +'</select></span>';
+				//end of quantiy div
+				var prodcuthtml = prodcuthtml + '</div>';
+				//end of actions div
+				var prodcuthtml = prodcuthtml + '</div>';
+				//end of products details div
+				var prodcuthtml = prodcuthtml + '</div>';
+				//end of product div
+				//add to the list		
+				itemlist.innerHTML = prodcuthtml;
+				// append  to the end of theParent
+				productlist.innerHTML = "";
+				productlist.appendChild(itemlist);
+	  		}
+		});
+		//cart clicked element
+		document.querySelector('.cd-cart-trigger').addEventListener('click', function () {
+	  		//check if cart shoud be shown
+	  		//debug
+	  		//itemcount = 1;
+	  		if (itemcount == 0)
+	  		{
+	  			//always remove as its 0
+	  			removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  		}
+	  		else
+	  		{
+	  			//see if the cart is open and toggle it
+	  			var res = hasClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  			if (res == 1)
+	  			{
+	  				//close it
+	  				removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  			}
+	  			else
+	  			{
+	  				cartstate(1);
+	  			}
+	  		}
+		});
+		/*
+		*===============================
+		*END OF ELEMENT CLICK FUNCTIONS
+		*================================
+		*/
+	}
+    return {
+        init : function(Args) 
+        {
+        	/*
+
+        	Server vars you can pass set to "" to ignore
+        	0 = server url. string
+        	1 = animating.  True or false
+        	2 = quantity
+			3 = cdnurl
+			4 = uid
+			5 = theme
+
+        	*/
+			_args = Args;
+
+			//override the server url
+			if (_args[0] != '')
+			{
+				serverurl = _args[0];
+				//alert(serverurl);
+			}
+			//check if it is a boolean and if so then set it.
+			if (typeof(_args[1]) === "boolean")
+			{
+				animating = _args[1]
+			}
+			//quantity
+			if (_args[2] != "")
+			{
+				quantity = _args[2]
+			}
+			//cdn url
+			if (_args[3] != "")
+			{
+				cdnurl = _args[3]
+			}	
+			//uid
+			if (_args[4] != "")
+			{
+				uid = _args[4]
+			}
+			//theme
+			if (_args[5] != "")
+			{
+				theme = _args[5]
+			}
+
+			//load css
+
+        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
+
+			//fetch the template so we can use themes 
+			fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
+        }
+        ,
+        //this function changes the quantity of the item in the cart
+        //note : it is in the name space like this as the cart items are created dynamically so the dom does not always know about it's existence 
+       	//		 which means that we have to call it from the onchange in the select old school I.E javascript:SR.chanagequantity() which is not ideal
+       	//		 and we will fix it later.
+        changequantity : function() {
+        	var elquantity = document.getElementById('productquantity');
+			itemcountq = elquantity.options[elquantity.selectedIndex];
+			itemcount = parseInt(itemcountq.value);
+			carttotal();	
+        }
+        ,
+        //this function deletes an item in the cart
+        //note : it is in the name space like this as the cart items are created dynamically so the dom does not always know about it's existence 
+       	//		 which means that we have to call it from the onchange in the select old school I.E javascript:SR.chanagequantity() which is not ideal
+       	//		 and we will fix it later.        
+        deleteitem : function ()
+		{
+			itemcount = 0;
+			var productlist = document.getElementById('cartlistitems');
+			productlist.innerHTML = "";
+			carttotal();
+			//close it
+	  		removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+		}
+   };
+}());
