@@ -351,6 +351,7 @@ app.get('/api/monitor', (req, res) => {
 	//the amont for the address
 	client.getReceivedByAddress(req.query.address).then(result => {
 	   //check it is more tha 0
+	   //note may want to check confirmations here
 	   if (result > 0)
 	   {
 	   		//build the query
@@ -382,18 +383,18 @@ app.get('/api/monitor', (req, res) => {
 app.get('/api/sweep', (req, res) => {
 	//set the headers
 	res = setHeaders(res);
-	client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
-		let sql = `SELECT * FROM keys where address = "`+req.query.address+`" and swept = 0 and processed = 1`;
-		db.each(sql, function(err, row) {
-			//debug
-	    	//console.log(row.address);  
+	client.walletPassphrase(process.env.walletpassphrase, 50).then(() => {
+    	//unlock the wallet
+    	client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
+    		//get the unspent transaxtions for the address we are intrested in.
+    		client.listUnspent(1,9999999,[req.query.address]).then(result => {
+    			//debug
+    			//console.log(result)
 
-	    	//unlock the wallet
-	    	client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
-	    		//get the unspent transaxtions for the address we are intrested in.
-	    		client.listUnspent(1,9999999,[req.query.address]).then(result => {
-	    			//debug
-	    			//console.log(result.length)
+    			client.dumpPrivKey(req.query.address).then(pkey => {
+					//debug
+    				//console.log(pkey)
+    				//console.log(result)
 
 	    			//check if there are any
 	    			if(result.length == 0 ) 
@@ -402,13 +403,13 @@ app.get('/api/sweep', (req, res) => {
     					//console.log(result);
 
     					//exit gracefully
-    					res.send(JSON.stringify({result:"nothing to sweep"}));
+    					res.send(JSON.stringify({result:"nothing to sweep no unspent transactions"}));
 						return;
 					}
 					else
 	    			{
 	    				//debug
-	    				//console.log(result[0].confirmations)
+	    				//console.log(result[0])
 
 	    				//check the confirmation count
 	    				//note (chris) it is set to 1 for now as I want to play with it as soon as possible.  It should 3 - 6 when we are happy
@@ -421,6 +422,7 @@ app.get('/api/sweep', (req, res) => {
 
 	    						//work out the amount to send
 								var amounttosend = result[0].amount - fee.feerate;
+								//console.log(amounttosend)
 								//create raw transaction
 								/*
 	    						we are in a catch 22 here 
@@ -428,48 +430,55 @@ app.get('/api/sweep', (req, res) => {
 								restart bitcoind with -deprecatedrpc=signrawtransaction.
 								Projects should transition to using signrawtransactionwithkey and signrawtransactionwithwallet before upgrading to v0.18
 								but v0.17 does not support signrawtransactionwithkey so we wil update when v0.18 comes out
+								
 								*/
 	    						client.createRawTransaction([{"txid":result[0].txid,"vout":0}],[{[process.env.toaddress]:amounttosend}]).then((txhash) => {
 	    							//debug
 	    							//console.log(txhash)
 
 	    							//sign it
-	    							client.signRawTransaction(txhash).then((res) => {
+	    							//note may have to trap for errors
+	    							client.signRawTransaction(txhash,[{"txid":result[0].txid,"vout":0,"amount":result[0].amount,"scriptPubKey":result[0].scriptPubKey,"redeemScript":result[0].redeemScript}],[pkey]).then((signed) => {
 	    								//debug
-	    								console.log(res);
-
-		    							//broadcast it
-
-		    							//update database
-		    							/*
-		    							let sqldata = ['1', address];
-										let sql = `UPDATE keys
+	    								//console.log(signed);
+	    								
+	    								//broadcast it
+	    								//note may have to trap for errors
+	    								client.sendRawTransaction(signed.hex).then((broadcasted) => {
+	    									//debug
+	    									//console.log(broadcasted);
+	    									let sqldata = ['1', req.query.address];
+											let sql = `UPDATE keys
 												   	SET swept = ?
 												    WHERE address = ?`;
-												 
-										db.run(sql, sqldata, function(err) {
-										  if (err) {
-										   // return console.error(err.message);
-										  }
+													 
+											db.run(sql, sqldata, function(err) {
+											  if (err) {
 
-											res.send(JSON.stringify({status: "already swept"}));
-											return;
-										 
-										});
-										*/
+											  	//client.walletLock();
+		    									//res.send(JSON.stringify({status: "not swept"}));
+		    									//return;
+											   // return console.error(err.message);
+											  }
+											  res.send(JSON.stringify({status: "swept"}));
+											  return;
+											});
+	    								});
+
 	    							});
 	    						});
-		    					//lock the wallet
-		    					client.walletLock();
-		    					//output result
-		    					//res.send(JSON.stringify({result:"sweept"}));
-								return;
 	    					});	
 	    				}
+	    				else
+	    				{
+	    					client.walletLock();
+		    				res.send(JSON.stringify({status: "not enough confirmations :"+result[0].confirmations}));
+							return;
+	    				}
 	    			}
-	    		});
-	    	});
-		});
+    			});
+    		});
+	    });
 	});
 })
 
