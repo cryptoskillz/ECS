@@ -10,12 +10,10 @@
   "license": "ISC",
   "dependencies": {
     "bitcoin-core": "^2.0.0",
-    "block_io": "^1.0.9",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "install": "^0.12.1",
     "npm": "^6.4.1",
-    "sqlite3": "^4.0.2",
-    "websocket": "^1.0.28"
+    "sqlite3": "^4.0.2"
   }
 }
