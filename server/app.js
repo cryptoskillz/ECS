@@ -1,9 +1,5 @@
 //load express
 const express = require('express');
-//load body parser
-//const bodyParser = require('body-parser');
-//load the bitcoin js files
-//var bitcoin = require('bitcoinjs-lib');
 //load bitcoin core
 const Client = require("bitcoin-core");
 //open a connection to the RPC client
@@ -29,7 +25,6 @@ let db = new sqlite3.Database('./db/db.db', (err) => {
   }
 });
 
-
 /*
 ========================
 START OF GENERIC FUNCTION
@@ -45,15 +40,11 @@ function setHeaders(res)
     return(res);
 }
 
-
-
 /*
 ========================
 END OF GENERIC FUNCTION
 ========================
 */
-
-
 
 /*
 ========================
@@ -248,14 +239,197 @@ app.get('/admin/login', (req, res) => {
 	 });	
 });
 
+
+//pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer. called from admin
+app.get('/api/monitor', (req, res) => {
+	//set the headers
+	res = setHeaders(res); 
+	//the amont for the address
+	client.getReceivedByAddress(req.query.address).then(result => {
+	   //check it is more tha 0
+	   //note may want to check confirmations here
+	   if (result > 0)
+	   {
+	   		//build the query
+			let data = ['1',result, req.query.address];
+			let sql = `UPDATE keys
+			            SET processed = ?,
+			            	amount = ?
+			            WHERE address = ?`;
+			//run the query
+			db.run(sql, data, function(err) {
+			  if (err) {
+			    return console.error(err.message);
+			  }
+			  //retun response
+			 res.send(JSON.stringify({status: "confirmed"}));
+			});
+	   }
+	   else
+	   {	
+	   		//return error
+	   		res.send(JSON.stringify({status: "not confirmed"}));
+	   }
+	});
+	
+})
+
+
+//move a payment to cold storage called from admin
+app.get('/api/sweep', (req, res) => {
+	//set the headers
+	res = setHeaders(res);
+	client.walletPassphrase(process.env.walletpassphrase, 50).then(() => {
+    	//unlock the wallet
+    	client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
+    		//get the unspent transaxtions for the address we are intrested in.
+    		client.listUnspent(1,9999999,[req.query.address]).then(result => {
+    			//debug
+    			//console.log(result)
+
+    			//get the private key
+    			client.dumpPrivKey(req.query.address).then(pkey => {
+					//debug
+    				//console.log(pkey)
+    				//console.log(result)
+
+	    			//check if there are any
+	    			if(result.length == 0 ) 
+	    			{
+	    				//debug
+    					//console.log(result);
+
+    					//exit gracefully
+    					res.send(JSON.stringify({result:"nothing to sweep no unspent transactions"}));
+						return;
+					}
+					else
+	    			{
+	    				//debug
+	    				//console.log(result[0])
+
+	    				//check the confirmation count
+	    				//note it is set to 1 for now as I want to play with it as soon as possible.  It should 3 - 6 when we are happy
+	    				if (result[0].confirmations > 1)
+	    				{
+	    					//estimate fee
+	    					client.estimateSmartFee(6).then((fee) => {
+	    						//debug
+	    						//console.log(fee)    						
+
+	    						//work out the amount to send
+								var amounttosend = result[0].amount - fee.feerate;
+								//debug
+								//console.log(amounttosend)
+								
+
+								//create raw transaction
+								/*
+	    						we are in a catch 22 here 
+								Unhandled rejection RpcError: signrawtransaction is deprecated and will be fully removed in v0.18. To use signrawtransaction in v0.17,
+								restart bitcoind with -deprecatedrpc=signrawtransaction.
+								Projects should transition to using signrawtransactionwithkey and signrawtransactionwithwallet before upgrading to v0.18
+								but v0.17 does not support signrawtransactionwithkey so we wil update when v0.18 comes out
+								
+								*/
+	    						client.createRawTransaction([{"txid":result[0].txid,"vout":0}],[{[process.env.toaddress]:amounttosend}]).then((txhash) => {
+	    							//debug
+	    							//console.log(txhash)
+
+	    							//sign it
+	    							//note may have to trap for errors
+	    							client.signRawTransaction(txhash,[{"txid":result[0].txid,"vout":0,"amount":result[0].amount,"scriptPubKey":result[0].scriptPubKey,"redeemScript":result[0].redeemScript}],[pkey]).then((signed) => {
+	    								//debug
+	    								//console.log(signed);
+	    								
+	    								//broadcast it
+	    								//note may have to trap for errors
+	    								client.sendRawTransaction(signed.hex).then((broadcasted) => {
+	    									//debug
+	    									//console.log(broadcasted);
+
+	    									//build sql
+	    									let sqldata = ['1', req.query.address];
+											let sql = `UPDATE keys
+												   	SET swept = ?
+												    WHERE address = ?`;
+											
+											//run sql		 
+											db.run(sql, sqldata, function(err) {
+											  if (err) {
+
+											  }
+											  //lock wallet
+											  client.walletLock();
+											  //return status
+											  res.send(JSON.stringify({status: "swept"}));
+											  return;
+											});
+	    								});
+
+	    							});
+	    						});
+	    					});	
+	    				}
+	    				else
+	    				{
+	    					//lock wallet
+	    					client.walletLock();
+	    					//return status
+		    				res.send(JSON.stringify({status: "not enough confirmations :"+result[0].confirmations}));
+							return;
+	    				}
+	    			}
+    			});
+    		});
+	    });
+	});
+})
+
 /*
 ========================
 END OF ADMIN FUNCTION
-========================*/
+========================
+*/
 
-			//var url = serverurl+"api/storeuserdetails?email="+email+"&address="+address;
 
-//store user details
+/*
+========================
+START OF API FUNCTIONS
+========================
+*/
+
+//generate an address and output it called rom sr.js
+app.get('/api/address', (req, res) => {
+	//set the headers
+	res = setHeaders(res);
+	//unlock the wallet
+	client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
+	  //create a new address in theaccount account :]
+	  client.getNewAddress(process.env.walletaccount).then(address => {
+	    //debug
+	    //console.log(address);
+
+	    //insert it into the database
+	    db.run(`INSERT INTO keys(address,userid,net) VALUES(?,?,?)`, [address,req.query.uid,network], function(err) {
+			if (err) {
+			  //debug
+			  //return console.log(err.message);
+
+			  //return error
+			  res.send(JSON.stringify({error: err.message}));
+			  return;
+			}
+			//return the address
+			res.send(JSON.stringify({address:address}));
+		});
+	    client.walletLock();
+	    return;
+	  });
+	});
+})
+
+//store user details called rom sr.js
 app.get('/api/storeuserdetails', (req, res) => {
 	//set the headers
 	res = setHeaders(res); 
@@ -273,7 +447,7 @@ app.get('/api/storeuserdetails', (req, res) => {
 	});
 });
 
-//storeproduct
+//storeproduct  called rom sr.js
 app.get('/api/storeproduct', (req, res) => {
 	//set the headers
 	res = setHeaders(res); 
@@ -335,182 +509,17 @@ app.get('/api/storeproduct', (req, res) => {
 	//console.log(req.query.address);
 	res.send(JSON.stringify({status: "ok"}));
 })
-/*
-	This endpoint is used to check if a payment has been made by www
-	it is not essetial but someone may want to add this to a control pabel or the final ste of the checkout.
 
+
+/*
+========================
+END OF API FUNCTIONS
+========================
 */
 
-//pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer.
-app.get('/api/monitor', (req, res) => {
-	//set the headers
-	res = setHeaders(res); 
-	//the amont for the address
-	client.getReceivedByAddress(req.query.address).then(result => {
-	   //check it is more tha 0
-	   //note may want to check confirmations here
-	   if (result > 0)
-	   {
-	   		//build the query
-			let data = ['1',result, req.query.address];
-			let sql = `UPDATE keys
-			            SET processed = ?,
-			            	amount = ?
-			            WHERE address = ?`;
-			//run the query
-			db.run(sql, data, function(err) {
-			  if (err) {
-			    return console.error(err.message);
-			  }
-			  //retun response
-			 res.send(JSON.stringify({status: "confirmed"}));
-			});
-	   }
-	   else
-	   {	
-	   		//return error
-	   		res.send(JSON.stringify({status: "not confirmed"}));
-	   }
-	});
-	
-})
-
-
-//move a payment to cold storage
-app.get('/api/sweep', (req, res) => {
-	//set the headers
-	res = setHeaders(res);
-	client.walletPassphrase(process.env.walletpassphrase, 50).then(() => {
-    	//unlock the wallet
-    	client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
-    		//get the unspent transaxtions for the address we are intrested in.
-    		client.listUnspent(1,9999999,[req.query.address]).then(result => {
-    			//debug
-    			//console.log(result)
-
-    			client.dumpPrivKey(req.query.address).then(pkey => {
-					//debug
-    				//console.log(pkey)
-    				//console.log(result)
-
-	    			//check if there are any
-	    			if(result.length == 0 ) 
-	    			{
-	    				//debug
-    					//console.log(result);
-
-    					//exit gracefully
-    					res.send(JSON.stringify({result:"nothing to sweep no unspent transactions"}));
-						return;
-					}
-					else
-	    			{
-	    				//debug
-	    				//console.log(result[0])
-
-	    				//check the confirmation count
-	    				//note (chris) it is set to 1 for now as I want to play with it as soon as possible.  It should 3 - 6 when we are happy
-	    				if (result[0].confirmations > 1)
-	    				{
-	    					//estimate fee
-	    					client.estimateSmartFee(6).then((fee) => {
-	    						//debug
-	    						//console.log(fee.feerate)    						
-
-	    						//work out the amount to send
-								var amounttosend = result[0].amount - fee.feerate;
-								//console.log(amounttosend)
-								//create raw transaction
-								/*
-	    						we are in a catch 22 here 
-								Unhandled rejection RpcError: signrawtransaction is deprecated and will be fully removed in v0.18. To use signrawtransaction in v0.17,
-								restart bitcoind with -deprecatedrpc=signrawtransaction.
-								Projects should transition to using signrawtransactionwithkey and signrawtransactionwithwallet before upgrading to v0.18
-								but v0.17 does not support signrawtransactionwithkey so we wil update when v0.18 comes out
-								
-								*/
-	    						client.createRawTransaction([{"txid":result[0].txid,"vout":0}],[{[process.env.toaddress]:amounttosend}]).then((txhash) => {
-	    							//debug
-	    							//console.log(txhash)
-
-	    							//sign it
-	    							//note may have to trap for errors
-	    							client.signRawTransaction(txhash,[{"txid":result[0].txid,"vout":0,"amount":result[0].amount,"scriptPubKey":result[0].scriptPubKey,"redeemScript":result[0].redeemScript}],[pkey]).then((signed) => {
-	    								//debug
-	    								//console.log(signed);
-	    								
-	    								//broadcast it
-	    								//note may have to trap for errors
-	    								client.sendRawTransaction(signed.hex).then((broadcasted) => {
-	    									//debug
-	    									//console.log(broadcasted);
-	    									let sqldata = ['1', req.query.address];
-											let sql = `UPDATE keys
-												   	SET swept = ?
-												    WHERE address = ?`;
-													 
-											db.run(sql, sqldata, function(err) {
-											  if (err) {
-
-											  	//client.walletLock();
-		    									//res.send(JSON.stringify({status: "not swept"}));
-		    									//return;
-											   // return console.error(err.message);
-											  }
-											  res.send(JSON.stringify({status: "swept"}));
-											  return;
-											});
-	    								});
-
-	    							});
-	    						});
-	    					});	
-	    				}
-	    				else
-	    				{
-	    					client.walletLock();
-		    				res.send(JSON.stringify({status: "not enough confirmations :"+result[0].confirmations}));
-							return;
-	    				}
-	    			}
-    			});
-    		});
-	    });
-	});
-})
-
-
-//generate an address and output it
-app.get('/api/address', (req, res) => {
-	//set the headers
-	res = setHeaders(res);
-	//unlock the wallet
-	client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
-	  //create a new address in theaccount account :]
-	  client.getNewAddress(process.env.walletaccount).then(address => {
-	    //debug
-	    //console.log(address);
-
-	    //insert it into the database
-	    db.run(`INSERT INTO keys(address,userid,net) VALUES(?,?,?)`, [address,req.query.uid,network], function(err) {
-			if (err) {
-			  //debug
-			  //return console.log(err.message);
-
-			  //return error
-			  res.send(JSON.stringify({error: err.message}));
-			  return;
-			}
-			//return the address
-			res.send(JSON.stringify({address:address}));
-		});
-	    client.walletLock();
-	    return;
-	  });
-	});
-})
-console.log('up and at em ')
-
+//console.log('up and at em ')
+//set port
 var port = process.env.PORT || 3000;
+//listen
 app.listen( port );
 
