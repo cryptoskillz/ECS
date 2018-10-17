@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "bitcoin-core": "^2.0.0",
-    "bitcoinjs-lib": "^4.0.2",
     "block_io": "^1.0.9",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
