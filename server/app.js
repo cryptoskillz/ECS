@@ -1,7 +1,7 @@
 //load express
 const express = require('express');
 //load body parser
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser');
 //load the bitcoin js files
 //var bitcoin = require('bitcoinjs-lib');
 //load bitcoin core
@@ -21,9 +21,6 @@ const app = express();
 //1 = testnet
 //2 = mainnet
 const network = "1";
-//var BlockIo = require('block_io');
-//var version = 2; // API version
-//var block_io = new BlockIo(process.env.blockiokey,process.env.blockiosecret, version);
 
 //open a database connection
 let db = new sqlite3.Database('./db/db.db', (err) => {
