@@ -280,111 +280,109 @@ app.get('/api/monitor', (req, res) => {
 app.get('/api/sweep', (req, res) => {
 	//set the headers
 	res = setHeaders(res);
-	client.walletPassphrase(process.env.walletpassphrase, 50).then(() => {
     	//unlock the wallet
-    	client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
-    		//get the unspent transaxtions for the address we are intrested in.
-    		client.listUnspent(1,9999999,[req.query.address]).then(result => {
-    			//debug
-    			//console.log(result)
+	client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
+		//get the unspent transaxtions for the address we are intrested in.
+		client.listUnspent(1,9999999,[req.query.address]).then(result => {
+			//debug
+			//console.log(result)
 
-    			//get the private key
-    			client.dumpPrivKey(req.query.address).then(pkey => {
-					//debug
-    				//console.log(pkey)
-    				//console.log(result)
+			//get the private key
+			client.dumpPrivKey(req.query.address).then(pkey => {
+				//debug
+				//console.log(pkey)
+				//console.log(result)
 
-	    			//check if there are any
-	    			if(result.length == 0 ) 
-	    			{
-	    				//debug
-    					//console.log(result);
+    			//check if there are any
+    			if(result.length == 0 ) 
+    			{
+    				//debug
+					//console.log(result);
 
-    					//exit gracefully
-    					res.send(JSON.stringify({result:"nothing to sweep no unspent transactions"}));
+					//exit gracefully
+					res.send(JSON.stringify({result:"nothing to sweep no unspent transactions"}));
+					return;
+				}
+				else
+    			{
+    				//debug
+    				//console.log(result[0])
+
+    				//check the confirmation count
+    				//note it is set to 1 for now as I want to play with it as soon as possible.  It should 3 - 6 when we are happy
+    				if (result[0].confirmations > 1)
+    				{
+    					//estimate fee
+    					client.estimateSmartFee(6).then((fee) => {
+    						//debug
+    						//console.log(fee)    						
+
+    						//work out the amount to send
+							var amounttosend = result[0].amount - fee.feerate;
+							//debug
+							//console.log(amounttosend)
+							
+
+							//create raw transaction
+							/*
+    						we are in a catch 22 here 
+							Unhandled rejection RpcError: signrawtransaction is deprecated and will be fully removed in v0.18. To use signrawtransaction in v0.17,
+							restart bitcoind with -deprecatedrpc=signrawtransaction.
+							Projects should transition to using signrawtransactionwithkey and signrawtransactionwithwallet before upgrading to v0.18
+							but v0.17 does not support signrawtransactionwithkey so we wil update when v0.18 comes out
+							
+							*/
+    						client.createRawTransaction([{"txid":result[0].txid,"vout":0}],[{[process.env.toaddress]:amounttosend}]).then((txhash) => {
+    							//debug
+    							//console.log(txhash)
+
+    							//sign it
+    							//note may have to trap for errors
+    							client.signRawTransaction(txhash,[{"txid":result[0].txid,"vout":0,"amount":result[0].amount,"scriptPubKey":result[0].scriptPubKey,"redeemScript":result[0].redeemScript}],[pkey]).then((signed) => {
+    								//debug
+    								//console.log(signed);
+    								
+    								//broadcast it
+    								//note may have to trap for errors
+    								client.sendRawTransaction(signed.hex).then((broadcasted) => {
+    									//debug
+    									//console.log(broadcasted);
+
+    									//build sql
+    									let sqldata = ['1', req.query.address];
+										let sql = `UPDATE keys
+											   	SET swept = ?
+											    WHERE address = ?`;
+										
+										//run sql		 
+										db.run(sql, sqldata, function(err) {
+										  if (err) {
+
+										  }
+										  //lock wallet
+										  client.walletLock();
+										  //return status
+										  res.send(JSON.stringify({status: "swept"}));
+										  return;
+										});
+    								});
+
+    							});
+    						});
+    					});	
+    				}
+    				else
+    				{
+    					//lock wallet
+    					client.walletLock();
+    					//return status
+	    				res.send(JSON.stringify({status: "not enough confirmations :"+result[0].confirmations}));
 						return;
-					}
-					else
-	    			{
-	    				//debug
-	    				//console.log(result[0])
-
-	    				//check the confirmation count
-	    				//note it is set to 1 for now as I want to play with it as soon as possible.  It should 3 - 6 when we are happy
-	    				if (result[0].confirmations > 1)
-	    				{
-	    					//estimate fee
-	    					client.estimateSmartFee(6).then((fee) => {
-	    						//debug
-	    						//console.log(fee)    						
-
-	    						//work out the amount to send
-								var amounttosend = result[0].amount - fee.feerate;
-								//debug
-								//console.log(amounttosend)
-								
-
-								//create raw transaction
-								/*
-	    						we are in a catch 22 here 
-								Unhandled rejection RpcError: signrawtransaction is deprecated and will be fully removed in v0.18. To use signrawtransaction in v0.17,
-								restart bitcoind with -deprecatedrpc=signrawtransaction.
-								Projects should transition to using signrawtransactionwithkey and signrawtransactionwithwallet before upgrading to v0.18
-								but v0.17 does not support signrawtransactionwithkey so we wil update when v0.18 comes out
-								
-								*/
-	    						client.createRawTransaction([{"txid":result[0].txid,"vout":0}],[{[process.env.toaddress]:amounttosend}]).then((txhash) => {
-	    							//debug
-	    							//console.log(txhash)
-
-	    							//sign it
-	    							//note may have to trap for errors
-	    							client.signRawTransaction(txhash,[{"txid":result[0].txid,"vout":0,"amount":result[0].amount,"scriptPubKey":result[0].scriptPubKey,"redeemScript":result[0].redeemScript}],[pkey]).then((signed) => {
-	    								//debug
-	    								//console.log(signed);
-	    								
-	    								//broadcast it
-	    								//note may have to trap for errors
-	    								client.sendRawTransaction(signed.hex).then((broadcasted) => {
-	    									//debug
-	    									//console.log(broadcasted);
-
-	    									//build sql
-	    									let sqldata = ['1', req.query.address];
-											let sql = `UPDATE keys
-												   	SET swept = ?
-												    WHERE address = ?`;
-											
-											//run sql		 
-											db.run(sql, sqldata, function(err) {
-											  if (err) {
-
-											  }
-											  //lock wallet
-											  client.walletLock();
-											  //return status
-											  res.send(JSON.stringify({status: "swept"}));
-											  return;
-											});
-	    								});
-
-	    							});
-	    						});
-	    					});	
-	    				}
-	    				else
-	    				{
-	    					//lock wallet
-	    					client.walletLock();
-	    					//return status
-		    				res.send(JSON.stringify({status: "not enough confirmations :"+result[0].confirmations}));
-							return;
-	    				}
-	    			}
-    			});
-    		});
-	    });
-	});
+    				}
+    			}
+			});
+		});
+    });
 })
 
 /*
