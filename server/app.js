@@ -92,38 +92,6 @@ app.get('/admin/updatesettings', (req, res) => {
 	 }); 
 });
 
-//orders
-app.get('/admin/order', (req, res) => {
-	//set the headers
-	res = setHeaders(res);
-	    let sql = `select *
-    		   from product
-	           WHERE product.address = '`+req.query.address+`'`;
-
-	var jsonStr = '{"results":[]}';
-	var obj = JSON.parse(jsonStr);
-	//jsonStr = JSON.stringify(obj)
-	db.all(sql, [], (err, rows) => {
-	  if (err) {
-	    throw err;
-	  }
-	 rows.forEach((row) => {
-	 	//console.log(row);
-	 	//myObj.push(row);
-	 	//obj.push('dsss');
-	 	obj['results'].push(row);
-
-
-	 });
-	 jsonStr = JSON.stringify(obj);
-	 //console.log('done');
-	 //console.log(jsonStr);
-	 res.send(jsonStr);
-
-	});
-});
-
-
 //return the admin settings
 app.get('/admin/settings', (req, res) => {
 	//set the headers
@@ -155,6 +123,37 @@ app.get('/admin/settings', (req, res) => {
 
 	  }
 	 }); 
+});
+
+//orders
+app.get('/admin/order', (req, res) => {
+	//set the headers
+	res = setHeaders(res);
+	    let sql = `select *
+    		   from product
+	           WHERE product.address = '`+req.query.address+`'`;
+
+	var jsonStr = '{"results":[]}';
+	var obj = JSON.parse(jsonStr);
+	//jsonStr = JSON.stringify(obj)
+	db.all(sql, [], (err, rows) => {
+	  if (err) {
+	    throw err;
+	  }
+	 rows.forEach((row) => {
+	 	//console.log(row);
+	 	//myObj.push(row);
+	 	//obj.push('dsss');
+	 	obj['results'].push(row);
+
+
+	 });
+	 jsonStr = JSON.stringify(obj);
+	 //console.log('done');
+	 //console.log(jsonStr);
+	 res.send(jsonStr);
+
+	});
 });
 
 //return a list of payments
@@ -276,6 +275,8 @@ app.get('/api/monitor', (req, res) => {
 
 
 //move a payment to cold storage called from admin
+//todo: We get the cold storage address from a process env but in the admin we store it a table.  We have to decide how to use the cold 
+//		storage address and serve it the same way in each function
 app.get('/api/sweep', (req, res) => {
 	//set the headers
 	res = setHeaders(res);
