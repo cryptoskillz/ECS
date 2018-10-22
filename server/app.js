@@ -40,6 +40,8 @@ function setHeaders(res)
     return(res);
 }
 
+
+
 /*
 ========================
 END OF GENERIC FUNCTION
@@ -285,6 +287,7 @@ app.get('/api/sweep', (req, res) => {
 		//get the unspent transaxtions for the address we are intrested in.
 		client.listUnspent(1,9999999,[req.query.address]).then(result => {
 			//debug
+			//console.log('listUnspent')
 			//console.log(result)
 
 			//get the private key
@@ -310,17 +313,20 @@ app.get('/api/sweep', (req, res) => {
 
     				//check the confirmation count
     				//note it is set to 1 for now as I want to play with it as soon as possible.  It should 3 - 6 when we are happy
-    				if (result[0].confirmations > 1)
+    				if (result[0].confirmations >= 1)
     				{
     					//estimate fee
     					client.estimateSmartFee(6).then((fee) => {
     						//debug
+    						//console.log('fee')  
     						//console.log(fee)    						
 
     						//work out the amount to send
 							var amounttosend = result[0].amount - fee.feerate;
+							amounttosend = amounttosend.toFixed(8)
 							//debug
 							//console.log(amounttosend)
+							//return
 							
 
 							//create raw transaction
@@ -330,22 +336,36 @@ app.get('/api/sweep', (req, res) => {
 							restart bitcoind with -deprecatedrpc=signrawtransaction.
 							Projects should transition to using signrawtransactionwithkey and signrawtransactionwithwallet before upgrading to v0.18
 							but v0.17 does not support signrawtransactionwithkey so we wil update when v0.18 comes out
+
+							Innputs
+
+							txid: the transation id you want to use as your input (from listUnspent)
+							vout: the transaciton id to you want to use as your input (from listUnspent)
+
+							Output
+
+							address to send to
+							amount to send
+
 							
 							*/
     						client.createRawTransaction([{"txid":result[0].txid,"vout":0}],[{[process.env.toaddress]:amounttosend}]).then((txhash) => {
     							//debug
+    							//console.log('txhash');
     							//console.log(txhash)
 
     							//sign it
     							//note may have to trap for errors
     							client.signRawTransaction(txhash,[{"txid":result[0].txid,"vout":0,"amount":result[0].amount,"scriptPubKey":result[0].scriptPubKey,"redeemScript":result[0].redeemScript}],[pkey]).then((signed) => {
     								//debug
+    								//console.log('signed');
     								//console.log(signed);
     								
     								//broadcast it
     								//note may have to trap for errors
     								client.sendRawTransaction(signed.hex).then((broadcasted) => {
     									//debug
+    									//console.log('broadcasted');
     									//console.log(broadcasted);
 
     									//build sql
