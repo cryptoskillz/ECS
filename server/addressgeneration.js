@@ -7,12 +7,6 @@ const bip39 = require('bip39');
 const bip32 = require('bip32')
 const network = bitcoin.networks.testnet
 
-
-
-//set a schema array
-var schema = [];
-//basic counter
-var i = 0;
 program
   .version('0.0.1')
   .description('Generate Address');
@@ -24,38 +18,36 @@ program
   .description('generate addresses')
   .action((mnemonic,number) => {
 
-    console.log(mnemonic.toString())
-    
+    //validate the menmonic
     var res = bip39.validateMnemonic(mnemonic);
     if (res != false)
     {
-      
+      //generate a seed
       const seed = bip39.mnemonicToSeed(mnemonic)
-      const root = bip32.fromSeed(seed);
+      //set root
+      var root = bip32.fromSeed(seed);
+      //debug
+      //console.log(root)
+      
+      //set the counter
       var i = 0;
+      //start the loop
       while (i < number)
       {
-        const address = bitcoin.payments.p2pkh({ pubkey: root.publicKey, network }).address
-        //const address = bitcoin.payments.p2pkh({ pubkey: root, network }).address
+        //user derive path to get a child
+        child = root.derivePath('m/0/'+i);
         //debug
-        //console.log(res);
-        //console.log(seed);
-        //console.log(root.network.bip32.private);
-        console.log(address); 
-        i++;      
+        //console.log(child);
+
+        //todo : check if there is any activity in this child and if not store otherwise get the next one in the sequence.
+
+        //get the address
+        var address = bitcoin.payments.p2pkh({ pubkey: child.publicKey, network }).address
+        //debug
+        console.log(address)
+        i++;
       }
-     
     }
-    
-
-    /*
-    const seed = bip39.mnemonicToSeed(mnemonic)
-    const root = bip32.fromSeed(seed)
-
-    // receive addresses
-    assert.strictEqual(getAddress(root.derivePath("m/0'/0/0")), '1AVQHbGuES57wD68AJi7Gcobc3RZrfYWTC')
-    console.log(bitcoin.payments.p2pkh({ pubkey: node.publicKey, network }).address)
-    */
 
   });
 
