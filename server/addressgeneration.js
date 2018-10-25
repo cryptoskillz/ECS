@@ -51,41 +51,44 @@ program
             }
           ).address
           //debug
-        //console.log(address)
-        
-        //debug we know this has been sent funs so it will skip this and move the index on
-        //if (addressIndex == 5)
-        //  address = "2Mx1TYm5J87WQAuqo4SBMQZJZLRPNjg716N"
-        
-        //use block.io to see if this address has been used.
-        block_io.get_transactions({'type':'received','address': address}, function (error, data)
-        {
-            //debug
-            //console.log(data)
-            
-            //move on the index
-            addressIndex++;
-            //check for transaxtions
-            if (data.data.txs.length == 0)
-            {
-              //output the address as it has never been used
-              console.log(address)
-              //check if we are under the number of requested addresses and call the function again if this is the case.
-              if (addressIndex <= number)
-                 generateAddress(root,addressIndex)
-            }
-            else
-            {
-              //call the function to get  new address as this one had some transactions. 
-              generateAddress(root,addressIndex)
-            }
+          //console.log(address)
+          
+          //debug we know this has been sent funs so it will skip this and move the index on
+          //if (addressIndex == 5)
+          //  address = "2Mx1TYm5J87WQAuqo4SBMQZJZLRPNjg716N"
+          
+          //use block.io to see if this address has been used.
+          //note: when we get to the hardware wallet code we will remove this dependency at the moment this is the 
+          //      only we can check if an address has been used as the block chain does not have the ability for us to 
+          //      check and address for transactions.  I assume block.io are storing an indexed database to allow this 
+          //      functionality.  We could check our own database of course but that is not as good as the block.io method. 
+          block_io.get_transactions({'type':'received','address': address}, function (error, data)
+          {
+              //debug
+              //console.log(data)
+              
+              //move on the index
+              addressIndex++;
+              //check for transaxtions
+              if (data.data.txs.length == 0)
+              {
+                //output the address as it has never been used
+                console.log(address)
+                //check if we are under the number of requested addresses and call the function again if this is the case.
+                if (addressIndex <= number)
+                   generateAddress(root,addressIndex)
+              }
+              else
+              {
+                //call the function to get  new address as this one had some transactions. 
+                generateAddress(root,addressIndex)
+              }
 
-        });
-      }
-
-      console.log('Generating '+number+' of addresses starting from index 0');
-      //call the generate address function
-      generateAddress(root,0)
+          });
+        }
+        console.log('Generating '+number+' of addresses starting from index 0');
+        //call the generate address function
+        generateAddress(root,0)
       
     }
   });
