@@ -22,12 +22,21 @@ program
 
     //validate the menmonic
     var res = bip39.validateMnemonic(mnemonic);
+    //debug
+    //console.log(res);
+
     if (res != false)
     {
       //generate a seed
       const seed = bip39.mnemonicToSeed(mnemonic)
+      //debug
+      //console.log(seed);
+
       //set root
       var root = bip32.fromSeed(seed);
+      //debug
+      //console.log(seed);
+      //console.log(root);
 
       //recursive generate address function
       function generateAddress(root,addressIndex)
