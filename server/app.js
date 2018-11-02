@@ -1,7 +1,8 @@
 //load express
 const express = require("express");
+//include the version package
 require( 'pkginfo' )( module, 'version','name','description' );
-//export it
+//display a message to the console.
 console.log( module.exports.name+": " + module.exports.version );
 console.log( module.exports.description+' is listenting :]');
 
@@ -585,7 +586,8 @@ END OF API FUNCTIONS
 */
 
 //console.log('up and at em ')
-//set port
+//set port not we use an env port so that the server we deploy to can set it to whatever port it wants.
+//This is common practice in AWS I am not sure if all server providers use the same method.
 var port = process.env.PORT || 3000;
 //listen
 app.listen(port);
