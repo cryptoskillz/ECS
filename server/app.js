@@ -1,5 +1,11 @@
 //load express
 const express = require("express");
+require( 'pkginfo' )( module, 'version','name','description' );
+//export it
+console.log( module.exports.name+": " + module.exports.version );
+console.log( module.exports.description+' is listenting :]');
+
+
 //load bitcoin core
 const Client = require("bitcoin-core");
 //open a connection to the RPC client
