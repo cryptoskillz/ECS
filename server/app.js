@@ -65,16 +65,25 @@ START OF ADMIN FUNCTION
 */
 
 //update the settings
+//update the settings
 app.get("/admin/updatesettings", (req, res) => {
   //set the headers
   res = setHeaders(res);
 
   //check if it is a zero and if so return error
+  //todo : check for duplicate address and validate the btc adddress
+  if (req.query.address == '')
+  {
+     res.send(JSON.stringify({ error: "no address" }));
+     return;
+
+  }
+
 
   let sql =
     `select user.id 
-    		   from user
-	           WHERE user.sessiontoken = '` +
+           from user
+             WHERE user.sessiontoken = '` +
     req.query.token +
     `'`;
   //run the sql
@@ -87,33 +96,46 @@ app.get("/admin/updatesettings", (req, res) => {
     if (rows.length == 0) {
       res.send(JSON.stringify({ results: "error" }));
     } else {
-      let data = [req.query.address, rows[0].id];
-      let sql = `UPDATE usersettings
-		            SET coldstorageaddress = ?
-		            WHERE userid = ? `;
 
-      db.run(sql, data, function(err) {
-        if (err) {
-          res.send(JSON.stringify({ results: "error" }));
+
+         db.run(
+        `INSERT INTO coldstorageaddresses(address,userid) VALUES(?,?)`,
+        [req.query.address,rows[0].id],
+        function(err) {
+          if (err) {
+            //debug
+            //return console.log(err.message);
+
+            //return error
+            res.send(JSON.stringify({ error: err.message }));
+            return;
+          }
+          //return the address
+          res.send(JSON.stringify({ results: "ok" }));
         }
-        //oupt guid to api request
-        res.send(JSON.stringify({ results: "ok" }));
-      });
+      );
+
     }
   });
 });
+
+
+
+
 
 //return the admin settings
 app.get("/admin/settings", (req, res) => {
   //set the headers
   res = setHeaders(res);
   let sql =
-    `select usersettings.coldstorageaddress 
+    `select coldstorageaddresses.address 
     		   from user
-    		   INNER JOIN usersettings ON user.id = usersettings.userid
+    		   INNER JOIN coldstorageaddresses ON user.id = coldstorageaddresses.userid
 	           WHERE user.sessiontoken = '` +
     req.query.token +
     `'`;
+
+
   //run the sql
   var jsonStr = '{"results":[]}';
   var obj = JSON.parse(jsonStr);
@@ -126,7 +148,10 @@ app.get("/admin/settings", (req, res) => {
     if (rows.length == 0) {
       res.send(JSON.stringify({ results: "0" }));
     } else {
-      obj["results"].push(rows[0]);
+      //debug
+      //console.log(rows);
+      
+      obj["results"].push(rows);
       jsonStr = JSON.stringify(obj);
       //console.log('done');
       //console.log(jsonStr);

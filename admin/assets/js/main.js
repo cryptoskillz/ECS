@@ -44,12 +44,14 @@ function settingsDone()
 	if (result.results[0] != '0')
 	{
 		//alert(result.results[0].coldstorageaddress);
-		$('#address').val(result.results[0].coldstorageaddress);
+		//$('#address').val(result.results[0].coldstorageaddress);
+		jQuery.each( result.results[0], function( index, res )
+		{
+			$('#addresses').append(res.address+'<br>');
+			//console.log(res.address);
+		});
 	}
-	else
-	{
-		alert('settings not updated');
-	}
+	
 	
 }
 
@@ -64,7 +66,7 @@ function updatesettigsDone()
 	//check update status
 	if (result.results == 'ok')
 	{
-		alert('settings updated');
+		document.location.reload();
 
 	}
 	else
