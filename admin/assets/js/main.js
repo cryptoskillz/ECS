@@ -35,6 +35,22 @@ function getCookie(cname) {
     return '';
 }
 
+function deleteSettingAaddress()
+{
+	var result = $.parseJSON(ajaxdata);
+	//debug
+	//console.log(result.results[0]);
+	if (result.results[0] != '0')
+	{
+		document.location.reload();
+
+	}
+	else
+	{
+		alert('error deleting address');
+	}
+}
+
 //process the return from the server settings calls
 function settingsDone()
 {
@@ -47,7 +63,7 @@ function settingsDone()
 		//$('#address').val(result.results[0].coldstorageaddress);
 		jQuery.each( result.results[0], function( index, res )
 		{
-			$('#addresses').append(res.address+'<br>');
+			$('#addresses').append(res.address+" <a href=\"javascript:deleteAddress('"+res.address+"')\">Delete</a><br>");
 			//console.log(res.address);
 		});
 	}
@@ -271,6 +287,12 @@ function ajaxGET(url,parentcallback)
 	})
 	.complete(function() {
 	});
+}
+
+function deleteAddress(address)
+{
+	var geturl = serverurl+'admin/deletesettingsaddress?address='+address+'&token='+token;
+  	ajaxGET(geturl,"deleteSettingAaddress()");
 }
 
 //update settings click

@@ -18,6 +18,10 @@ const client = new Client({
 });
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
+//load the shared functions
+var helperfunctions = require('./api/helpers/sharedfunctions.js').HelperFunctions;
+//init the helper functions.
+var helper = new helperfunctions();
 //init it
 const app = express();
 
@@ -32,31 +36,21 @@ let db = new sqlite3.Database("./db/db.db", err => {
   }
 });
 
-/*
-========================
-START OF GENERIC FUNCTION
-========================
-*/
-
-function setHeaders(res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  ); // If needed
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  ); // If needed
-  res.setHeader("Access-Control-Allow-Credentials", true); // If needed
-  return res;
-}
 
 /*
-========================
-END OF GENERIC FUNCTION
-========================
+==============================
+START OF BACKOFFICE FUNCTIONS
+=============================
 */
+
+
+/*
+==============================
+END OF BACKOFFICE FUNCTIONS
+=============================
+*/
+
+
 
 /*
 ========================
@@ -68,7 +62,7 @@ START OF ADMIN FUNCTION
 //update the settings
 app.get("/admin/updatesettings", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
 
   //check if it is a zero and if so return error
   //todo : check for duplicate address and validate the btc adddress
@@ -121,12 +115,27 @@ app.get("/admin/updatesettings", (req, res) => {
 
 
 
+//return the admin settings
+app.get("/admin/deletesettingsaddress", (req, res) => {
+  //set the headers
+  res = helper.setHeaders(res);
+  let data = [req.query.address];
+  let sql = `delete FROM coldstorageaddresses WHERE address = ?`;
+  db.run(sql, data, function(err) {
+    if (err) {
+      res.send(JSON.stringify({ results: err.message }));
+    }   
+    res.send(JSON.stringify({ results: "ok" }));
+  });
+  
+
+});
 
 
 //return the admin settings
 app.get("/admin/settings", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
   let sql =
     `select coldstorageaddresses.address 
     		   from user
@@ -150,7 +159,7 @@ app.get("/admin/settings", (req, res) => {
     } else {
       //debug
       //console.log(rows);
-      
+
       obj["results"].push(rows);
       jsonStr = JSON.stringify(obj);
       //console.log('done');
@@ -163,7 +172,7 @@ app.get("/admin/settings", (req, res) => {
 //orders
 app.get("/admin/order", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
   let sql =
     `select *
     		   from product
@@ -194,7 +203,7 @@ app.get("/admin/order", (req, res) => {
 //return a list of payments
 app.get("/admin/payments", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
   let sql =
     `select keys.id,keys.address,keys.processed,keys.swept,keys.net,keys.amount
     		   from user
@@ -226,7 +235,7 @@ app.get("/admin/payments", (req, res) => {
 //login the user in
 app.get("/admin/login", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
 
   //get username and password passed up
   let data = [req.query.uname, req.query.pass];
@@ -278,7 +287,7 @@ app.get("/admin/login", (req, res) => {
 //pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer. called from admin
 app.get("/api/monitor", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
   //the amont for the address
   client.getReceivedByAddress(req.query.address).then(result => {
     //check it is more tha 0
@@ -297,6 +306,7 @@ app.get("/api/monitor", (req, res) => {
         }
         //retun response
         res.send(JSON.stringify({ status: "confirmed" }));
+        //todo: send the email confirmations.
       });
     } else {
       //return error
@@ -310,7 +320,7 @@ app.get("/api/monitor", (req, res) => {
 //		storage address and serve it the same way in each function
 app.get("/api/sweep", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
 
   let sqldata = [0];
   let sql = `select * from coldstorageaddresses where used = ?`;
@@ -492,7 +502,7 @@ START OF API FUNCTIONS
 //generate an address and output it called rom sr.js
 app.get("/api/address", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
   //unlock the wallet
   client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
     //create a new address in theaccount account :]
@@ -526,7 +536,7 @@ app.get("/api/address", (req, res) => {
 //store user details called rom sr.js
 app.get("/api/storeuserdetails", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
   let data = [req.query.email, req.query.address];
   let sql = `UPDATE product
 	            SET email = ?
@@ -544,7 +554,7 @@ app.get("/api/storeuserdetails", (req, res) => {
 //storeproduct  called rom sr.js
 app.get("/api/storeproduct", (req, res) => {
   //set the headers
-  res = setHeaders(res);
+  res = helper.setHeaders(res);
   //check if it is in the product table
   if (req.query.quantity == 0) {
     //delete the record
