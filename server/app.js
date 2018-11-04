@@ -18,10 +18,10 @@ const client = new Client({
 });
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
-//load the shared functions
-var helperfunctions = require('./api/helpers/sharedfunctions.js').HelperFunctions;
-//init the helper functions.
-var helper = new helperfunctions();
+//load the generic functions
+var generichelper = require('./api/helpers/generic.js').Generic;
+var generic = new generichelper();
+
 //init it
 const app = express();
 
@@ -39,16 +39,26 @@ let db = new sqlite3.Database("./db/db.db", err => {
 
 /*
 ==============================
-START OF BACKOFFICE FUNCTIONS
+START OF BACKOFFICE ROUTING
 =============================
 */
+app.get("/backoffice/test", (req, res) => {
+  //load the back office helper
+  var backofficehelper = require('./api/helpers/backoffice.js').backOffice;
+  var backoffice = new backofficehelper();
+
+  //debug
+  //backoffice.test();
+});
 
 
 /*
 ==============================
-END OF BACKOFFICE FUNCTIONS
+END OF BACKOFFICE ROUTING
 =============================
 */
+
+
 
 
 
@@ -59,10 +69,9 @@ START OF ADMIN FUNCTION
 */
 
 //update the settings
-//update the settings
 app.get("/admin/updatesettings", (req, res) => {
   //set the headers
-  res = helper.setHeaders(res);
+  res = generic.setHeaders(res);
 
   //check if it is a zero and if so return error
   //todo : check for duplicate address and validate the btc adddress
@@ -70,47 +79,12 @@ app.get("/admin/updatesettings", (req, res) => {
   {
      res.send(JSON.stringify({ error: "no address" }));
      return;
-
   }
-
-
-  let sql =
-    `select user.id 
-           from user
-             WHERE user.sessiontoken = '` +
-    req.query.token +
-    `'`;
-  //run the sql
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    ///console.log(rows);
-    //check we have a result
-    if (rows.length == 0) {
-      res.send(JSON.stringify({ results: "error" }));
-    } else {
-
-
-         db.run(
-        `INSERT INTO coldstorageaddresses(address,userid) VALUES(?,?)`,
-        [req.query.address,rows[0].id],
-        function(err) {
-          if (err) {
-            //debug
-            //return console.log(err.message);
-
-            //return error
-            res.send(JSON.stringify({ error: err.message }));
-            return;
-          }
-          //return the address
-          res.send(JSON.stringify({ results: "ok" }));
-        }
-      );
-
-    }
-  });
+  //load the back office helper
+  var adminhelper = require('./api/helpers/admin.js').admin;
+  var admin = new adminhelper();
+  //add the cold storage address
+  admin.addColdStorageAddress(req.query.token,req.query.address,db,res);
 });
 
 
@@ -546,6 +520,9 @@ app.get("/api/storeuserdetails", (req, res) => {
     if (err) {
       return console.error(err.message);
     }
+    //todo: send email saying we are waiting for payment. 
+
+
     //console.log(`Row(s) updated: ${this.changes}`);
     res.send(JSON.stringify({ status: "ok" }));
   });
