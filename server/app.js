@@ -44,8 +44,8 @@ START OF BACKOFFICE ROUTING
 */
 app.get("/backoffice/test", (req, res) => {
   //load the back office helper
-  var backofficehelper = require('./api/helpers/backoffice.js').backOffice;
-  var backoffice = new backofficehelper();
+  let backofficehelper = require('./api/helpers/backoffice.js').backOffice;
+  let backoffice = new backofficehelper();
 
   //debug
   //backoffice.test();
@@ -81,8 +81,8 @@ app.get("/admin/updatesettings", (req, res) => {
      return;
   }
   //load the back office helper
-  var adminhelper = require('./api/helpers/admin.js').admin;
-  var admin = new adminhelper();
+  let adminhelper = require('./api/helpers/admin.js').admin;
+  let admin = new adminhelper();
   //add the cold storage address
   admin.addColdStorageAddress(req.query.token,req.query.address,db,res);
 });
@@ -258,6 +258,20 @@ app.get("/admin/login", (req, res) => {
   });
 });
 
+
+
+/*
+========================
+END OF ADMIN FUNCTION
+========================
+*/
+
+/*
+========================
+START OF API FUNCTIONS
+========================
+*/
+
 //pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer. called from admin
 app.get("/api/monitor", (req, res) => {
   //set the headers
@@ -270,9 +284,9 @@ app.get("/api/monitor", (req, res) => {
       //build the query
       let data = ["1", result, req.query.address];
       let sql = `UPDATE keys
-			            SET processed = ?,
-			            	amount = ?
-			            WHERE address = ?`;
+                  SET processed = ?,
+                    amount = ?
+                  WHERE address = ?`;
       //run the query
       db.run(sql, data, function(err) {
         if (err) {
@@ -291,7 +305,7 @@ app.get("/api/monitor", (req, res) => {
 
 //move a payment to cold storage called from admin
 //todo: We get the cold storage address from a process env but in the admin we store it a table.  We have to decide how to use the cold
-//		storage address and serve it the same way in each function
+//    storage address and serve it the same way in each function
 app.get("/api/sweep", (req, res) => {
   //set the headers
   res = helper.setHeaders(res);
@@ -355,22 +369,22 @@ app.get("/api/sweep", (req, res) => {
 
                 //create raw transaction
                 /*
-					we are in a catch 22 here 
-					Unhandled rejection RpcError: signrawtransaction is deprecated and will be fully removed in v0.18. To use signrawtransaction in v0.17,
-					restart bitcoind with -deprecatedrpc=signrawtransaction.
-					Projects should transition to using signrawtransactionwithkey and signrawtransactionwithwallet before upgrading to v0.18
-					but v0.17 does not support signrawtransactionwithkey so we wil update when v0.18 comes out
+          we are in a catch 22 here 
+          Unhandled rejection RpcError: signrawtransaction is deprecated and will be fully removed in v0.18. To use signrawtransaction in v0.17,
+          restart bitcoind with -deprecatedrpc=signrawtransaction.
+          Projects should transition to using signrawtransactionwithkey and signrawtransactionwithwallet before upgrading to v0.18
+          but v0.17 does not support signrawtransactionwithkey so we wil update when v0.18 comes out
 
-					Innputs
+          Innputs
 
-					txid: the transation id you want to use as your input (from listUnspent)
-					vout: the transaciton id to you want to use as your input (from listUnspent)
+          txid: the transation id you want to use as your input (from listUnspent)
+          vout: the transaciton id to you want to use as your input (from listUnspent)
 
-					Output
+          Output
 
-					address to send to
-					amount to send			
-				*/
+          address to send to
+          amount to send      
+        */
                 client
                   .createRawTransaction(
                     [{ txid: result[0].txid, vout: 0 }],
@@ -414,8 +428,8 @@ app.get("/api/sweep", (req, res) => {
                             //build sql
                             let sqldata = ["1", req.query.address];
                             let sql = `UPDATE keys
-												   	SET swept = ?
-												    WHERE address = ?`;
+                            SET swept = ?
+                            WHERE address = ?`;
 
                             //run sql
                             db.run(sql, sqldata, function(err) {
@@ -425,8 +439,8 @@ app.get("/api/sweep", (req, res) => {
                               //build sql
                               let sqldata = [0, coldstorageaddress];
                               let sql = `UPDATE coldstorageaddresses
-													   	SET used = ?
-													    WHERE coldstorageaddress = ?`;
+                              SET used = ?
+                              WHERE coldstorageaddress = ?`;
 
                               //run sql
                               db.run(sql, sqldata, function(err) {
@@ -460,18 +474,6 @@ app.get("/api/sweep", (req, res) => {
     });
   });
 });
-
-/*
-========================
-END OF ADMIN FUNCTION
-========================
-*/
-
-/*
-========================
-START OF API FUNCTIONS
-========================
-*/
 
 //generate an address and output it called rom sr.js
 app.get("/api/address", (req, res) => {
