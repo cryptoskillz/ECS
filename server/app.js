@@ -91,171 +91,84 @@ app.get("/admin/updatesettings", (req, res) => {
 
 //return the admin settings
 app.get("/admin/deletesettingsaddress", (req, res) => {
-  //set the headers
-  res = helper.setHeaders(res);
-  let data = [req.query.address];
-  let sql = `delete FROM coldstorageaddresses WHERE address = ?`;
-  db.run(sql, data, function(err) {
-    if (err) {
-      res.send(JSON.stringify({ results: err.message }));
-    }   
-    res.send(JSON.stringify({ results: "ok" }));
-  });
-  
 
+  //set the headers
+  res = generic.setHeaders(res);
+  //check if it is a zero and if so return error
+  if (req.query.address == '')
+  {
+     res.send(JSON.stringify({ error: "no address" }));
+     return;
+  }
+  //load the back office helper
+  let adminhelper = require('./api/helpers/admin.js').admin;
+  let admin = new adminhelper();  
+  admin.deleteColdStorageAddress(req.query.address,db,res)
+  
 });
 
 
 //return the admin settings
 app.get("/admin/settings", (req, res) => {
   //set the headers
-  res = helper.setHeaders(res);
-  let sql =
-    `select coldstorageaddresses.address 
-    		   from user
-    		   INNER JOIN coldstorageaddresses ON user.id = coldstorageaddresses.userid
-	           WHERE user.sessiontoken = '` +
-    req.query.token +
-    `'`;
-
-
-  //run the sql
-  var jsonStr = '{"results":[]}';
-  var obj = JSON.parse(jsonStr);
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    ///console.log(rows);
-    //check we have a result
-    if (rows.length == 0) {
-      res.send(JSON.stringify({ results: "0" }));
-    } else {
-      //debug
-      //console.log(rows);
-
-      obj["results"].push(rows);
-      jsonStr = JSON.stringify(obj);
-      //console.log('done');
-      //console.log(jsonStr);
-      res.send(jsonStr);
-    }
-  });
+  res = generic.setHeaders(res);
+  //check if it is a zero and if so return error
+  if (req.query.address == '')
+  {
+     res.send(JSON.stringify({ error: "no address" }));
+     return;
+  }
+  //load the back office helper
+  let adminhelper = require('./api/helpers/admin.js').admin;
+  let admin = new adminhelper(); 
+  //get the settings
+  admin.getSettings(req.query.token,db,res);
 });
 
 //orders
 app.get("/admin/order", (req, res) => {
   //set the headers
-  res = helper.setHeaders(res);
-  let sql =
-    `select *
-    		   from product
-	           WHERE product.address = '` +
-    req.query.address +
-    `'`;
-
-  var jsonStr = '{"results":[]}';
-  var obj = JSON.parse(jsonStr);
-  //jsonStr = JSON.stringify(obj)
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    rows.forEach(row => {
-      //console.log(row);
-      //myObj.push(row);
-      //obj.push('dsss');
-      obj["results"].push(row);
-    });
-    jsonStr = JSON.stringify(obj);
-    //console.log('done');
-    //console.log(jsonStr);
-    res.send(jsonStr);
-  });
+  res = generic.setHeaders(res);
+  //check if it is a zero and if so return error
+  if (req.query.address == '')
+  {
+     res.send(JSON.stringify({ error: "no address" }));
+     return;
+  }
+  //load the back office helper
+  let adminhelper = require('./api/helpers/admin.js').admin;
+  let admin = new adminhelper(); 
+  //get the products
+  admin.getOrder(req.query.address,db,res);
 });
 
 //return a list of payments
 app.get("/admin/payments", (req, res) => {
   //set the headers
-  res = helper.setHeaders(res);
-  let sql =
-    `select keys.id,keys.address,keys.processed,keys.swept,keys.net,keys.amount
-    		   from user
-    		   INNER JOIN keys ON user.id = keys.userid
-	           WHERE user.sessiontoken = '` +
-    req.query.token +
-    `'`;
+  res = generic.setHeaders(res);
+  //check if it is a zero and if so return error
+  if (req.query.address == '')
+  {
+     res.send(JSON.stringify({ error: "no address" }));
+     return;
+  }
+  //load the back office helper
+  let adminhelper = require('./api/helpers/admin.js').admin;
+  let admin = new adminhelper(); 
+  //call the get orders function
+  admin.getOrders(req.query.token,db,res);
 
-  var jsonStr = '{"results":[]}';
-  var obj = JSON.parse(jsonStr);
-  //jsonStr = JSON.stringify(obj)
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    rows.forEach(row => {
-      //console.log(row);
-      //myObj.push(row);
-      //obj.push('dsss');
-      obj["results"].push(row);
-    });
-    jsonStr = JSON.stringify(obj);
-    //console.log('done');
-    //console.log(jsonStr);
-    res.send(jsonStr);
-  });
 });
 
 //login the user in
 app.get("/admin/login", (req, res) => {
   //set the headers
-  res = helper.setHeaders(res);
-
-  //get username and password passed up
-  let data = [req.query.uname, req.query.pass];
-  //build sql
-  let sql =
-    `select * from user
-	            WHERE username = '` +
-    req.query.uname +
-    `' and password = '` +
-    req.query.pass +
-    `'`;
-
-  //run the sql
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    //check we have a result
-    if (rows.length != 0) {
-      //make a guid
-      var u = "";
-      var i = 0;
-      while (i++ < 36) {
-        var c = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"[i - 1],
-          r = (Math.random() * 16) | 0,
-          v = c == "x" ? r : (r & 0x3) | 0x8;
-        u += c == "-" || c == "4" ? c : v.toString(16);
-      }
-      sessiontoken = u;
-      //update the table with the guid
-      let data = [sessiontoken, rows[0].id];
-      let sql = `UPDATE user
-		            SET sessiontoken = ?
-		            WHERE id = ? `;
-
-      db.run(sql, data, function(err) {
-        if (err) {
-          return console.error(err.message);
-        }
-        //oupt guid to api request
-        res.send(JSON.stringify({ token: sessiontoken }));
-      });
-    } else {
-      res.send(JSON.stringify({ token: "0" }));
-    }
-  });
+  res = generic.setHeaders(res);
+  //load the back office helper
+  let adminhelper = require('./api/helpers/admin.js').admin;
+  let admin = new adminhelper(); 
+  //call the login function
+  admin.login(req.query.uname,req.query.pass,db,res);
 });
 
 
