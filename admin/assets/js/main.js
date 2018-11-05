@@ -183,7 +183,7 @@ function paymentsDone()
 	//console.log(ajaxdata);
 
 	//grab the table
-	var t = $('#example').DataTable();
+	var t = $('#paymentstable').DataTable();
 	//empty the table
 	t
     .clear()
@@ -228,7 +228,7 @@ function paymentsDone()
 			'<a href="'+blockexplorerurl+'" target="_blank" title="View on blockchain explorer">'+res.address+'</a>',
 			processed,
 			swept,
-			res.amount,
+			'<i class="fab fa-bitcoin"></i>'+res.amount,
 			actions
 		] ).draw( false );
 	});
