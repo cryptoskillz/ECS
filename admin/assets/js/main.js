@@ -201,14 +201,14 @@ function paymentsDone()
 		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
 		blockexplorerurl = blockexplorerurl+res.address+'/';
 		//actions column
-		var actions = '<a href="'+blockexplorerurl+'" target="_blank"><i class="fas fa-external-link-square-alt"></i>View</a>'
+		var actions = '<a href="'+blockexplorerurl+'" target="_blank"><i class="fas fa-globe" title="View on blockchain explorer"></i> </a>'
 		//check if the payment was processed
 		if (res.processed == 0)
 		{	
 			//set processed to no
 			processed = 'No';
 			//add to the action
-			actions = actions + '<a href="javascript:checkProcessed(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Process</a>'
+			actions = actions + '<a href="javascript:checkProcessed(\''+res.address+'\')"><i class="fas fa-money-bill" title="Check for payment"></i> </a>'
 
 		}
 		//check if it was swept
@@ -217,15 +217,15 @@ function paymentsDone()
 		{
 			//add to the acction 
 			swept = "No";
-			actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Sweep</a>'
+			actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-broom" title="Move money to cold storage"></i> </a>'
 		}
 
 		
 		
 		//add the row to the table
 		t.row.add( [
-			'<a href="order.html?address='+res.address+'" >'+res.id+'</a>',
-			'<a href="'+blockexplorerurl+'" target="_blank">'+res.address+'</a>',
+			'<a href="order.html?address='+res.address+'" title="View Order details">'+res.id+'</a>',
+			'<a href="'+blockexplorerurl+'" target="_blank" title="View on blockchain explorer">'+res.address+'</a>',
 			processed,
 			swept,
 			res.amount,
