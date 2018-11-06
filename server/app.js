@@ -6,36 +6,12 @@ require( 'pkginfo' )( module, 'version','name','description' );
 console.log( module.exports.name+": " + module.exports.version );
 console.log( module.exports.description+' is listenting :]');
 
-
-//load bitcoin core
-const Client = require("bitcoin-core");
-//open a connection to the RPC client
-const client = new Client({
-  host: "127.0.0.1",
-  port: 18332,
-  username: "test",
-  password: "test"
-});
-//load SQLlite (use any database you want or none)
-const sqlite3 = require("sqlite3").verbose();
 //load the generic functions
 var generichelper = require('./api/helpers/generic.js').Generic;
 var generic = new generichelper();
 
 //init it
 const app = express();
-
-//1 = testnet
-//2 = mainnet
-const network = "1";
-
-//open a database connection
-let db = new sqlite3.Database("./db/db.db", err => {
-  if (err) {
-    console.error(err.message);
-  }
-});
-
 
 /*
 ==============================
@@ -58,10 +34,6 @@ END OF BACKOFFICE ROUTING
 =============================
 */
 
-
-
-
-
 /*
 ========================
 START OF ADMIN FUNCTION
@@ -80,11 +52,11 @@ app.get("/admin/updatesettings", (req, res) => {
      res.send(JSON.stringify({ error: "no address" }));
      return;
   }
-  //load the back office helper
+  //load the admin helper
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper();
   //add the cold storage address
-  admin.addColdStorageAddress(req.query.token,req.query.address,db,res);
+  admin.addColdStorageAddress(req.query.token,req.query.address,res);
 });
 
 
@@ -100,10 +72,10 @@ app.get("/admin/deletesettingsaddress", (req, res) => {
      res.send(JSON.stringify({ error: "no address" }));
      return;
   }
-  //load the back office helper
+  //load the admin helper
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper();  
-  admin.deleteColdStorageAddress(req.query.address,db,res)
+  admin.deleteColdStorageAddress(req.query.address,res)
   
 });
 
@@ -118,7 +90,7 @@ app.get("/admin/settings", (req, res) => {
      res.send(JSON.stringify({ error: "no address" }));
      return;
   }
-  //load the back office helper
+  //load the admin helper
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
   //get the settings
@@ -135,11 +107,11 @@ app.get("/admin/order", (req, res) => {
      res.send(JSON.stringify({ error: "no address" }));
      return;
   }
-  //load the back office helper
+  //load the admin helper
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
   //get the products
-  admin.getOrder(req.query.address,db,res);
+  admin.getOrder(req.query.address,res);
 });
 
 //return a list of payments
@@ -152,7 +124,7 @@ app.get("/admin/payments", (req, res) => {
      res.send(JSON.stringify({ error: "no address" }));
      return;
   }
-  //load the back office helper
+  //load the admin helper
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
   //call the get orders function
@@ -164,11 +136,11 @@ app.get("/admin/payments", (req, res) => {
 app.get("/admin/login", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
-  //load the back office helper
+  //load the admin helper
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
   //call the login function
-  admin.login(req.query.uname,req.query.pass,db,res);
+  admin.login(req.query.uname,req.query.pass,res);
 });
 
 
@@ -188,32 +160,12 @@ START OF API FUNCTIONS
 //pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer. called from admin
 app.get("/api/monitor", (req, res) => {
   //set the headers
-  res = helper.setHeaders(res);
-  //the amont for the address
-  client.getReceivedByAddress(req.query.address).then(result => {
-    //check it is more tha 0
-    //note may want to check confirmations here
-    if (result > 0) {
-      //build the query
-      let data = ["1", result, req.query.address];
-      let sql = `UPDATE keys
-                  SET processed = ?,
-                    amount = ?
-                  WHERE address = ?`;
-      //run the query
-      db.run(sql, data, function(err) {
-        if (err) {
-          return console.error(err.message);
-        }
-        //retun response
-        res.send(JSON.stringify({ status: "confirmed" }));
-        //todo: send the email confirmations.
-      });
-    } else {
-      //return error
-      res.send(JSON.stringify({ status: "not confirmed" }));
-    }
-  });
+  res = generic.setHeaders(res);
+  //load the api helper
+  let apihelper = require('./api/helpers/api.js').api;
+  let api = new apihelper(); 
+  //call the login function
+  api.monitor(req.query.address,res);
 });
 
 //move a payment to cold storage called from admin
@@ -221,205 +173,23 @@ app.get("/api/monitor", (req, res) => {
 //    storage address and serve it the same way in each function
 app.get("/api/sweep", (req, res) => {
   //set the headers
-  res = helper.setHeaders(res);
-
-  let sqldata = [0];
-  let sql = `select * from coldstorageaddresses where used = ?`;
-
-  //get a cold storage address
-  db.get(sql, sqldata, (err, result) => {
-    if (err) {
-      return console.error(err.message);
-    }
-    //save the address
-    var coldstorageaddress = result.address;
-    //get the sweep address
-    //unlock the wallet
-    client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
-      //get the unspent transaxtions for the address we are intrested in.
-      client.listUnspent(1, 9999999, [req.query.address]).then(result => {
-        //debug
-        //console.log('listUnspent')
-        //console.log(result)
-
-        //get the private key
-        client.dumpPrivKey(req.query.address).then(pkey => {
-          //debug
-          //console.log(pkey)
-          //console.log(result)
-
-          //check if there are any
-          if (result.length == 0) {
-            //debug
-            //console.log(result);
-
-            //exit gracefully
-            res.send(
-              JSON.stringify({
-                result: "nothing to sweep no unspent transactions"
-              })
-            );
-            return;
-          } else {
-            //debug
-            //console.log(result[0])
-
-            //check the confirmation count
-            //note it is set to 1 for now as I want to play with it as soon as possible.  It should 3 - 6 when we are happy
-            if (result[0].confirmations >= 1) {
-              //estimate fee
-              client.estimateSmartFee(6).then(fee => {
-                //debug
-                //console.log('fee')
-                //console.log(fee)
-
-                //work out the amount to send
-                var amounttosend = result[0].amount - fee.feerate;
-                amounttosend = amounttosend.toFixed(8);
-                //debug
-                //console.log(amounttosend)
-                //return
-
-                //create raw transaction
-                /*
-          we are in a catch 22 here 
-          Unhandled rejection RpcError: signrawtransaction is deprecated and will be fully removed in v0.18. To use signrawtransaction in v0.17,
-          restart bitcoind with -deprecatedrpc=signrawtransaction.
-          Projects should transition to using signrawtransactionwithkey and signrawtransactionwithwallet before upgrading to v0.18
-          but v0.17 does not support signrawtransactionwithkey so we wil update when v0.18 comes out
-
-          Innputs
-
-          txid: the transation id you want to use as your input (from listUnspent)
-          vout: the transaciton id to you want to use as your input (from listUnspent)
-
-          Output
-
-          address to send to
-          amount to send      
-        */
-                client
-                  .createRawTransaction(
-                    [{ txid: result[0].txid, vout: 0 }],
-                    [{ [coldstorageaddress]: amounttosend }]
-                  )
-                  .then(txhash => {
-                    //debug
-                    //console.log('txhash');
-                    //console.log(txhash)
-
-                    //sign it
-                    //note may have to trap for errors
-                    client
-                      .signRawTransaction(
-                        txhash,
-                        [
-                          {
-                            txid: result[0].txid,
-                            vout: 0,
-                            amount: result[0].amount,
-                            scriptPubKey: result[0].scriptPubKey,
-                            redeemScript: result[0].redeemScript
-                          }
-                        ],
-                        [pkey]
-                      )
-                      .then(signed => {
-                        //debug
-                        //console.log('signed');
-                        //console.log(signed);
-
-                        //broadcast it
-                        //note may have to trap for errors
-                        client
-                          .sendRawTransaction(signed.hex)
-                          .then(broadcasted => {
-                            //debug
-                            //console.log('broadcasted');
-                            //console.log(broadcasted);
-
-                            //build sql
-                            let sqldata = ["1", req.query.address];
-                            let sql = `UPDATE keys
-                            SET swept = ?
-                            WHERE address = ?`;
-
-                            //run sql
-                            db.run(sql, sqldata, function(err) {
-                              if (err) {
-                              }
-                              //update the address in cold storage so it is not used again.
-                              //build sql
-                              let sqldata = [0, coldstorageaddress];
-                              let sql = `UPDATE coldstorageaddresses
-                              SET used = ?
-                              WHERE coldstorageaddress = ?`;
-
-                              //run sql
-                              db.run(sql, sqldata, function(err) {
-                                if (err) {
-                                }
-                                //lock wallet
-                                client.walletLock();
-                                //return status
-                                res.send(JSON.stringify({ status: "swept" }));
-                                return;
-                              });
-                            });
-                          });
-                      });
-                  });
-              });
-            } else {
-              //lock wallet
-              client.walletLock();
-              //return status
-              res.send(
-                JSON.stringify({
-                  status: "not enough confirmations :" + result[0].confirmations
-                })
-              );
-              return;
-            }
-          }
-        });
-      });
-    });
-  });
+  res = generic.setHeaders(res);
+  //load the api helper
+  let apihelper = require('./api/helpers/api.js').api;
+  let api = new apihelper(); 
+  //call the login function
+  api.sweep(address,res);
 });
 
 //generate an address and output it called rom sr.js
 app.get("/api/address", (req, res) => {
-  //set the headers
-  res = helper.setHeaders(res);
-  //unlock the wallet
-  client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
-    //create a new address in theaccount account :]
-    client.getNewAddress(process.env.walletaccount).then(address => {
-      //debug
-      //console.log(address);
-
-      //insert it into the database
-      db.run(
-        `INSERT INTO keys(address,userid,net) VALUES(?,?,?)`,
-        [address, req.query.uid, network],
-        function(err) {
-          if (err) {
-            //debug
-            //return console.log(err.message);
-
-            //return error
-            res.send(JSON.stringify({ error: err.message }));
-            return;
-          }
-          //return the address
-          res.send(JSON.stringify({ address: address }));
-        }
-      );
-      client.walletLock();
-      return;
-    });
-  });
+    //set the headers
+  res = generic.setHeaders(res);
+  //load the api helper
+  let apihelper = require('./api/helpers/api.js').api;
+  let api = new apihelper(); 
+  //call the login function
+  api.generateAddress(req.query.uid,res);
 });
 
 //store user details called rom sr.js
@@ -436,7 +206,6 @@ app.get("/api/storeuserdetails", (req, res) => {
       return console.error(err.message);
     }
     //todo: send email saying we are waiting for payment. 
-
 
     //console.log(`Row(s) updated: ${this.changes}`);
     res.send(JSON.stringify({ status: "ok" }));

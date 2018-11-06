@@ -1,5 +1,9 @@
+
 var Generic = function ()
 {
+	this.test = function test() {
+		console.log('yay')
+	}
 
 	this.setHeaders = function setHeaders(res) {
 		res.setHeader("Access-Control-Allow-Origin", "*");

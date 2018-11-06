@@ -1,3 +1,13 @@
+//load SQLlite (use any database you want or none)
+const sqlite3 = require("sqlite3").verbose();
+//open a database connection
+let db = new sqlite3.Database("./db/db.db", err => {
+  if (err) {
+    console.error(err.message);
+  }
+});
+
+
 var admin = function ()
 {
 	this.test = function test() 
@@ -5,7 +15,7 @@ var admin = function ()
 		console.log('yay')
 	}
 
-	this.login = function login(uname,pass,db,res)
+	this.login = function login(uname,pass,res)
 	{
 		//get username and password passed up
 		let data = [uname,pass];
@@ -57,7 +67,7 @@ var admin = function ()
 	*		  in either the server or the amdin side.
 	*
 	*/
-	this.getOrders = function getOrders(token,db,res)
+	this.getOrders = function getOrders(token,res)
 	{
 		//create a reults object
 		let jsonStr = '{"results":[]}';
@@ -107,7 +117,7 @@ var admin = function ()
 	* 	Note: Not 100% sure that order is the correct name here, we may have to change this in the future
 	*
 	*/
-	this.getOrder = function getOrder(address,db,res)
+	this.getOrder = function getOrder(address,res)
 	{
 		console.log(address);
 		//create a reults object
@@ -145,7 +155,7 @@ var admin = function ()
 	*	This function returns the settings.
 	*
 	*/
-	this.getSettings = function getSettings(token,db,res)
+	this.getSettings = function getSettings(token,res)
 	{
 		//create a reults object
 		let jsonStr = '{"results":[]}';
@@ -197,7 +207,7 @@ var admin = function ()
 	*	This function deletes a cold storage address.
 	*
 	*/
-	this.deleteColdStorageAddress = function deleteColdStorageAddress(address,db,res)
+	this.deleteColdStorageAddress = function deleteColdStorageAddress(address,res)
 	{
 		//store the data for the query 
 		let data = [address];
@@ -217,7 +227,7 @@ var admin = function ()
 	*
 	*	This function add a cold storage address
 	*/
-	this.addColdStorageAddress = function addColdStorageAddress(token,address,db,res)
+	this.addColdStorageAddress = function addColdStorageAddress(token,address,res)
 	{
 		//store the data for the query 
 		let data = [address];
