@@ -94,7 +94,7 @@ app.get("/admin/settings", (req, res) => {
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
   //get the settings
-  admin.getSettings(req.query.token,db,res);
+  admin.getSettings(req.query.token,res);
 });
 
 //orders
@@ -128,7 +128,7 @@ app.get("/admin/payments", (req, res) => {
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
   //call the get orders function
-  admin.getOrders(req.query.token,db,res);
+  admin.getOrders(req.query.token,res);
 
 });
 

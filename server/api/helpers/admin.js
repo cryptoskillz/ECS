@@ -230,7 +230,7 @@ var admin = function ()
 	this.addColdStorageAddress = function addColdStorageAddress(token,address,res)
 	{
 		//store the data for the query 
-		let data = [address];
+		let data = [token];
 		//build the sql query
 		let sql =  `select user.id from user WHERE user.sessiontoken = ?`;
 
@@ -238,7 +238,7 @@ var admin = function ()
 	  	//console.log(sql);
 
 		//run the sql
-		db.all(sql, [], (err, rows) => {
+		db.all(sql, data, (err, rows) => {
 			if (err) {
 			  res.send(JSON.stringify({ results: err.message }));
 			}

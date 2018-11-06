@@ -63,7 +63,7 @@ function settingsDone()
 		//$('#address').val(result.results[0].coldstorageaddress);
 		jQuery.each( result.results[0], function( index, res )
 		{
-			$('#addresses').append(res.address+" <a href=\"javascript:deleteAddress('"+res.address+"')\">Delete</a><br>");
+			$('#addresses').append(res.address+" <a href=\"javascript:deleteAddress('"+res.address+"')\"><i class='fas fa-trash' title='Delete address'></i></a><br>");
 			//console.log(res.address);
 		});
 	}
