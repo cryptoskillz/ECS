@@ -48,6 +48,7 @@ var api = function() {
         }
         //todo: send email saying we are waiting for payment. 
         //send email to customer and to store owner
+        console.log('send mail in store user details')
         generic.sendMail();
         //console.log(`Row(s) updated: ${this.changes}`);
         res.send(JSON.stringify({ status: "ok" }));
@@ -185,6 +186,7 @@ var api = function() {
           res.send(JSON.stringify({ status: "confirmed" }));
           //todo: send the email confirmations.
           //send email to customer.
+          console.log('send email in monitor')
           generic.sendMail();
         });
       } else {
@@ -217,8 +219,8 @@ var api = function() {
         //get the unspent transaxtions for the address we are intrested in.
         client.listUnspent(1, 9999999, [address]).then(result => {
           //debug
-          //console.log('listUnspent')
-          //console.log(result)
+          console.log('listUnspent')
+          console.log(result)
 
           //get the private key
           client.dumpPrivKey(address).then(pkey => {
@@ -256,7 +258,7 @@ var api = function() {
                   var amounttosend = result[0].amount - fee.feerate;
                   amounttosend = amounttosend.toFixed(8);
                   //debug
-                  //console.log(amounttosend)
+                  console.log(amounttosend)
                   //return
 
                   //create raw transaction
@@ -281,7 +283,7 @@ var api = function() {
                   //console.log(coldstorageaddress)
                   client
                     .createRawTransaction(
-                      [{ txid: result[0].txid, vout: 0 }],
+                      [{ txid: result[0].txid, vout: result[0].vout }],
                       [{ [coldstorageaddress]: amounttosend }]
                     )
                     .then(txhash => {
@@ -297,7 +299,7 @@ var api = function() {
                           [
                             {
                               txid: result[0].txid,
-                              vout: 0,
+                              vout: result[0].vout,
                               amount: result[0].amount,
                               scriptPubKey: result[0].scriptPubKey,
                               redeemScript: result[0].redeemScript
@@ -331,10 +333,12 @@ var api = function() {
                                 }
                                 //update the address in cold storage so it is not used again.
                                 //build sql
-                                let sqldata = [1, coldstorageaddress];
+                                let sqldata = ["1", coldstorageaddress];
                                 let sql = `UPDATE coldstorageaddresses
 	                          SET used = ?
 	                          WHERE coldstorageaddress = ?`;
+                            console.log(coldstorageaddress)
+                            console.log(sql)
 
                                 //run sql
                                 db.run(sql, sqldata, function(err) {
