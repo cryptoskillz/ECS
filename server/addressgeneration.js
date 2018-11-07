@@ -16,7 +16,7 @@ const network = bitcoin.networks.testnet;
 program.version("0.0.1").description("Generate Address");
 //get the balance of the account.
 program
-  .command("generate <mnemonic> <number> <offline>")
+  .command("generate <mnemonic> <number>")
   .alias("a")
   .description("generate addresses")
   .action((mnemonic, number) => {

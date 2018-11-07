@@ -36,6 +36,7 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
+    console.log(req.query);
       let data = [req.query.email, req.query.address];
       let sql = `UPDATE product
                   SET email = ?
@@ -46,6 +47,7 @@ var api = function() {
           return console.error(err.message);
         }
         //todo: send email saying we are waiting for payment. 
+        //send email to customer and to store owner
         generic.sendMail();
         //console.log(`Row(s) updated: ${this.changes}`);
         res.send(JSON.stringify({ status: "ok" }));
@@ -182,6 +184,7 @@ var api = function() {
           //retun response
           res.send(JSON.stringify({ status: "confirmed" }));
           //todo: send the email confirmations.
+          //send email to customer.
           generic.sendMail();
         });
       } else {
@@ -197,8 +200,6 @@ var api = function() {
 	*
 	*/
   this.sweep = function sweep(address, res) {
-    //set the headers
-    res = helper.setHeaders(res);
 
     let sqldata = [0];
     let sql = `select * from coldstorageaddresses where used = ?`;
@@ -220,8 +221,9 @@ var api = function() {
           //console.log(result)
 
           //get the private key
-          client.dumpPrivKey(req.query.address).then(pkey => {
+          client.dumpPrivKey(address).then(pkey => {
             //debug
+            //console.log('pkey')
             //console.log(pkey)
             //console.log(result)
 
@@ -275,6 +277,8 @@ var api = function() {
       		          address to send to
       		          amount to send      
     		          */
+
+                  //console.log(coldstorageaddress)
                   client
                     .createRawTransaction(
                       [{ txid: result[0].txid, vout: 0 }],
@@ -327,7 +331,7 @@ var api = function() {
                                 }
                                 //update the address in cold storage so it is not used again.
                                 //build sql
-                                let sqldata = [0, coldstorageaddress];
+                                let sqldata = [1, coldstorageaddress];
                                 let sql = `UPDATE coldstorageaddresses
 	                          SET used = ?
 	                          WHERE coldstorageaddress = ?`;

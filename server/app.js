@@ -178,7 +178,7 @@ app.get("/api/sweep", (req, res) => {
   let apihelper = require('./api/helpers/api.js').api;
   let api = new apihelper(); 
   //call the login function
-  api.sweep(address,res);
+  api.sweep(req.query.address,res);
 });
 
 //generate an address and output it called rom sr.js

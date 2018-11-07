@@ -259,8 +259,10 @@ var admin = function ()
 					{
 						if (err) 
 						{
+							console.log(err.message)
 							res.send(JSON.stringify({ error: err.message }));
-							}
+							return;
+						}
 						res.send(JSON.stringify({ results: "ok" }));
 					}
 				);
