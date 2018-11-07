@@ -8,6 +8,12 @@ const client = new Client({
   password: "test"
 });
 
+//load the generic functions
+//note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that. 
+var generichelper = require('./generic.js').Generic;
+var generic = new generichelper();
+
+
 //1 = testnet
 //2 = mainnet
 const network = "1";
