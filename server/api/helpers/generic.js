@@ -27,6 +27,11 @@ var Generic = function ()
 		console.log('yay')
 	}
 
+	/*
+	*
+	*	This function sends an email. 
+	*
+	*/
 	this.sendMail = function sendMail() {
          // send mail with defined transport object
 	    transporter.sendMail(mailOptions, (error, info) => {
@@ -42,6 +47,11 @@ var Generic = function ()
 	    });
     };
 
+	/*
+	*
+	*	This function sets the origin headers i have just allowed everything you can set your corrs policy however you want.
+	*
+	*/
 	this.setHeaders = function setHeaders(res) {
 		res.setHeader("Access-Control-Allow-Origin", "*");
 		res.setHeader(

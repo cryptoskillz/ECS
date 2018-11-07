@@ -29,6 +29,11 @@ let db = new sqlite3.Database("./db/db.db", err => {
 
 var api = function() {
 
+   /*
+  *
+  * This function stores the user details 
+  *
+  */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
       let data = [req.query.email, req.query.address];
@@ -41,13 +46,18 @@ var api = function() {
           return console.error(err.message);
         }
         //todo: send email saying we are waiting for payment. 
-
+        generic.sendMail();
         //console.log(`Row(s) updated: ${this.changes}`);
         res.send(JSON.stringify({ status: "ok" }));
       });
   }
 
 
+  /*
+  *
+  * This function stores the product in the database
+  *
+  */
   this.storeProduct = function storeProduct(req,res)
   {
     //check if it is in the product table
@@ -172,6 +182,7 @@ var api = function() {
           //retun response
           res.send(JSON.stringify({ status: "confirmed" }));
           //todo: send the email confirmations.
+          generic.sendMail();
         });
       } else {
         //return error
