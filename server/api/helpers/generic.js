@@ -1,8 +1,9 @@
 
 const nodemailer = require('nodemailer');
-// create reusable transporter object using the default SMTP transport
+//create reusable transporter object using the default SMTP transport
+//note : We are usint hte ethereal email servie which fake emails for this demo you can repalce the details with amazons ses, send grid or whatever your preference is.
 let transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
+    host: process.env.emailsmtp,
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
