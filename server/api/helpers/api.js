@@ -49,7 +49,7 @@ var api = function() {
         //todo: send email saying we are waiting for payment. 
         //send email to customer and to store owner
         console.log('send mail in store user details')
-        generic.sendMail();
+        generic.sendMail(1,req.query.email);
         //console.log(`Row(s) updated: ${this.changes}`);
         res.send(JSON.stringify({ status: "ok" }));
       });
@@ -186,8 +186,8 @@ var api = function() {
           res.send(JSON.stringify({ status: "confirmed" }));
           //todo: send the email confirmations.
           //send email to customer.
-          console.log('send email in monitor')
-          generic.sendMail();
+          //console.log('send email in monitor')
+          generic.sendMail(2,'cryptoskillz@protonmail.com');
         });
       } else {
         //return error

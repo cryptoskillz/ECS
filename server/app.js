@@ -9,6 +9,8 @@ console.log( module.exports.description+' is listenting :]');
 //load the generic functions
 var generichelper = require('./api/helpers/generic.js').Generic;
 var generic = new generichelper();
+//debug
+//generic.sendMail(1,'wah@gah.com');
 
 //init it
 const app = express();
@@ -183,6 +185,8 @@ app.get("/api/sweep", (req, res) => {
 
 //generate an address and output it called rom sr.js
 app.get("/api/address", (req, res) => {
+  //debug
+generic.test();
     //set the headers
   res = generic.setHeaders(res);
   //load the api helper
