@@ -129,6 +129,8 @@ var api = function() {
   this.generateAddress = function generateAddress(uid,res)
   {
     //unlock the wallet
+    //debug
+    //console.log(process.env.walletpassphrase)
     client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
       //create a new address in theaccount account :]
       client.getNewAddress(process.env.walletaccount).then(address => {

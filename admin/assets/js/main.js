@@ -4,9 +4,10 @@
 var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
 //check if we are local
 //note : set this whatever your local instance is 127.0.0.1 for example
-if(window.location.href.indexOf("srcryptoadmin") > -1) 
+if(window.location.href.indexOf("127.0.0.1") > -1) 
 {
 	serverurl = "http://127.0.0.1:3000/";
+	//alert(serverurl)
 }
 
 //hold the return from the server

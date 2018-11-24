@@ -186,7 +186,7 @@ app.get("/api/sweep", (req, res) => {
 //generate an address and output it called rom sr.js
 app.get("/api/address", (req, res) => {
   //debug
-generic.test();
+  //generic.test();
     //set the headers
   res = generic.setHeaders(res);
   //load the api helper

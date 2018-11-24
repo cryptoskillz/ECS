@@ -239,6 +239,8 @@ var admin = function ()
 
 		//run the sql
 		db.all(sql, data, (err, rows) => {
+
+			//console.log(rows)
 			if (err) {
 			  res.send(JSON.stringify({ results: err.message }));
 			}
