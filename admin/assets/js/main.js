@@ -4,9 +4,10 @@
 var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
 //check if we are local
 //note : set this whatever your local instance is 127.0.0.1 for example
-if(window.location.href.indexOf("srcryptoadmin") > -1) 
+if(window.location.href.indexOf("127.0.0.1") > -1) 
 {
 	serverurl = "http://127.0.0.1:3000/";
+	//alert(serverurl)
 }
 
 //hold the return from the server
@@ -35,6 +36,22 @@ function getCookie(cname) {
     return '';
 }
 
+function deleteSettingAaddress()
+{
+	var result = $.parseJSON(ajaxdata);
+	//debug
+	//console.log(result.results[0]);
+	if (result.results[0] != '0')
+	{
+		document.location.reload();
+
+	}
+	else
+	{
+		alert('error deleting address');
+	}
+}
+
 //process the return from the server settings calls
 function settingsDone()
 {
@@ -44,12 +61,14 @@ function settingsDone()
 	if (result.results[0] != '0')
 	{
 		//alert(result.results[0].coldstorageaddress);
-		$('#address').val(result.results[0].coldstorageaddress);
+		//$('#address').val(result.results[0].coldstorageaddress);
+		jQuery.each( result.results[0], function( index, res )
+		{
+			$('#addresses').append(res.address+" <a href=\"javascript:deleteAddress('"+res.address+"')\"><i class='fas fa-trash' title='Delete address'></i></a><br>");
+			//console.log(res.address);
+		});
 	}
-	else
-	{
-		alert('settings not updated');
-	}
+	
 	
 }
 
@@ -64,7 +83,7 @@ function updatesettigsDone()
 	//check update status
 	if (result.results == 'ok')
 	{
-		alert('settings updated');
+		document.location.reload();
 
 	}
 	else
@@ -165,7 +184,7 @@ function paymentsDone()
 	//console.log(ajaxdata);
 
 	//grab the table
-	var t = $('#example').DataTable();
+	var t = $('#paymentstable').DataTable();
 	//empty the table
 	t
     .clear()
@@ -183,14 +202,14 @@ function paymentsDone()
 		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
 		blockexplorerurl = blockexplorerurl+res.address+'/';
 		//actions column
-		var actions = '<a href="'+blockexplorerurl+'" target="_blank"><i class="fas fa-external-link-square-alt"></i>View</a>'
+		var actions = '<a href="'+blockexplorerurl+'" target="_blank"><i class="fas fa-globe" title="View on blockchain explorer"></i> </a>'
 		//check if the payment was processed
 		if (res.processed == 0)
 		{	
 			//set processed to no
 			processed = 'No';
 			//add to the action
-			actions = actions + '<a href="javascript:checkProcessed(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Process</a>'
+			actions = actions + '<a href="javascript:checkProcessed(\''+res.address+'\')"><i class="fas fa-money-bill" title="Check for payment"></i> </a>'
 
 		}
 		//check if it was swept
@@ -199,18 +218,18 @@ function paymentsDone()
 		{
 			//add to the acction 
 			swept = "No";
-			actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-external-link-square-alt"></i>Sweep</a>'
+			actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-broom" title="Move money to cold storage"></i> </a>'
 		}
 
 		
 		
 		//add the row to the table
 		t.row.add( [
-			'<a href="order.html?address='+res.address+'" >'+res.id+'</a>',
-			'<a href="'+blockexplorerurl+'" target="_blank">'+res.address+'</a>',
+			'<a href="order.html?address='+res.address+'" title="View Order details">'+res.id+'</a>',
+			'<a href="'+blockexplorerurl+'" target="_blank" title="View on blockchain explorer">'+res.address+'</a>',
 			processed,
 			swept,
-			res.amount,
+			'<i class="fab fa-bitcoin"></i>'+res.amount,
 			actions
 		] ).draw( false );
 	});
@@ -269,6 +288,12 @@ function ajaxGET(url,parentcallback)
 	})
 	.complete(function() {
 	});
+}
+
+function deleteAddress(address)
+{
+	var geturl = serverurl+'admin/deletesettingsaddress?address='+address+'&token='+token;
+  	ajaxGET(geturl,"deleteSettingAaddress()");
 }
 
 //update settings click

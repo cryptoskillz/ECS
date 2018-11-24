@@ -13,10 +13,12 @@ var block_io = new BlockIo(
 );
 const network = bitcoin.networks.testnet;
 
+
+console.log(process.env.blockiokey)
 program.version("0.0.1").description("Generate Address");
 //get the balance of the account.
 program
-  .command("generate <mnemonic> <number> <offline>")
+  .command("generate <mnemonic> <number>")
   .alias("a")
   .description("generate addresses")
   .action((mnemonic, number) => {
