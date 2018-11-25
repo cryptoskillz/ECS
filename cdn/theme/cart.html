@@ -15,18 +15,50 @@
          <div class="body">
             <ul id='cartlistitems'>
             </ul>
-            <div id="customerdetailswrapper">
+            <div id="customerdetailswrapper" class="customerdetails">
                <label>Email</label>  
                <input type="text" name="sr-email" id="sr-email">
-               <a href="#0" id="sr-pay" class="sr-button">Payg</a>
               <div id="addresswrapper" class="addresswrapper">
                   <div id="billingaddressswrapper" class="billingaddressswrapper">
-                    ba
+                    <span>Billing Address</span>
+                    <div>
+                      <label>Address</label>  
+                      <input type="text" name="sr-billingaddress1" id="sr-billingaddress1">
+                    </div>
+                    <div>
+                      <label>City</label>  
+                      <input type="text" name="sr-billingcity" id="sr-billingcity">
+                    </div>
+                    <div>
+                      <label>State</label>  
+                      <input type="text" name="sr-billingstate" id="sr-billingstate">
+                    </div>
+                    <div>
+                      <label>Zip</label>  
+                      <input type="text" name="sr-billingzip" id="sr-billingzip">
+                    </div>
+                    <div>
+                      <label>Country</label>  
+                      <select name="sr-billingcountry" id="sr-billingcountry">
+                      
+                      </select>
+                    </div>
+                    <div id="sr-billingandshippingequal">
+                      <input type="checkbox" id="sr-billingandshippingcheck" name="sr-billingandshippingcheck" checked> Billing & Shippng the same<br>
+                    </div>
+
                   </div>
                   <div id="shippingaddresswrapper" class="shippingaddresswrapper">
-                    sa
+                      <span>Shipping Address</span>
+                      <input type="text" name="sr-shippingaddress1" id="sr-billingaddress1">
+                     <input type="text" name="sr-shippingcity" id="sr-shippingcity">
+                     <input type="text" name="sr-shippingstate" id="sr-shippingstate">
+                     <input type="text" name="sr-shippingzip" id="sr-shippingzip">
+                     <input type="text" name="sr-shippingcountry" id="sr-shippingcountry">
                   </div>
                 </div>
+                <a href="#0" id="sr-pay" class="sr-button">Pay</a>
+
             </div>
 
             <div id="bitcoinaddresswrapper">

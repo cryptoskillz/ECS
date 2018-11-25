@@ -454,10 +454,14 @@ Main Components
   height: 1.6em;
   line-height: 1.6em;
 }
+
 .cd-cart .actions::after {
   clear: both;
   content: "";
   display: block;
+}
+.cd-cart .customerdetails {
+  line-height: 1.6em;
 }
 .cd-cart .delete-item, .cd-cart .quantity {
   float: left;
