@@ -280,6 +280,8 @@ var SR = SR || (function()
 		*/
 		switch (state) {
 		    case 1:
+		    	//hide the check out button
+				showClass(document.getElementById('checkout'));
 		    	//hide btc stuff
 		        hideClass(document.getElementById('checkoutbitocoin'));
 				hideClass(document.getElementById('bitcoinaddresswrapper'));
@@ -293,6 +295,8 @@ var SR = SR || (function()
 				showClass(document.getElementById('cartlistitems'));
 		        break;
 		    case 2:
+		    	//hide the check out button
+				hideClass(document.getElementById('checkout'));
 				//hide the product details
 				hideClass(document.getElementById('cartlistitems'));
 				//show the customer details
@@ -302,6 +306,8 @@ var SR = SR || (function()
 				hideClass(document.getElementById('bitcoinaddresswrapper'));
 		        break;
 		    case 3:
+		    	//show the check out button
+				showClass(document.getElementById('checkout'));
 				//show the product details
 		       	showClass(document.getElementById('cartlistitems'));
 		    	//hide btc stuff
@@ -381,6 +387,7 @@ var SR = SR || (function()
 		//add to cart click element
 		document.querySelector('.checkout').addEventListener('click', function () 
 		{
+
 			cartstate(2);
 		});
 
