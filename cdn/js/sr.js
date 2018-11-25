@@ -34,6 +34,11 @@ var SR = SR || (function()
 	var animating = false;
 
 	var theme = 'cart';
+
+	//billing and shipping addres booleans
+	var billingaddress = 0;
+	var shippingaddress = 0;
+
 	/*
 	**=========================
 	*END OF GLOBAL FUNCTIONS
@@ -280,6 +285,8 @@ var SR = SR || (function()
 		*/
 		switch (state) {
 		    case 1:
+		    	//hide the address
+		        hideClass(document.getElementById('addresswrapper'));
 		    	//hide the check out button
 				showClass(document.getElementById('checkout'));
 		    	//hide btc stuff
@@ -295,7 +302,33 @@ var SR = SR || (function()
 				showClass(document.getElementById('cartlistitems'));
 		        break;
 		    case 2:
-		    	//hide the check out button
+		    	if ((shippingaddress == 1) && ( billingaddress == 1))
+		    	{
+		    		//show the both
+		    		showClass(document.getElementById('addresswrapper'));
+
+		    	}
+		    	else
+		    	{
+		    		if (shippingaddress == 1)
+		    		{
+		    			//hide billing and show shipping
+		    			showClass(document.getElementById('addresswrapper'));
+		    			showClass(document.getElementById('shippingaddresswrapper'));
+		    			hideClass(document.getElementById('billingaddressswrapper'));
+
+
+		    		}
+		    		if (billingaddress == 1)
+		    		{
+		    			//hide shipping and show billing
+		    			showClass(document.getElementById('addresswrapper'));
+		    			hideClass(document.getElementById('shippingaddresswrapper'));
+		    			showClass(document.getElementById('billingaddressswrapper'));
+
+		    		}
+		    	}
+		    	//hide btc stuff
 				hideClass(document.getElementById('checkout'));
 				//hide the product details
 				hideClass(document.getElementById('cartlistitems'));
@@ -536,6 +569,17 @@ var SR = SR || (function()
 			{
 				theme = _args[5]
 			}
+			//theme
+			if (_args[6] != "")
+			{
+				billingaddress = _args[6]
+			}
+						//theme
+			if (_args[7] != "")
+			{
+				shippingaddress = _args[7]
+			}
+
 
 			//load css
 
