@@ -24,9 +24,11 @@ let db = new sqlite3.Database("./db/db.db", err => {
 
 var backOffice = function ()
 {
-	this.test = function test() 
+	this.test = function test(req,res) 
 	{
 		console.log('yay')
+    res.send(JSON.stringify({ status: "ok" }));
+
 	}
 
 

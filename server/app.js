@@ -23,10 +23,10 @@ START OF BACKOFFICE ROUTING
 app.get("/backoffice/test", (req, res) => {
   //load the back office helper
   let backofficehelper = require('./api/helpers/backoffice.js').backOffice;
-  let backoffice = new backofficehelper();
+  let backoffice = new backofficehelper(req,res);
 
   //debug
-  //backoffice.test();
+  backoffice.test();
 });
 
 
@@ -227,6 +227,7 @@ END OF API FUNCTIONS
 //console.log('up and at em ')
 //set port not we use an env port so that the server we deploy to can set it to whatever port it wants.
 //This is common practice in AWS I am not sure if all server providers use the same method.
+//note as we are passing this as process env we have to make sure this is set on the server
 var port = process.env.PORT || 3000;
 console.log('listenting on port:'+port)
 //listen
