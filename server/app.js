@@ -10,11 +10,14 @@ if (process.env.walletpassphrase == undefined)
   process.env.walletpassphrase = 'test';
 if (process.env.walletaccount == undefined)
   process.env.walletaccount = 'theaccount';
+
+/*
 if (process.env.blockiokey == undefined)
   process.env.blockiokey = '9ccb-fad0-7811-4dfb ';
 if (process.env.blockiosecret == undefined)
   process.env.blockiosecret = '2N3Xtg7pBjUG4RPaiwfc2t3wftvLGWv6i2K';
-console.log(process.env.walletaccount)
+*/
+
 if (process.env.PORT == undefined)
   process.env.PORT = 8080;
 
