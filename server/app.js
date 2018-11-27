@@ -23,10 +23,10 @@ START OF BACKOFFICE ROUTING
 app.get("/backoffice/test", (req, res) => {
   //load the back office helper
   let backofficehelper = require('./api/helpers/backoffice.js').backOffice;
-  let backoffice = new backofficehelper(req,res);
+  let backoffice = new backofficehelper();
 
   //debug
-  backoffice.test();
+  backoffice.test(req,res);
 });
 
 
