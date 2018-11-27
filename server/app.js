@@ -1,3 +1,23 @@
+//check the process env vars
+
+if (process.env.emailsmtp == undefined)
+  process.env.emailsmtp = 'smtp.ethereal.email';
+if (process.env.emailusername == undefined)
+  process.env.emailusername = 'rjf2z2dghi4bn3yv@ethereal.email';
+if (process.env.emailpassword == undefined)
+  process.env.emailpassword = 'NG4PPPuqvZaagwSjWV';
+if (process.env.walletpassphrase == undefined)
+  process.env.walletpassphrase = 'test';
+if (process.env.walletaccount == undefined)
+  process.env.walletaccount = 'theaccount';
+if (process.env.blockiokey == undefined)
+  process.env.blockiokey = '9ccb-fad0-7811-4dfb ';
+if (process.env.blockiosecret == undefined)
+  process.env.blockiosecret = '2N3Xtg7pBjUG4RPaiwfc2t3wftvLGWv6i2K';
+console.log(process.env.walletaccount)
+if (process.env.PORT == undefined)
+  process.env.PORT = 8080;
+
 //load express
 const express = require("express");
 //include the version package
@@ -228,7 +248,7 @@ END OF API FUNCTIONS
 //set port not we use an env port so that the server we deploy to can set it to whatever port it wants.
 //This is common practice in AWS I am not sure if all server providers use the same method.
 //note as we are passing this as process env we have to make sure this is set on the server
-var port = process.env.PORT || 3000;
+var port = process.env.PORT 
 console.log('listenting on port:'+port)
 //listen
 app.listen(port);
