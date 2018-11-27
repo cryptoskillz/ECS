@@ -228,6 +228,7 @@ END OF API FUNCTIONS
 //set port not we use an env port so that the server we deploy to can set it to whatever port it wants.
 //This is common practice in AWS I am not sure if all server providers use the same method.
 var port = process.env.PORT || 3000;
+console.log('listenting on port:'+port)
 //listen
 app.listen(port);
 
