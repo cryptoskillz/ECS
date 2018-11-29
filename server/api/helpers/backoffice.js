@@ -24,9 +24,15 @@ let db = new sqlite3.Database("./db/db.db", err => {
 
 var backOffice = function ()
 {
-	this.test = function test() 
+	this.test = function test(req,res) 
 	{
-		console.log('yay')
+     client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
+      //create a new address in theaccount account :]
+      client.getBlockCount().then(count => {
+        res.send(JSON.stringify({ status: "ok","count":count }));
+      });
+    });
+
 	}
 
 
