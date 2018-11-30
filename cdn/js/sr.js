@@ -59,7 +59,6 @@ var SR = SR || (function()
 	*=========================
 	*/
 
-
 	//this function loops through a JSON object and adds the items to a select. 
 	//note: It makes the assumpation that you pass it a json object with a Name and Code key value pair, anything else will break
 	function populateDropdonw(element,dataset,selected)
@@ -666,6 +665,19 @@ var SR = SR || (function()
 			carttotal();
 			//close it
 	  		removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+		}
+		,
+		checkBilling : function()
+		{
+			var checkbox =  document.getElementById('sr-billingandshippingcheck');
+
+			if (checkbox.checked) {
+			    //Checkbox has been checked
+			    alert('checked')
+			} else {
+			    //Checkbox has been unchecked
+			    alert('un checked')
+			}
 		}
    };
 }());
