@@ -235,7 +235,7 @@ var SR = SR || (function()
 		producttotal = parseFloat(producttotal).toFixed(8);
 		changeClassText(document.getElementById('checkouttotal'),producttotal);
 		//update counter
-	  	changeClassText(document.querySelector('.cd-count'),itemcount);	
+	  	changeClassText(document.querySelector('.sr-count'),itemcount);	
 	  	//store product
 		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
 		//call the store produt endpoint
@@ -261,7 +261,7 @@ var SR = SR || (function()
 			    //set the address
 			    address = data.address;
 			    //set the address in the checkout
-			    var elbtcaddress = document.getElementById('bitcoinaddress');
+			    var elbtcaddress = document.getElementById('sr-bitcoinaddress');
 			    //set the href
 			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
 			    //set the address
@@ -270,7 +270,7 @@ var SR = SR || (function()
 			    //console.log(elbtcaddress)
 
 			    //generate the qr code
-			    var elbtcqr = document.getElementById('bitcoinqrcode');
+			    var elbtcqr = document.getElementById('sr-bitcoinqrcode');
 				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
 		    	//debug
 			    //console.log(elbtcqr)
@@ -314,16 +314,15 @@ var SR = SR || (function()
 	function checkAddressState()
 	{
 		checkAddressClickState();
-		//hideClass(document.getElementById('addresswrapper'));
 		//chek if shipping and billing has been enabled
 		if ((shippingaddress == 1) && ( billingaddress == 1))
     	{
 
     		//show the both
-    		showClass(document.getElementById('addresswrapper'));
-    		showClass(document.getElementById('billingaddressswrapper'));
+    		showClass(document.getElementById('sr-addresswrapper'));
+    		showClass(document.getElementById('sr-billingaddressswrapper'));
     		//hide shipping
-    		hideClass(document.getElementById('shippingaddresswrapper'));
+    		hideClass(document.getElementById('sr-shippingaddresswrapper'));
     		//populate countries dropdown
     		populateDropdonw('sr-billingcountry',countries,startcountry);
     		populateDropdonw('sr-shippingcountry',countries,startcountry);
@@ -336,9 +335,9 @@ var SR = SR || (function()
     		{
     			populateDropdonw('sr-shippingcountry',countries,startcountry);
     			//hide billing and show shipping
-    			showClass(document.getElementById('addresswrapper'));
-    			showClass(document.getElementById('shippingaddresswrapper'));
-    			hideClass(document.getElementById('billingaddressswrapper'));
+    			showClass(document.getElementById('sr-addresswrapper'));
+    			showClass(document.getElementById('sr-shippingaddresswrapper'));
+    			hideClass(document.getElementById('sr-sbillingaddressswrapper'));
 
 
     		}
@@ -397,17 +396,17 @@ var SR = SR || (function()
 		    	hideClass(document.getElementById('sr-billing'));
 		        hideClass(document.getElementById('sr-shipping'));
 		    	//hide the address
-		        hideClass(document.getElementById('addresswrapper'));
+		        hideClass(document.getElementById('sr-addresswrapper'));
 		    	//hide the check out button
 				showClass(document.getElementById('checkout'));
 		    	//hide btc stuff
-				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 				//hide the customer details
-				hideClass(document.getElementById('customerdetailswrapper'));
+				hideClass(document.getElementById('sr-customerdetailswrapper'));
 				//hide back button
 				hideClass(document.getElementById('sr-back-button'));
 				//open it
-				addClass(document.querySelector('.cd-cart-container'),'cart-open');
+				addClass(document.querySelector('.sr-cart-container'),'cart-open');
 				//show the product details
 				showClass(document.getElementById('cartlistitems'));
 		        break;
@@ -419,10 +418,10 @@ var SR = SR || (function()
 				//hide the product details
 				hideClass(document.getElementById('cartlistitems'));
 				//show the customer details
-				showClass(document.getElementById('customerdetailswrapper'));
+				showClass(document.getElementById('sr-customerdetailswrapper'));
 				showClass(document.getElementById('sr-back-button'));
 		    	//hide btc stuff
-				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 		        break;
 		    case 3:
 		    	//check address
@@ -431,20 +430,18 @@ var SR = SR || (function()
 				showClass(document.getElementById('checkout'));
 				//show the product details
 		       	showClass(document.getElementById('cartlistitems'));
-		    	//hide btc stuff
-			  	//hideClass(document.getElementById('bitcoinaddresswrapper'));
 				//hide the customer details			  	
-			    hideClass(document.getElementById('customerdetailswrapper'));
+			    hideClass(document.getElementById('sr-customerdetailswrapper'));
 			   	hideClass(document.getElementById('sr-back-button'));
 		        break;
 		    case 4:
 				//hide the product details
 		    	hideClass(document.getElementById('cartlistitems'));
 		    	//show btc stuff		    	
-				showClass(document.getElementById('bitcoinaddresswrapper'));
+				showClass(document.getElementById('sr-bitcoinaddresswrapper'));
 				//hide the customer details			  					
 				showClass(document.getElementById('sr-back-button'));
-				hideClass(document.getElementById('customerdetailswrapper'));
+				hideClass(document.getElementById('sr-customerdetailswrapper'));
 		        break;
 		    case 5:
 		    	//check address
@@ -453,13 +450,13 @@ var SR = SR || (function()
 		    	hideClass(document.getElementById('cartlistitems'));
 				//show the customer details
 				showClass(document.getElementById('sr-back-button'));
-				showClass(document.getElementById('customerdetailswrapper'));
+				showClass(document.getElementById('sr-customerdetailswrapper'));
 		    	//show btc stuff
-				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 		        break; 
 		     case 6:
-		     	hideClass(document.getElementById('billingaddressswrapper'));
-		     	showClass(document.getElementById('shippingaddresswrapper'));
+		     	hideClass(document.getElementById('sr-billingaddressswrapper'));
+		     	showClass(document.getElementById('sr-shippingaddresswrapper'));
 		     	showClass(document.getElementById('sr-pay'));
 		     	hideClass(document.getElementById('sr-shipping'));
 
@@ -532,10 +529,10 @@ var SR = SR || (function()
 		});
 
 		//add to cart click element
-		document.querySelector('.cd-add-to-cart').addEventListener('click', function () 
+		document.querySelector('.sr-add-to-cart').addEventListener('click', function () 
 		{
 			//get details
-			var elproduct = document.getElementById('cd-add-to-cart');
+			var elproduct = document.getElementById('sr-add-to-cart');
 			price =elproduct.getAttribute('data-price');
 			name =elproduct.getAttribute('data-name');
 			//will update when we use multipile products
@@ -549,7 +546,7 @@ var SR = SR || (function()
 				carttotal(price)
 				
 		  		//show it
-		  		showClass(document.querySelector('.cd-cart-container'))	
+		  		showClass(document.querySelector('.sr-cart-container'))	
 			  	
 			  	//add item to cart
 			  	var productlist = document.getElementById('cartlistitems');
@@ -559,7 +556,7 @@ var SR = SR || (function()
 				//build produt
 				var prodcuthtml = '';
 				//product image		
-				var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
+				var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="'+cdnurl+'img/sr-product-preview.png" alt="placeholder"></a></div>';
 				//product name
 				prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
 				//product price
@@ -571,7 +568,7 @@ var SR = SR || (function()
 				prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="delete-item">Delete</a>';
 				prodcuthtml = prodcuthtml + '<div class="quantity">';
 				//quantity label
-				prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
+				prodcuthtml = prodcuthtml + '<label for="sr-product-'+ productid +'">Qty</label>';
 				//quantity select
 				prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="SR.changequantity()">';
 				var i = 0;
@@ -599,23 +596,23 @@ var SR = SR || (function()
 	  		}
 		});
 		//cart clicked element
-		document.querySelector('.cd-cart-trigger').addEventListener('click', function () {
+		document.querySelector('.sr-cart-trigger').addEventListener('click', function () {
 	  		//check if cart shoud be shown
 	  		//debug
 	  		//itemcount = 1;
 	  		if (itemcount == 0)
 	  		{
 	  			//always remove as its 0
-	  			removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  			removeClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  		}
 	  		else
 	  		{
 	  			//see if the cart is open and toggle it
-	  			var res = hasClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  			var res = hasClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  			if (res == 1)
 	  			{
 	  				//close it
-	  				removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  				removeClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  			}
 	  			else
 	  			{
@@ -727,7 +724,7 @@ var SR = SR || (function()
 			productlist.innerHTML = "";
 			carttotal();
 			//close it
-	  		removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  		removeClass(document.querySelector('.sr-cart-container'),'cart-open');
 		}
    };
 }());
