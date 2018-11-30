@@ -382,11 +382,13 @@ var SR = SR || (function()
 	function cartstate(state)
 	{
 		/*
+			* = redundant and will be replaced / removed 
+
 			1 = show cart product details
 			2 = show customer details screen
-			3 = customer detals back
+			3 = customer detals back*
 			4 = custmer details pay click
-			5 = bitcoin details back click
+			5 = bitcoin details back click*
 			6 = shipping button clicked
 		*/
 		//alert(state);
@@ -440,7 +442,6 @@ var SR = SR || (function()
 		    	hideClass(document.getElementById('cartlistitems'));
 		    	//show btc stuff		    	
 				showClass(document.getElementById('bitcoinaddresswrapper'));
-				showClass(document.getElementById('checkoutbitocoin'));
 				//hide the customer details			  					
 				showClass(document.getElementById('sr-back-button'));
 				hideClass(document.getElementById('customerdetailswrapper'));
@@ -455,7 +456,6 @@ var SR = SR || (function()
 				showClass(document.getElementById('customerdetailswrapper'));
 		    	//show btc stuff
 				hideClass(document.getElementById('bitcoinaddresswrapper'));
-				hideClass(document.getElementById('checkoutbitocoin'));
 		        break; 
 		     case 6:
 		     	hideClass(document.getElementById('billingaddressswrapper'));
