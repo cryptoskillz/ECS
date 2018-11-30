@@ -233,7 +233,7 @@ var SR = SR || (function()
 		var producttotal = price * itemcount;
 		//set it to 8 decimal places as it's Bitcoin
 		producttotal = parseFloat(producttotal).toFixed(8);
-		changeClassText(document.getElementById('checkouttotal'),producttotal);
+		changeClassText(document.getElementById('sr-checkouttotal'),producttotal);
 		//update counter
 	  	changeClassText(document.querySelector('.sr-count'),itemcount);	
 	  	//store product
@@ -398,7 +398,7 @@ var SR = SR || (function()
 		    	//hide the address
 		        hideClass(document.getElementById('sr-addresswrapper'));
 		    	//hide the check out button
-				showClass(document.getElementById('checkout'));
+				showClass(document.getElementById('sr-checkout'));
 		    	//hide btc stuff
 				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 				//hide the customer details
@@ -408,15 +408,15 @@ var SR = SR || (function()
 				//open it
 				addClass(document.querySelector('.sr-cart-container'),'cart-open');
 				//show the product details
-				showClass(document.getElementById('cartlistitems'));
+				showClass(document.getElementById('sr-cartlistitems'));
 		        break;
 		    case 2:
 		    	//check address
 		    	checkAddressState();
 		    	//hide btc stuff
-				hideClass(document.getElementById('checkout'));
+				hideClass(document.getElementById('sr-checkout'));
 				//hide the product details
-				hideClass(document.getElementById('cartlistitems'));
+				hideClass(document.getElementById('sr-cartlistitems'));
 				//show the customer details
 				showClass(document.getElementById('sr-customerdetailswrapper'));
 				showClass(document.getElementById('sr-back-button'));
@@ -427,16 +427,16 @@ var SR = SR || (function()
 		    	//check address
 		    	checkAddressState();
 		    	//show the check out button
-				showClass(document.getElementById('checkout'));
+				showClass(document.getElementById('sr-checkout'));
 				//show the product details
-		       	showClass(document.getElementById('cartlistitems'));
+		       	showClass(document.getElementById('sr-cartlistitems'));
 				//hide the customer details			  	
 			    hideClass(document.getElementById('sr-customerdetailswrapper'));
 			   	hideClass(document.getElementById('sr-back-button'));
 		        break;
 		    case 4:
 				//hide the product details
-		    	hideClass(document.getElementById('cartlistitems'));
+		    	hideClass(document.getElementById('sr-cartlistitems'));
 		    	//show btc stuff		    	
 				showClass(document.getElementById('sr-bitcoinaddresswrapper'));
 				//hide the customer details			  					
@@ -447,7 +447,7 @@ var SR = SR || (function()
 		    	//check address
 		    	checkAddressState();
 		    	//hide the product details
-		    	hideClass(document.getElementById('cartlistitems'));
+		    	hideClass(document.getElementById('sr-cartlistitems'));
 				//show the customer details
 				showClass(document.getElementById('sr-back-button'));
 				showClass(document.getElementById('sr-customerdetailswrapper'));
@@ -523,7 +523,7 @@ var SR = SR || (function()
 		});
 
 		//add to cart click element
-		document.querySelector('.checkout').addEventListener('click', function () 
+		document.querySelector('.sr-checkout').addEventListener('click', function () 
 		{
 			cartstate(2);
 		});
@@ -549,7 +549,7 @@ var SR = SR || (function()
 		  		showClass(document.querySelector('.sr-cart-container'))	
 			  	
 			  	//add item to cart
-			  	var productlist = document.getElementById('cartlistitems');
+			  	var productlist = document.getElementById('sr-cartlistitems');
 				var itemlist  = document.createElement('li');
 				itemlist.className = 'product ';
 
@@ -720,7 +720,7 @@ var SR = SR || (function()
         deleteitem : function ()
 		{
 			itemcount = 0;
-			var productlist = document.getElementById('cartlistitems');
+			var productlist = document.getElementById('sr-cartlistitems');
 			productlist.innerHTML = "";
 			carttotal();
 			//close it

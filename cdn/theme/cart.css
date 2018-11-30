@@ -266,10 +266,10 @@ Main Components
       -ms-transform: scale(1);
           transform: scale(1);
 }
-.sr-cart-trigger:hover + div .wrapper {
+.sr-cart-trigger:hover + div .sr-wrapper {
   box-shadow: 0 6px 40px rgba(0, 0, 0, 0.3);
 }
-.cart-open .sr-cart-trigger:hover + div .wrapper {
+.cart-open .sr-cart-trigger:hover + div .sr-wrapper {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.17);
 }
 
@@ -282,7 +282,7 @@ Main Components
   max-height: 90%;
   pointer-events: none;
 }
-.sr-cart .wrapper {
+.sr-cart .sr-wrapper {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -305,7 +305,7 @@ Main Components
   left: 0;
   width: 100%;
 }
-.sr-cart header, .sr-cart .body {
+.sr-cart header, .sr-cart .sr-body {
     font-size: 1.2rem;
 
   opacity: 0;
@@ -362,7 +362,7 @@ Main Components
   opacity: 1;
   visibility: visible;
 }
-.sr-cart .checkout {
+.sr-cart .sr-checkout {
   display: block;
   height: 72px;
   line-height: 72px;
@@ -375,10 +375,10 @@ Main Components
   -webkit-transition: all .2s 0s;
   transition: all .2s 0s;
 }
-.sr-cart .checkout:hover {
+.sr-cart .sr-checkout:hover {
   background: #399ee0;
 }
-.sr-cart .checkout em {
+.sr-cart .sr-checkout em {
   font-size: 62.5% !important;
   position: relative;
   display: inline-block;
@@ -390,7 +390,7 @@ Main Components
   transition: transform 0s .2s;
   transition: transform 0s .2s, -webkit-transform 0s .2s;
 }
-.sr-cart .checkout em::after {
+.sr-cart .sr-checkout em::after {
   position: absolute;
   top: 50%;
   bottom: auto;
@@ -406,7 +406,7 @@ Main Components
   -webkit-transition: opacity .2s;
   transition: opacity .2s;
 }
-.sr-cart .body {
+.sr-cart .sr-body {
   position: relative;
   z-index: 1;
   height: calc(100% - 40px);
@@ -417,13 +417,13 @@ Main Components
   -webkit-transition: opacity .2s;
   transition: opacity .2s;
 }
-.sr-cart .body ul {
+.sr-cart .sr-body ul {
   overflow: hidden;
   padding: 0 1.4em;
   position: relative;
   padding-bottom: 90px;
 }
-.sr-cart .body li {
+.sr-cart .sr-body li {
   position: relative;
   opacity: 0;
   -webkit-transform: translateX(80px);
@@ -434,15 +434,15 @@ Main Components
   transition: opacity 0s .2s, transform 0s .2s;
   transition: opacity 0s .2s, transform 0s .2s, -webkit-transform 0s .2s;
 }
-.sr-cart .body li::after {
+.sr-cart .sr-body li::after {
   clear: both;
   content: "";
   display: block;
 }
-.sr-cart .body li:not(:last-of-type) {
+.sr-cart .sr-body li:not(:last-of-type) {
   margin-bottom: 20px;
 }
-.sr-cart .body li.deleted {
+.sr-cart .sr-body li.deleted {
   /* this class is added to an item when it is removed form the cart */
   position: absolute;
   left: 1.4em;
@@ -451,18 +451,18 @@ Main Components
   -webkit-animation: sr-item-slide-out .3s forwards;
           animation: sr-item-slide-out .3s forwards;
 }
-.sr-cart .body li.deleted.undo-deleted {
+.sr-cart .sr-body li.deleted.undo-deleted {
   /* used to reinsert an item deleted from the cart when user clicks 'Undo' */
   -webkit-animation: sr-item-slide-in .3s forwards;
           animation: sr-item-slide-in .3s forwards;
 }
-.sr-cart .body li.deleted + li {
+.sr-cart .sr-body li.deleted + li {
   -webkit-animation: sr-item-move-up-mobile .3s;
           animation: sr-item-move-up-mobile .3s;
   -webkit-animation-fill-mode: forwards;
           animation-fill-mode: forwards;
 }
-.sr-cart .body li.undo-deleted + li {
+.sr-cart .sr-body li.undo-deleted + li {
   -webkit-animation: sr-item-move-down-mobile .3s;
           animation: sr-item-move-down-mobile .3s;
   -webkit-animation-fill-mode: forwards;
@@ -539,24 +539,24 @@ Main Components
 }
 
 
-.cart-open .sr-cart .wrapper {
+.cart-open .sr-cart .sr-wrapper {
   height: 100%;
   width: 100%;
   -webkit-transition-delay: 0s;
           transition-delay: 0s;
 }
-.cart-open .sr-cart header, .cart-open .sr-cart .body {
+.cart-open .sr-cart header, .cart-open .sr-cart .sr-body {
   opacity: 1;
 }
 .cart-open .sr-cart header {
   -webkit-transition: opacity .2s .2s;
   transition: opacity .2s .2s;
 }
-.cart-open .sr-cart .body {
+.cart-open .sr-cart .sr-body {
   -webkit-transition: opacity 0s;
   transition: opacity 0s;
 }
-.cart-open .sr-cart .body li {
+.cart-open .sr-cart .sr-body li {
   -webkit-transition: opacity .3s .2s, -webkit-transform .3s .2s;
   transition: opacity .3s .2s, -webkit-transform .3s .2s;
   transition: transform .3s .2s, opacity .3s .2s;
@@ -566,24 +566,24 @@ Main Components
       -ms-transform: translateX(0);
           transform: translateX(0);
 }
-.cart-open .sr-cart .body li:nth-of-type(2) {
+.cart-open .sr-cart .sr-body li:nth-of-type(2) {
   -webkit-transition-duration: .4s;
           transition-duration: .4s;
 }
-.cart-open .sr-cart .body li:nth-of-type(3) {
+.cart-open .sr-cart .sr-body li:nth-of-type(3) {
   -webkit-transition-duration: .5s;
           transition-duration: .5s;
 }
-.cart-open .sr-cart .body li:nth-of-type(4), .cart-open .sr-cart .body li:nth-of-type(5) {
+.cart-open .sr-cart .sr-body li:nth-of-type(4), .cart-open .sr-cart .sr-body li:nth-of-type(5) {
   -webkit-transition-duration: .55s;
           transition-duration: .55s;
 }
-.cart-open .sr-cart .checkout {
+.cart-open .sr-cart .sr-checkout {
   color: #ffffff;
   -webkit-transition: color .2s .3s;
   transition: color .2s .3s;
 }
-.cart-open .sr-cart .checkout em {
+.cart-open .sr-cart .sr-checkout em {
   -webkit-transform: translateX(0);
       -ms-transform: translateX(0);
           transform: translateX(0);
@@ -592,25 +592,25 @@ Main Components
   transition: transform .2s .3s, padding .2s 0s;
   transition: transform .2s .3s, padding .2s 0s, -webkit-transform .2s .3s;
 }
-.cart-open .sr-cart .checkout:hover em {
+.cart-open .sr-cart .sr-checkout:hover em {
   padding-right: 30px;
 }
-.cart-open .sr-cart .checkout:hover em::after {
+.cart-open .sr-cart .sr-checkout:hover em::after {
   opacity: 1;
 }
 @media only screen and (min-width: 768px) {
-  .sr-cart .body li:not(:last-of-type) {
+  .sr-cart .sr-body li:not(:last-of-type) {
     margin-bottom: 14px;
   }
-  .sr-cart .body li.deleted + li {
+  .sr-cart .sr-body li.deleted + li {
     -webkit-animation: sr-item-move-up .3s;
             animation: sr-item-move-up .3s;
   }
-  .sr-cart .body li.undo-deleted + li {
+  .sr-cart .sr-body li.undo-deleted + li {
     -webkit-animation: sr-item-move-down .3s;
             animation: sr-item-move-down .3s;
   }
-  .sr-cart .checkout {
+  .sr-cart .sr-checkout {
     font-size: 2.4rem;
   }
   .sr-cart .product-image {
@@ -626,7 +626,7 @@ Main Components
   }
 }
 
-.sr-cart .back  {
+.sr-cart .sr-back  {
     font-size: 62.5% !important;
     letter-spacing: .1em
 }
