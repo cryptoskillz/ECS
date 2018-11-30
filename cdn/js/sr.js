@@ -319,9 +319,13 @@ var SR = SR || (function()
 			3 = customer detals back
 			4 = custmer details pay click
 			5 = bitcoin details back click
+			6 = shipping button clicked
 		*/
 		switch (state) {
 		    case 1:
+		    	hideClass(document.getElementById('sr-billing'));
+		        hideClass(document.getElementById('sr-shipping'));
+
 		    	//hide the address
 		        hideClass(document.getElementById('addresswrapper'));
 		    	//hide the check out button
@@ -412,7 +416,9 @@ var SR = SR || (function()
 		    	//show btc stuff
 				hideClass(document.getElementById('bitcoinaddresswrapper'));
 				hideClass(document.getElementById('checkoutbitocoin'));
-		        break;  
+		        break; 
+		     case 6:
+		     	alert('cart state has been clicked for shipping click') 
 		}
 	}
 
@@ -454,6 +460,36 @@ var SR = SR || (function()
 				cartstate(4);
 			}
 							
+			
+		});
+
+		
+		//shipping and billing checbox
+		document.getElementById('sr-billingandshippingcheck').addEventListener('click', function () 
+		{
+			var checkbox =  document.getElementById('sr-billingandshippingcheck');
+
+			if (checkbox.checked) {
+			    //Checkbox has been checked
+		        showClass(document.getElementById('sr-pay'));
+			    hideClass(document.getElementById('sr-billing'));
+		        hideClass(document.getElementById('sr-shipping'));
+
+			} else {
+			    //Checkbox has been unchecked
+			    hideClass(document.getElementById('sr-pay'));
+			    hideClass(document.getElementById('sr-billing'));
+		        showClass(document.getElementById('sr-shipping'));
+
+			}
+							
+			
+		});
+		
+		//shipping button clicked
+		document.getElementById('sr-shipping').addEventListener('click', function () 
+		{
+			cartstate(6)			
 			
 		});
 		//customer back click
@@ -665,19 +701,6 @@ var SR = SR || (function()
 			carttotal();
 			//close it
 	  		removeClass(document.querySelector('.cd-cart-container'),'cart-open');
-		}
-		,
-		checkBilling : function()
-		{
-			var checkbox =  document.getElementById('sr-billingandshippingcheck');
-
-			if (checkbox.checked) {
-			    //Checkbox has been checked
-			    alert('checked')
-			} else {
-			    //Checkbox has been unchecked
-			    alert('un checked')
-			}
 		}
    };
 }());
