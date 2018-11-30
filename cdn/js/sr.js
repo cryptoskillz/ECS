@@ -310,6 +310,74 @@ var SR = SR || (function()
 		request.send();
 	}
 
+	//this function sets the correct addres state. billing / shipping etc
+	function checkAddressState()
+	{
+		checkAddressClickState();
+		//hideClass(document.getElementById('addresswrapper'));
+		//chek if shipping and billing has been enabled
+		if ((shippingaddress == 1) && ( billingaddress == 1))
+    	{
+
+    		//show the both
+    		showClass(document.getElementById('addresswrapper'));
+    		showClass(document.getElementById('billingaddressswrapper'));
+    		//hide shipping
+    		hideClass(document.getElementById('shippingaddresswrapper'));
+    		//populate countries dropdown
+    		populateDropdonw('sr-billingcountry',countries,startcountry);
+    		populateDropdonw('sr-shippingcountry',countries,startcountry);
+
+    	}
+    	else
+    	{
+    		//check if shipping is enabled
+    		if (shippingaddress == 1)
+    		{
+    			populateDropdonw('sr-shippingcountry',countries,startcountry);
+    			//hide billing and show shipping
+    			showClass(document.getElementById('addresswrapper'));
+    			showClass(document.getElementById('shippingaddresswrapper'));
+    			hideClass(document.getElementById('billingaddressswrapper'));
+
+
+    		}
+    		//check if billing is enabled
+    		if (billingaddress == 1)
+    		{
+    			populateDropdonw('sr-billingcountry',countries,startcountry);
+    			//hide shipping and show billing
+    			showClass(document.getElementById('addresswrapper'));
+    			hideClass(document.getElementById('shippingaddresswrapper'));
+    			showClass(document.getElementById('billingaddressswrapper'));
+
+    		}
+    	}
+	}
+
+
+	function checkAddressClickState()
+	{
+		var checkbox =  document.getElementById('sr-billingandshippingcheck');
+
+		if (checkbox.checked) 
+		{
+		    //Checkbox has been checked
+	        showClass(document.getElementById('sr-pay'));
+		    hideClass(document.getElementById('sr-billing'));
+	        hideClass(document.getElementById('sr-shipping'));
+
+		} 
+		else 
+		{
+		    //Checkbox has been unchecked
+		    hideClass(document.getElementById('sr-pay'));
+		    hideClass(document.getElementById('sr-billing'));
+	        showClass(document.getElementById('sr-shipping'));
+
+		}
+	}
+
 	//this function works with how the cart should look and sets the correct viusal elements
 	function cartstate(state)
 	{
@@ -321,81 +389,51 @@ var SR = SR || (function()
 			5 = bitcoin details back click
 			6 = shipping button clicked
 		*/
+		//alert(state);
 		switch (state) {
 		    case 1:
 		    	hideClass(document.getElementById('sr-billing'));
 		        hideClass(document.getElementById('sr-shipping'));
-
 		    	//hide the address
 		        hideClass(document.getElementById('addresswrapper'));
 		    	//hide the check out button
 				showClass(document.getElementById('checkout'));
 		    	//hide btc stuff
-		        hideClass(document.getElementById('checkoutbitocoin'));
 				hideClass(document.getElementById('bitcoinaddresswrapper'));
 				//hide the customer details
 				hideClass(document.getElementById('customerdetailswrapper'));
-				//hide customer detals back
-				hideClass(document.getElementById('checkoutcustomerdetailsback'));
+				//hide back button
+				hideClass(document.getElementById('sr-back-button'));
 				//open it
 				addClass(document.querySelector('.cd-cart-container'),'cart-open');
 				//show the product details
 				showClass(document.getElementById('cartlistitems'));
 		        break;
 		    case 2:
-		    	if ((shippingaddress == 1) && ( billingaddress == 1))
-		    	{
-		    		//show the both
-		    		showClass(document.getElementById('addresswrapper'));
-		    		//hide shipping
-		    		hideClass(document.getElementById('shippingaddresswrapper'));
-		    		//populate countries dropdown
-		    		populateDropdonw('sr-billingcountry',countries,startcountry);
-		    		populateDropdonw('sr-shippingcountry',countries,startcountry);
-
-		    	}
-		    	else
-		    	{
-		    		if (shippingaddress == 1)
-		    		{
-		    			populateDropdonw('sr-shippingcountry',countries,startcountry);
-		    			//hide billing and show shipping
-		    			showClass(document.getElementById('addresswrapper'));
-		    			showClass(document.getElementById('shippingaddresswrapper'));
-		    			hideClass(document.getElementById('billingaddressswrapper'));
-
-
-		    		}
-		    		if (billingaddress == 1)
-		    		{
-		    			populateDropdonw('sr-billingcountry',countries,startcountry);
-		    			//hide shipping and show billing
-		    			showClass(document.getElementById('addresswrapper'));
-		    			hideClass(document.getElementById('shippingaddresswrapper'));
-		    			showClass(document.getElementById('billingaddressswrapper'));
-
-		    		}
-		    	}
+		    	//check address
+		    	checkAddressState();
 		    	//hide btc stuff
 				hideClass(document.getElementById('checkout'));
 				//hide the product details
 				hideClass(document.getElementById('cartlistitems'));
 				//show the customer details
 				showClass(document.getElementById('customerdetailswrapper'));
-				showClass(document.getElementById('checkoutcustomerdetailsback'));
+				showClass(document.getElementById('sr-back-button'));
 		    	//hide btc stuff
 				hideClass(document.getElementById('bitcoinaddresswrapper'));
 		        break;
 		    case 3:
+		    	//check address
+		    	checkAddressState();
 		    	//show the check out button
 				showClass(document.getElementById('checkout'));
 				//show the product details
 		       	showClass(document.getElementById('cartlistitems'));
 		    	//hide btc stuff
-			  	hideClass(document.getElementById('bitcoinaddresswrapper'));
+			  	//hideClass(document.getElementById('bitcoinaddresswrapper'));
 				//hide the customer details			  	
 			    hideClass(document.getElementById('customerdetailswrapper'));
-			   	hideClass(document.getElementById('checkoutcustomerdetailsback'));
+			   	hideClass(document.getElementById('sr-back-button'));
 		        break;
 		    case 4:
 				//hide the product details
@@ -404,21 +442,29 @@ var SR = SR || (function()
 				showClass(document.getElementById('bitcoinaddresswrapper'));
 				showClass(document.getElementById('checkoutbitocoin'));
 				//hide the customer details			  					
-				hideClass(document.getElementById('checkoutcustomerdetailsback'));
+				showClass(document.getElementById('sr-back-button'));
 				hideClass(document.getElementById('customerdetailswrapper'));
 		        break;
 		    case 5:
+		    	//check address
+		    	checkAddressState();
 		    	//hide the product details
 		    	hideClass(document.getElementById('cartlistitems'));
 				//show the customer details
-				showClass(document.getElementById('checkoutcustomerdetailsback'));
+				showClass(document.getElementById('sr-back-button'));
 				showClass(document.getElementById('customerdetailswrapper'));
 		    	//show btc stuff
 				hideClass(document.getElementById('bitcoinaddresswrapper'));
 				hideClass(document.getElementById('checkoutbitocoin'));
 		        break; 
 		     case 6:
-		     	alert('cart state has been clicked for shipping click') 
+		     	hideClass(document.getElementById('billingaddressswrapper'));
+		     	showClass(document.getElementById('shippingaddresswrapper'));
+		     	showClass(document.getElementById('sr-pay'));
+		     	hideClass(document.getElementById('sr-shipping'));
+
+
+		     	
 		}
 	}
 
@@ -437,9 +483,10 @@ var SR = SR || (function()
 		*/
 
 		//bitcoin back click
-		document.getElementById('checkoutbitocoin').addEventListener('click', function () 
+		document.getElementById('sr-back-button').addEventListener('click', function () 
 		{
-			cartstate(5);
+			//reset cart
+			cartstate(1);
 		});
 		//payment click
 		document.getElementById('sr-pay').addEventListener('click', function () 
@@ -467,22 +514,7 @@ var SR = SR || (function()
 		//shipping and billing checbox
 		document.getElementById('sr-billingandshippingcheck').addEventListener('click', function () 
 		{
-			var checkbox =  document.getElementById('sr-billingandshippingcheck');
-
-			if (checkbox.checked) {
-			    //Checkbox has been checked
-		        showClass(document.getElementById('sr-pay'));
-			    hideClass(document.getElementById('sr-billing'));
-		        hideClass(document.getElementById('sr-shipping'));
-
-			} else {
-			    //Checkbox has been unchecked
-			    hideClass(document.getElementById('sr-pay'));
-			    hideClass(document.getElementById('sr-billing'));
-		        showClass(document.getElementById('sr-shipping'));
-
-			}
-							
+			checkAddressClickState()
 			
 		});
 		
@@ -492,15 +524,10 @@ var SR = SR || (function()
 			cartstate(6)			
 			
 		});
-		//customer back click
-		document.getElementById('checkoutcustomerdetailsback').addEventListener('click', function () 
-		{
-			cartstate(3);
-		});
+
 		//add to cart click element
 		document.querySelector('.checkout').addEventListener('click', function () 
 		{
-
 			cartstate(2);
 		});
 
