@@ -1,3 +1,65 @@
+/*select*/
+
+.cd-cart-country {
+  background: transparent;
+  border: 1px solid #E5E5E5;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px; 
+  border-radius: 30px; 
+  box-shadow: 0 0 10px #E8E8E8 inset;
+  outline:0; 
+  height:25px; 
+  width: 275px; 
+  padding-left:10px; 
+  padding-right:10px; 
+  float: right;
+  width: 74%;
+}
+
+
+.cd-cart .quantity label {
+  display: inline-block;
+  margin-right: .3em;
+}
+/*
+.cd-cart-quanity {
+  position: relative;
+}
+.cd-cart-quanity::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+  display: block;
+  width: 12px;
+  height: 12px;
+  background: url(../img/cd-icon-select.svg) no-repeat center center;
+  pointer-events: none;
+}
+
+
+/*end select*/
+
+/*text box*/
+.cd-textbox { 
+    border: 1px solid #848484; 
+    -webkit-border-radius: 30px; 
+    -moz-border-radius: 30px; 
+    border-radius: 30px; 
+    outline:0; 
+    height:25px; 
+    width: 275px; 
+    padding-left:10px; 
+    padding-right:10px; 
+    float: right;
+    width: 70%;
+  } 
+
+ /*end textbox*/
 .cd-cart-container {
   font-size: 62.5%;
   font-family: "Source Sans Pro", sans-serif;
@@ -475,52 +537,8 @@ Main Components
 .cd-cart .delete-item:hover {
   color: #e94b35;
 }
-.cd-cart .quantity label {
-  display: inline-block;
-  margin-right: .3em;
-}
-.cd-cart .select {
-  position: relative;
-}
-.cd-cart .select::after {
-  /* switcher arrow for select element */
-  content: '';
-  position: absolute;
-  z-index: 1;
-  right: 0;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-          transform: translateY(-50%);
-  display: block;
-  width: 12px;
-  height: 12px;
-  background: url(../img/cd-icon-select.svg) no-repeat center center;
-  pointer-events: none;
-}
-.cd-cart select {
-  position: relative;
-  padding: 0 1em 0 0;
-  cursor: pointer;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  font-size: 1.4rem;
-  margin: 0;
-  color: #808b97;
-}
-.cd-cart select:focus {
-  outline: none;
-  color: #2b3e51;
-  box-shadow: 0 1px 0 currentColor;
-}
-.cd-cart select::-ms-expand {
-  /* hide default select arrow on IE */
-  display: none;
-}
+
+
 .cart-open .cd-cart .wrapper {
   height: 100%;
   width: 100%;

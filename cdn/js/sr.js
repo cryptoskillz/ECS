@@ -5,7 +5,6 @@ var SR = SR || (function()
 	*START OF GLOBAL FUNCTIONS
 	*=========================
 	*/
-
 	//holdthe number of product
 	var itemcount = 0;
 	//hold the price of the product
