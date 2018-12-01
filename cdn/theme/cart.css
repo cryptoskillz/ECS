@@ -197,7 +197,7 @@ Main Components
   color: #ffffff;
   font-weight: bold;
   border-radius: 50%;
-  text-indent: 7px;
+  text-indent: 2px;
   -webkit-transition: -webkit-transform .2s .5s;
   transition: -webkit-transform .2s .5s;
   transition: transform .2s .5s;
