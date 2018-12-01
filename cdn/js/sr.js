@@ -578,23 +578,23 @@ var SR = SR || (function()
 			  	//add item to cart
 			  	var productlist = document.getElementById('sr-cartlistitems');
 				var itemlist  = document.createElement('li');
-				itemlist.className = 'product ';
+				itemlist.className = 'sr-product ';
 
 				//build produt
 				var prodcuthtml = '';
 				//display default image or the one supplied	
 				if (preview == "")
 				{
-					var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="'+cdnurl+'img/sr-product-preview.png" alt="placeholder"></a></div>';
+					var prodcuthtml = prodcuthtml +'<div class="sr-product-image"><a href="#0"><img src="'+cdnurl+'img/sr-product-preview.png" alt="placeholder"></a></div>';
 				}
 				else
 				{
-					var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="'+preview+'" alt="placeholder"></a></div>';
+					var prodcuthtml = prodcuthtml +'<div class="sr-product-image"><a href="#0"><img src="'+preview+'" alt="placeholder"></a></div>';
 				}
 				//product name
 				prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
 				//product price
-				prodcuthtml = prodcuthtml + '<span class="sr-price">'+price+' BTC</span>';
+				prodcuthtml = prodcuthtml + '<div class="sr-price">'+price+' BTC</div>';
 				//actions div
 				prodcuthtml = prodcuthtml + '<div class="sr-actions">';
 
@@ -602,7 +602,6 @@ var SR = SR || (function()
 				prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="sr-delete-item">Delete</a>';
 				prodcuthtml = prodcuthtml + '<div class="sr-quantity">';
 				//quantity label
-				prodcuthtml = prodcuthtml + '<label for="sr-product-'+ productid +'">Qty</label>';
 				//quantity select
 				prodcuthtml = prodcuthtml + '<span class="select"><select id="sr-productquantity" name="sr-productquantity" onchange="SR.changequantity()">';
 				var i = 0;
@@ -625,8 +624,9 @@ var SR = SR || (function()
 				//add to the list		
 				itemlist.innerHTML = prodcuthtml;
 				// append  to the end of theParent
-				productlist.innerHTML = "";
-				productlist.appendChild(itemlist);
+				productlist.innerHTML = prodcuthtml;
+				//note we have to fix this when we add multipile products. 
+				//productlist.appendChild(itemlist);
 	  		}
 		});
 		//cart clicked element
