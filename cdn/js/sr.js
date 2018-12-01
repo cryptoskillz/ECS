@@ -13,6 +13,8 @@ var SR = SR || (function()
 	var name = '';
 	//hold the addres of the product
 	var address = '';
+	//hold the preview image
+	var preview = '';
 
 	//hold the email
 	var email = '';
@@ -266,6 +268,12 @@ var SR = SR || (function()
 			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
 			    //set the address
 	    		elbtcaddress.innerText =address;
+	    		//do pay from wallet also
+	    		var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
+			    //set the href
+			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
+	    		//do pay from wallet alo
+
 	    		//debug
 			    //console.log(elbtcaddress)
 
@@ -512,21 +520,7 @@ var SR = SR || (function()
 			
 		});
 
-		//copy the btc address to the clipboard
-		/*
-		cartWrapper.on('click', '.bitcoinaddresscopy', function(event){
-			event.preventDefault();
-  			var element = document.getElementById("bitcoinaddress");
-  			var $temp = $("<input>");
-  			$("body").append($temp);
-  			$temp.val($(element).text()).select();
- 		 	document.execCommand("copy");
-  			//$temp.remove();
-
-
-		});
-		*/
-
+		
 		document.getElementById('sr-bitcoinaddresscopy').addEventListener('click', function () 
 		{
 			const el = document.createElement('textarea');  // Create a <textarea> element
@@ -567,6 +561,7 @@ var SR = SR || (function()
 			var elproduct = document.getElementById('sr-add-to-cart');
 			price =elproduct.getAttribute('data-price');
 			name =elproduct.getAttribute('data-name');
+			preview = elproduct.getAttribute('data-preview');
 			//will update when we use multipile products
 			var productid = 1;
 			//todo
@@ -587,8 +582,15 @@ var SR = SR || (function()
 
 				//build produt
 				var prodcuthtml = '';
-				//product image		
-				var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="'+cdnurl+'img/sr-product-preview.png" alt="placeholder"></a></div>';
+				//display default image or the one supplied	
+				if (preview == "")
+				{
+					var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="'+cdnurl+'img/sr-product-preview.png" alt="placeholder"></a></div>';
+				}
+				else
+				{
+					var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="'+preview+'" alt="placeholder"></a></div>';
+				}
 				//product name
 				prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
 				//product price
