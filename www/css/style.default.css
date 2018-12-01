@@ -601,13 +601,10 @@ section.big-product .info .info-wrapper::after {
   content: '';
   width: 150px;
   height: 2px;
-  border-bottom: 2px solid #eee;
   display: block;
-  margin: 20px 0 5px;
 }
 
 section.big-product .info a.add-to-cart {
-  margin-top: 20px;
 }
 
 /* Big Product Media Queries ========================================== */
