@@ -1,39 +1,120 @@
-<!doctype html>
-<html lang="en" class="no-js">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="css/reset.css"> 
- 	<script src="js/modernizr.js"></script> <!-- Modernizr -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Shirt Store</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all,follow">
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <!-- Custom font icons-->
+    <link rel="stylesheet" href="css/custom-font.css">
+    <!-- Google fonts - Open Sans-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+    <!-- owl carousel-->
 
-	<title></title>
-</head>
-<body>
-<main>
-	<h1>Add to Cart Interaction</h1>
-	<a href="#0" id="sr-add-to-cart" class="sr-add-to-cart" data-price="0.1" data-name="a product" data-preview="https://cdn.shopify.com/s/files/1/1843/7927/products/Men-Crew-Neck-T-Shirt-Sublimation-Mockup-Front-Preview-1_1024x1024.jpg?v=1491892432">Add To Cart</a>
-</main>
+    <!-- Bootstrap Select-->
+    <link rel="stylesheet" href="vendor/bootstrap-select/css/bootstrap-select.min.css">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
 
-<!-- this is were we host the js file that andles cart interaction etc you can dwnload and self host this if you prefer
-<script type="text/javascript" src="https://s3.eu-west-1.amazonaws.com/srcrypto/js/sr.js"></script>-->
-<script type="text/javascript" src="../cdn/js/sr.js"></script>
-<script type="text/javascript">
-   /*
-   		0 = server url
-   		1 = animated
-   		2 = quantity count
-   		3 = cdn url
-   		4 = uid
-         5 = theme
-         6 = billing address 
-         7 = shipping address
-         8 = start country
-   */
-   //SR.init(["http://srcryptoapi.eu-west-1.elasticbeanstalk.com/", false,15,"http://s3.eu-west-1.amazonaws.com/srcrypto/","3",""]);
-   //production server local cd 
-   SR.init(["http://207.154.217.166/", false,15,"http://127.0.0.1:8080/cdn/","3","",1,1,"GB"]);
-   //SR.init(["http://127.0.0.1:3000/", false,15,"http://127.0.0.1:8080/cdn/","3","",1,1,"GB"]);
-</script>
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="img/favicon.ico">
+    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+  </head>
+  <body>
+    <!-- navbar-->
+    <header class="header">
+     
+      <nav class="navbar navbar-expand-lg">
+        <div class="container"><a href="index.html" class="navbar-brand">cryptoskillz</a>
+          
+        
+        </div>
+      </nav>
+    </header>
+    <!-- End Navbar-->
+    
+  
+    
+    <!-- Big Product Section-->
+    <section class="big-product">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 product"><img src="img/entity.png" alt="t-shirt" class="img-fluid"></div>
+          <div class="col-md-8 info">
+            <div class="info-wrapper">
+              <h2>Entity T</h2>
+              <p class="lead">
+                This is a T-Shirt.  It has an Apache attack helicopter on it and the word entity wrote in an obtuse font.  There is only one design, one T, and one colour.  However, the design is open source and as a result, forks can be submitted by anyone. Submit your fork <a href="https://github.com/cryptoskillz/Entity-T" target="_blank">here</a>
+              </p>
+              <ul class="product-info list-unstyled">
+                <li class="size">
+                  <select title="Choose Your Size" class="selectpicker">
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
+                    <option value="x-large">X-Large</option>
+                  </select>
+                </li>
+                
+                <li class="price">0.01BTC</li>
+              </ul>
+            </div>
+            <a href="#0" 
+      id="sr-add-to-cart" 
+      class="sr-add-to-cart add-to-cart btn btn-primary" 
+      data-price="0.01" 
+      data-name="a product" 
+      data-preview="https://cdn.shopify.com/s/files/1/1843/7927/products/Men-Crew-Neck-T-Shirt-Sublimation-Mockup-Front-Preview-1_1024x1024.jpg?v=1491892432">Add To Cart</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End Big Product Section-->
+  
+    
+    
+    
+    
+    
+    
+    <!-- Scroll to top button-->
+    <div id="scrollTop"><i class="fa fa-angle-up"></i></div>
+    <!-- End scroll to top button-->
+    <!-- JavaScript files-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/popper.js/umd/popper.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!-- this is were we host the js file that andles cart interaction etc you can dwnload and self host this if you prefer
+    <script type="text/javascript" src="https://s3.eu-west-1.amazonaws.com/srcrypto/js/sr.js"></script>-->
+        <script src="vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
 
-</body>
+    <script src="js/front.js"></script>
+    <script type="text/javascript" src="../cdn/js/sr.js"></script>
+
+    <script type="text/javascript">
+       /*
+          0 = server url
+          1 = animated
+          2 = quantity count
+          3 = cdn url
+          4 = uid
+             5 = theme
+             6 = billing address 
+             7 = shipping address
+             8 = start country
+       */
+       //SR.init(["http://srcryptoapi.eu-west-1.elasticbeanstalk.com/", false,15,"http://s3.eu-west-1.amazonaws.com/srcrypto/","3",""]);
+       //production server local cd 
+       SR.init(["http://207.154.217.166/", false,15,"http://127.0.0.1:8080/cdn/","3","",1,1,"GB"]);
+       //SR.init(["http://127.0.0.1:3000/", false,15,"http://127.0.0.1:8080/cdn/","3","",1,1,"GB"]);
+    </script>
+
+
+  </body>
 </html>

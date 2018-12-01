@@ -594,17 +594,17 @@ var SR = SR || (function()
 				//product name
 				prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
 				//product price
-				prodcuthtml = prodcuthtml + '<span class="price">'+price+' BTC</span>';
+				prodcuthtml = prodcuthtml + '<span class="sr-price">'+price+' BTC</span>';
 				//actions div
-				prodcuthtml = prodcuthtml + '<div class="actions">';
+				prodcuthtml = prodcuthtml + '<div class="sr-actions">';
 
 				//delete option
-				prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="delete-item">Delete</a>';
-				prodcuthtml = prodcuthtml + '<div class="quantity">';
+				prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="sr-delete-item">Delete</a>';
+				prodcuthtml = prodcuthtml + '<div class="sr-quantity">';
 				//quantity label
 				prodcuthtml = prodcuthtml + '<label for="sr-product-'+ productid +'">Qty</label>';
 				//quantity select
-				prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="SR.changequantity()">';
+				prodcuthtml = prodcuthtml + '<span class="select"><select id="sr-productquantity" name="sr-productquantity" onchange="SR.changequantity()">';
 				var i = 0;
 				for (i = 1; i < quantity; i++) 
 				{ 
@@ -741,7 +741,7 @@ var SR = SR || (function()
        	//		 which means that we have to call it from the onchange in the select old school I.E javascript:SR.chanagequantity() which is not ideal
        	//		 and we will fix it later.
         changequantity : function() {
-        	var elquantity = document.getElementById('productquantity');
+        	var elquantity = document.getElementById('sr-productquantity');
 			itemcountq = elquantity.options[elquantity.selectedIndex];
 			itemcount = parseInt(itemcountq.value);
 			carttotal();	
