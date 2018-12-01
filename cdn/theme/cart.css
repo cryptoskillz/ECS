@@ -563,8 +563,8 @@ Main Components
   transition: transform .3s .2s, opacity .3s .2s, -webkit-transform .3s .2s;
   opacity: 1;
   -webkit-transform: translateX(0);
-      -ms-transform: translateX(0);
-          transform: translateX(0);
+  -ms-transform: translateX(0);
+  transform: translateX(0);
 }
 .cart-open .sr-cart .sr-body li:nth-of-type(2) {
   -webkit-transition-duration: .4s;
@@ -585,8 +585,8 @@ Main Components
 }
 .cart-open .sr-cart .sr-checkout em {
   -webkit-transform: translateX(0);
-      -ms-transform: translateX(0);
-          transform: translateX(0);
+  -ms-transform: translateX(0);
+  transform: translateX(0);
   -webkit-transition: padding .2s 0s, -webkit-transform .2s .3s;
   transition: padding .2s 0s, -webkit-transform .2s .3s;
   transition: transform .2s .3s, padding .2s 0s;

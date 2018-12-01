@@ -61,30 +61,30 @@ var SR = SR || (function()
 
 	//this function loops through a JSON object and adds the items to a select. 
 	//note: It makes the assumpation that you pass it a json object with a Name and Code key value pair, anything else will break
-	function populateDropdonw(element,dataset,selected)
+	function populateDropdown(elementarr,dataset,selected)
 	{
-		//get the dropdown element
-		dropdownelement = document.getElementById(element);
-		//empty the dropdown
-		dropdownelement.innerHTML = "";
-		//loop through the dataset
-		Object.keys(dataset).forEach(function(key) {
-			//debug
-			//console.log(key, countries[key].Name);
-		  	//console.log(key)
-		  	//console.log(countries[key].Name)
+		elementarr.forEach(function(entry) {
+			//console.log(entry)
+			dropdownelement = document.getElementById(entry);
+			dropdownelement.innerHTML = "";
+			Object.keys(dataset).forEach(function(key) {
+				//debug
+				//console.log(key, countries[key].Name);
+			  	//console.log(key)
+			  	//console.log(countries[key].Name)
 
-		  	//create an options
-		  	newOption = document.createElement("option");
-		  	//add the name 
-			newOption.text = dataset[key].Name;
-			//ad the value
-			newOption.value = dataset[key].Code;
-			//check if the code matches the selected and if so set it to the selected item
-			if (dataset[key].Code == selected)
-				newOption.selected = true;
-			//add the element
-			dropdownelement.appendChild(newOption);
+			  	//create an options
+			  	newOption = document.createElement("option");
+			  	//add the name 
+				newOption.text = dataset[key].Name;
+				//ad the value
+				newOption.value = dataset[key].Code;
+				//check if the code matches the selected and if so set it to the selected item
+				if (dataset[key].Code == selected)
+					newOption.selected = true;
+				//add the element
+				dropdownelement.appendChild(newOption);
+			});
 		});
 	}
 
@@ -324,8 +324,7 @@ var SR = SR || (function()
     		//hide shipping
     		hideClass(document.getElementById('sr-shippingaddresswrapper'));
     		//populate countries dropdown
-    		populateDropdonw('sr-billingcountry',countries,startcountry);
-    		populateDropdonw('sr-shippingcountry',countries,startcountry);
+    		populateDropdown(['sr-billingcountry','sr-shippingcountry'],countries,startcountry);
 
     	}
     	else
@@ -333,7 +332,7 @@ var SR = SR || (function()
     		//check if shipping is enabled
     		if (shippingaddress == 1)
     		{
-    			populateDropdonw('sr-shippingcountry',countries,startcountry);
+    			populateDropdown(['sr-shippingcountry'],countries,startcountry);
     			//hide billing and show shipping
     			showClass(document.getElementById('sr-addresswrapper'));
     			showClass(document.getElementById('sr-shippingaddresswrapper'));
@@ -344,7 +343,7 @@ var SR = SR || (function()
     		//check if billing is enabled
     		if (billingaddress == 1)
     		{
-    			populateDropdonw('sr-billingcountry',countries,startcountry);
+    			populateDropdown(['sr-billingcountry'],countries,startcountry);
     			//hide shipping and show billing
     			showClass(document.getElementById('addresswrapper'));
     			hideClass(document.getElementById('shippingaddresswrapper'));
@@ -488,21 +487,27 @@ var SR = SR || (function()
 		//payment click
 		document.getElementById('sr-pay').addEventListener('click', function () 
 		{
-			//get the email
-			//note: We want to update this when we collect more than email, shipping address etc. 
-			var useremail = document.getElementById('sr-email').value; 
-			//only send the email if it has not been sent
-			if (email != useremail)
-			{
-				email = useremail
-				var url = serverurl+"api/storeuserdetails?email="+email+"&address="+address;
-				//call the store produt endpoint
-				fetchurl(url,'storeuserdetails')		
+			var cartstring = "";
+			var elements = document.getElementsByClassName("sr-input");
+			for (var i = 0, len = elements.length; i < len; i++) {
+			    // elements[i].style ...
+			    if (cartstring == "" )
+			    {
+			    	cartstring = "?"+elements[i].name+'='+elements[i].value;
+			    }
+			    else
+			    {
+			    	cartstring = cartstring+"&"+elements[i].name+'='+elements[i].value;
+			    }
+			    //console.log(elements[i].name);
+			    //console.log(elements[i].value);
 			}
-			else
-			{
-				cartstate(4);
-			}
+			console.log(cartstring);
+
+			var url = serverurl+"api/storeuserdetails"+cartstring;
+			//call the store produt endpoint
+			fetchurl(url,'storeuserdetails')		
+			
 							
 			
 		});
