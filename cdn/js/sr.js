@@ -510,9 +510,10 @@ var SR = SR || (function()
 			    //console.log(elements[i].name);
 			    //console.log(elements[i].value);
 			}
-			console.log(cartstring);
+			///console.log(cartstring);
 
-			var url = serverurl+"api/storeuserdetails"+cartstring;
+			var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+address;
+			console.log(url)
 			//call the store produt endpoint
 			fetchurl(url,'storeuserdetails')		
 			
