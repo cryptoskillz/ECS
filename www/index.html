@@ -31,7 +31,7 @@
     <header class="header">
      
       <nav class="navbar navbar-expand-lg">
-        <div class="container"><a href="index.html" class="navbar-brand">cryptoskillz</a>
+        <div class="container"><a href="https://cryptoskillz.com/" class="navbar-brand">cryptoskillz</a>
           
         
         </div>
@@ -99,7 +99,10 @@
         <script src="vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
 
     <script src="js/front.js"></script>
-    <script type="text/javascript" src="../cdn/js/sr.js"></script>
+   <!-- local
+    <script type="text/javascript" src="../cdn/js/sr.js"></script> -->
+    <script type="text/javascript" src="https://cryptoskillz.com/srcrypto/prod/cdn/js/sr.js"></script> 
+   
 
     <script type="text/javascript">
        /*
@@ -116,7 +119,10 @@
        //SR.init(["http://srcryptoapi.eu-west-1.elasticbeanstalk.com/", false,15,"http://s3.eu-west-1.amazonaws.com/srcrypto/","3",""]);
        //production server local cd 
        //SR.init(["http://207.154.217.166/", false,15,"http://127.0.0.1:8080/cdn/","3","",1,1,"GB"]);
-       SR.init(["http://127.0.0.1:3000/", false,15,"http://127.0.0.1:8080/cdn/","3","",1,1,"GB"]);
+       //all production 
+        SR.init(["https://ecs.cryptoskillz.com/", false,15,"https://cryptoskillz.com/srcrypto/prod/cdn/","3","",1,1,"GB"]);
+       //all local
+       //SR.init(["http://127.0.0.1:3000/", false,15,"http://127.0.0.1:8080/cdn/","3","",1,1,"GB"]);
     </script>
 
 
