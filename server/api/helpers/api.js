@@ -36,23 +36,50 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
-    console.log(req.query);
-      let data = [req.query.email, req.query.address];
-      let sql = `UPDATE product
-                  SET email = ?
-                  WHERE address = ?`;
+    let data = [req.query.address];
+    //console.log(data)
+    let sql = `SELECT * FROM product where address = "`+req.query.address+`"`;
+    //debug
 
+    db.get(sql, [], (err, result) => {
+      console.log(result)
+      if (err) {
+        console.log(err)
+      }
+      let data = [result.id];
+      let sql = `delete FROM order_meta WHERE productid = ?`;
       db.run(sql, data, function(err) {
         if (err) {
           return console.error(err.message);
         }
-        //todo: send email saying we are waiting for payment. 
-        //send email to customer and to store owner
-        console.log('send mail in store user details')
-        generic.sendMail(1,req.query.email);
-        //console.log(`Row(s) updated: ${this.changes}`);
+        for (var metaname in req.query) 
+        {
+            if (req.query.hasOwnProperty(metaname)) 
+            {
+                var metavalue = req.query[metaname]
+                metaname = metaname.replace("sr-", "");
+
+
+                db.run(
+                `INSERT INTO order_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                [
+                  result.id,
+                  metaname,
+                  metavalue
+                ],
+                function(err) {
+                  if (err) {
+                    return console.log(err.message);
+                  }
+                }
+              );
+              //debug
+              //console.log(metaname, metavalue);
+            }
+        }
         res.send(JSON.stringify({ status: "ok" }));
-      });
+        });
+    });
   }
 
 

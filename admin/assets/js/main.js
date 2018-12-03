@@ -1,7 +1,7 @@
 
 //server call to make the AJAX calls to
 //set url to production
-var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
+var serverurl = "https://ecs.cryptoskillz.com/";
 //check if we are local
 //note : set this whatever your local instance is 127.0.0.1 for example
 if(window.location.href.indexOf("127.0.0.1") > -1) 

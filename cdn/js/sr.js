@@ -5,7 +5,6 @@ var SR = SR || (function()
 	*START OF GLOBAL FUNCTIONS
 	*=========================
 	*/
-
 	//holdthe number of product
 	var itemcount = 0;
 	//hold the price of the product
@@ -14,6 +13,8 @@ var SR = SR || (function()
 	var name = '';
 	//hold the addres of the product
 	var address = '';
+	//hold the preview image
+	var preview = '';
 
 	//hold the email
 	var email = '';
@@ -60,33 +61,32 @@ var SR = SR || (function()
 	*=========================
 	*/
 
-
 	//this function loops through a JSON object and adds the items to a select. 
 	//note: It makes the assumpation that you pass it a json object with a Name and Code key value pair, anything else will break
-	function populateDropdonw(element,dataset,selected)
+	function populateDropdown(elementarr,dataset,selected)
 	{
-		//get the dropdown element
-		dropdownelement = document.getElementById(element);
-		//empty the dropdown
-		dropdownelement.innerHTML = "";
-		//loop through the dataset
-		Object.keys(dataset).forEach(function(key) {
-			//debug
-			//console.log(key, countries[key].Name);
-		  	//console.log(key)
-		  	//console.log(countries[key].Name)
+		elementarr.forEach(function(entry) {
+			//console.log(entry)
+			dropdownelement = document.getElementById(entry);
+			dropdownelement.innerHTML = "";
+			Object.keys(dataset).forEach(function(key) {
+				//debug
+				//console.log(key, countries[key].Name);
+			  	//console.log(key)
+			  	//console.log(countries[key].Name)
 
-		  	//create an options
-		  	newOption = document.createElement("option");
-		  	//add the name 
-			newOption.text = dataset[key].Name;
-			//ad the value
-			newOption.value = dataset[key].Code;
-			//check if the code matches the selected and if so set it to the selected item
-			if (dataset[key].Code == selected)
-				newOption.selected = true;
-			//add the element
-			dropdownelement.appendChild(newOption);
+			  	//create an options
+			  	newOption = document.createElement("option");
+			  	//add the name 
+				newOption.text = dataset[key].Name;
+				//ad the value
+				newOption.value = dataset[key].Code;
+				//check if the code matches the selected and if so set it to the selected item
+				if (dataset[key].Code == selected)
+					newOption.selected = true;
+				//add the element
+				dropdownelement.appendChild(newOption);
+			});
 		});
 	}
 
@@ -235,9 +235,9 @@ var SR = SR || (function()
 		var producttotal = price * itemcount;
 		//set it to 8 decimal places as it's Bitcoin
 		producttotal = parseFloat(producttotal).toFixed(8);
-		changeClassText(document.getElementById('checkouttotal'),producttotal);
+		changeClassText(document.getElementById('sr-checkouttotal'),producttotal);
 		//update counter
-	  	changeClassText(document.querySelector('.cd-count'),itemcount);	
+	  	changeClassText(document.querySelector('.sr-count'),itemcount);	
 	  	//store product
 		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
 		//call the store produt endpoint
@@ -263,16 +263,22 @@ var SR = SR || (function()
 			    //set the address
 			    address = data.address;
 			    //set the address in the checkout
-			    var elbtcaddress = document.getElementById('bitcoinaddress');
+			    var elbtcaddress = document.getElementById('sr-bitcoinaddress');
 			    //set the href
 			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
 			    //set the address
 	    		elbtcaddress.innerText =address;
+	    		//do pay from wallet also
+	    		var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
+			    //set the href
+			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
+	    		//do pay from wallet alo
+
 	    		//debug
 			    //console.log(elbtcaddress)
 
 			    //generate the qr code
-			    var elbtcqr = document.getElementById('bitcoinqrcode');
+			    var elbtcqr = document.getElementById('sr-bitcoinqrcode');
 				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
 		    	//debug
 			    //console.log(elbtcqr)
@@ -312,109 +318,157 @@ var SR = SR || (function()
 		request.send();
 	}
 
+	//this function sets the correct addres state. billing / shipping etc
+	function checkAddressState()
+	{
+		checkAddressClickState();
+		//chek if shipping and billing has been enabled
+		if ((shippingaddress == 1) && ( billingaddress == 1))
+    	{
+
+    		//show the both
+    		showClass(document.getElementById('sr-addresswrapper'));
+    		showClass(document.getElementById('sr-billingaddressswrapper'));
+    		//hide shipping
+    		hideClass(document.getElementById('sr-shippingaddresswrapper'));
+    		//populate countries dropdown
+    		populateDropdown(['sr-billingcountry','sr-shippingcountry'],countries,startcountry);
+
+    	}
+    	else
+    	{
+    		//check if shipping is enabled
+    		if (shippingaddress == 1)
+    		{
+    			populateDropdown(['sr-shippingcountry'],countries,startcountry);
+    			//hide billing and show shipping
+    			showClass(document.getElementById('sr-addresswrapper'));
+    			showClass(document.getElementById('sr-shippingaddresswrapper'));
+    			hideClass(document.getElementById('sr-sbillingaddressswrapper'));
+
+
+    		}
+    		//check if billing is enabled
+    		if (billingaddress == 1)
+    		{
+    			populateDropdown(['sr-billingcountry'],countries,startcountry);
+    			//hide shipping and show billing
+    			showClass(document.getElementById('addresswrapper'));
+    			hideClass(document.getElementById('shippingaddresswrapper'));
+    			showClass(document.getElementById('billingaddressswrapper'));
+
+    		}
+    	}
+	}
+
+
+	function checkAddressClickState()
+	{
+		var checkbox =  document.getElementById('sr-billingandshippingcheck');
+
+		if (checkbox.checked) 
+		{
+		    //Checkbox has been checked
+	        showClass(document.getElementById('sr-pay'));
+		    hideClass(document.getElementById('sr-billing'));
+	        hideClass(document.getElementById('sr-shipping'));
+
+		} 
+		else 
+		{
+		    //Checkbox has been unchecked
+		    hideClass(document.getElementById('sr-pay'));
+		    hideClass(document.getElementById('sr-billing'));
+	        showClass(document.getElementById('sr-shipping'));
+
+		}
+	}
+
 	//this function works with how the cart should look and sets the correct viusal elements
 	function cartstate(state)
 	{
 		/*
+			* = redundant and will be replaced / removed 
+
 			1 = show cart product details
 			2 = show customer details screen
-			3 = customer detals back
+			3 = customer detals back*
 			4 = custmer details pay click
-			5 = bitcoin details back click
+			5 = bitcoin details back click*
+			6 = shipping button clicked
 		*/
+		//alert(state);
 		switch (state) {
 		    case 1:
+		    	hideClass(document.getElementById('sr-billing'));
+		        hideClass(document.getElementById('sr-shipping'));
 		    	//hide the address
-		        hideClass(document.getElementById('addresswrapper'));
+		        hideClass(document.getElementById('sr-addresswrapper'));
 		    	//hide the check out button
-				showClass(document.getElementById('checkout'));
+				showClass(document.getElementById('sr-checkout'));
 		    	//hide btc stuff
-		        hideClass(document.getElementById('checkoutbitocoin'));
-				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 				//hide the customer details
-				hideClass(document.getElementById('customerdetailswrapper'));
-				//hide customer detals back
-				hideClass(document.getElementById('checkoutcustomerdetailsback'));
+				hideClass(document.getElementById('sr-customerdetailswrapper'));
+				//hide back button
+				hideClass(document.getElementById('sr-back-button'));
 				//open it
-				addClass(document.querySelector('.cd-cart-container'),'cart-open');
+				addClass(document.querySelector('.sr-cart-container'),'cart-open');
 				//show the product details
-				showClass(document.getElementById('cartlistitems'));
+				showClass(document.getElementById('sr-cartlistitems'));
 		        break;
 		    case 2:
-		    	if ((shippingaddress == 1) && ( billingaddress == 1))
-		    	{
-		    		//show the both
-		    		showClass(document.getElementById('addresswrapper'));
-		    		//hide shipping
-		    		hideClass(document.getElementById('shippingaddresswrapper'));
-		    		//populate countries dropdown
-		    		populateDropdonw('sr-billingcountry',countries,startcountry);
-		    		populateDropdonw('sr-shippingcountry',countries,startcountry);
-
-		    	}
-		    	else
-		    	{
-		    		if (shippingaddress == 1)
-		    		{
-		    			populateDropdonw('sr-shippingcountry',countries,startcountry);
-		    			//hide billing and show shipping
-		    			showClass(document.getElementById('addresswrapper'));
-		    			showClass(document.getElementById('shippingaddresswrapper'));
-		    			hideClass(document.getElementById('billingaddressswrapper'));
-
-
-		    		}
-		    		if (billingaddress == 1)
-		    		{
-		    			populateDropdonw('sr-billingcountry',countries,startcountry);
-		    			//hide shipping and show billing
-		    			showClass(document.getElementById('addresswrapper'));
-		    			hideClass(document.getElementById('shippingaddresswrapper'));
-		    			showClass(document.getElementById('billingaddressswrapper'));
-
-		    		}
-		    	}
+		    	//check address
+		    	checkAddressState();
 		    	//hide btc stuff
-				hideClass(document.getElementById('checkout'));
+				hideClass(document.getElementById('sr-checkout'));
 				//hide the product details
-				hideClass(document.getElementById('cartlistitems'));
+				hideClass(document.getElementById('sr-cartlistitems'));
 				//show the customer details
-				showClass(document.getElementById('customerdetailswrapper'));
-				showClass(document.getElementById('checkoutcustomerdetailsback'));
+				showClass(document.getElementById('sr-customerdetailswrapper'));
+				showClass(document.getElementById('sr-back-button'));
 		    	//hide btc stuff
-				hideClass(document.getElementById('bitcoinaddresswrapper'));
+				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 		        break;
 		    case 3:
+		    	//check address
+		    	checkAddressState();
 		    	//show the check out button
-				showClass(document.getElementById('checkout'));
+				showClass(document.getElementById('sr-checkout'));
 				//show the product details
-		       	showClass(document.getElementById('cartlistitems'));
-		    	//hide btc stuff
-			  	hideClass(document.getElementById('bitcoinaddresswrapper'));
+		       	showClass(document.getElementById('sr-cartlistitems'));
 				//hide the customer details			  	
-			    hideClass(document.getElementById('customerdetailswrapper'));
-			   	hideClass(document.getElementById('checkoutcustomerdetailsback'));
+			    hideClass(document.getElementById('sr-customerdetailswrapper'));
+			   	hideClass(document.getElementById('sr-back-button'));
 		        break;
 		    case 4:
 				//hide the product details
-		    	hideClass(document.getElementById('cartlistitems'));
+		    	hideClass(document.getElementById('sr-cartlistitems'));
 		    	//show btc stuff		    	
-				showClass(document.getElementById('bitcoinaddresswrapper'));
-				showClass(document.getElementById('checkoutbitocoin'));
+				showClass(document.getElementById('sr-bitcoinaddresswrapper'));
 				//hide the customer details			  					
-				hideClass(document.getElementById('checkoutcustomerdetailsback'));
-				hideClass(document.getElementById('customerdetailswrapper'));
+				showClass(document.getElementById('sr-back-button'));
+				hideClass(document.getElementById('sr-customerdetailswrapper'));
 		        break;
 		    case 5:
+		    	//check address
+		    	checkAddressState();
 		    	//hide the product details
-		    	hideClass(document.getElementById('cartlistitems'));
+		    	hideClass(document.getElementById('sr-cartlistitems'));
 				//show the customer details
-				showClass(document.getElementById('checkoutcustomerdetailsback'));
-				showClass(document.getElementById('customerdetailswrapper'));
+				showClass(document.getElementById('sr-back-button'));
+				showClass(document.getElementById('sr-customerdetailswrapper'));
 		    	//show btc stuff
-				hideClass(document.getElementById('bitcoinaddresswrapper'));
-				hideClass(document.getElementById('checkoutbitocoin'));
-		        break;  
+				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+		        break; 
+		     case 6:
+		     	hideClass(document.getElementById('sr-billingaddressswrapper'));
+		     	showClass(document.getElementById('sr-shippingaddresswrapper'));
+		     	showClass(document.getElementById('sr-pay'));
+		     	hideClass(document.getElementById('sr-shipping'));
+
+
+		     	
 		}
 	}
 
@@ -433,50 +487,82 @@ var SR = SR || (function()
 		*/
 
 		//bitcoin back click
-		document.getElementById('checkoutbitocoin').addEventListener('click', function () 
+		document.getElementById('sr-back-button').addEventListener('click', function () 
 		{
-			cartstate(5);
+			//reset cart
+			cartstate(1);
 		});
 		//payment click
 		document.getElementById('sr-pay').addEventListener('click', function () 
 		{
-			//get the email
-			//note: We want to update this when we collect more than email, shipping address etc. 
-			var useremail = document.getElementById('sr-email').value; 
-			//only send the email if it has not been sent
-			if (email != useremail)
-			{
-				email = useremail
-				var url = serverurl+"api/storeuserdetails?email="+email+"&address="+address;
-				//call the store produt endpoint
-				fetchurl(url,'storeuserdetails')		
+			var cartstring = "";
+			var elements = document.getElementsByClassName("sr-input");
+			for (var i = 0, len = elements.length; i < len; i++) {
+			    // elements[i].style ...
+			    if (cartstring == "" )
+			    {
+			    	cartstring = "?"+elements[i].name+'='+elements[i].value;
+			    }
+			    else
+			    {
+			    	cartstring = cartstring+"&"+elements[i].name+'='+elements[i].value;
+			    }
+			    //console.log(elements[i].name);
+			    //console.log(elements[i].value);
 			}
-			else
-			{
-				cartstate(4);
-			}
+			///console.log(cartstring);
+
+			var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+address;
+			console.log(url)
+			//call the store produt endpoint
+			fetchurl(url,'storeuserdetails')		
+			
 							
 			
 		});
-		//customer back click
-		document.getElementById('checkoutcustomerdetailsback').addEventListener('click', function () 
-		{
-			cartstate(3);
-		});
-		//add to cart click element
-		document.querySelector('.checkout').addEventListener('click', function () 
-		{
 
+		
+		document.getElementById('sr-bitcoinaddresscopy').addEventListener('click', function () 
+		{
+			const el = document.createElement('textarea');  // Create a <textarea> element
+			el.value = address;                                 // Set its value to the string that you want copied
+			el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
+			el.style.position = 'absolute';                 
+			el.style.left = '-9999px';                      // Move outside the screen to make it invisible
+			document.body.appendChild(el);  
+			el.select();                                    // Select the <textarea> content
+  			document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
+  			document.body.removeChild(el);      
+		});
+		
+		//shipping and billing checbox
+		document.getElementById('sr-billingandshippingcheck').addEventListener('click', function () 
+		{
+			checkAddressClickState()
+			
+		});
+		
+		//shipping button clicked
+		document.getElementById('sr-shipping').addEventListener('click', function () 
+		{
+			cartstate(6)			
+			
+		});
+
+		//add to cart click element
+		document.querySelector('.sr-checkout').addEventListener('click', function () 
+		{
 			cartstate(2);
 		});
 
 		//add to cart click element
-		document.querySelector('.cd-add-to-cart').addEventListener('click', function () 
+		document.querySelector('.sr-add-to-cart').addEventListener('click', function () 
 		{
 			//get details
-			var elproduct = document.getElementById('cd-add-to-cart');
+			var elproduct = document.getElementById('sr-add-to-cart');
 			price =elproduct.getAttribute('data-price');
 			name =elproduct.getAttribute('data-name');
+			preview = elproduct.getAttribute('data-preview');
 			//will update when we use multipile products
 			var productid = 1;
 			//todo
@@ -488,31 +574,37 @@ var SR = SR || (function()
 				carttotal(price)
 				
 		  		//show it
-		  		showClass(document.querySelector('.cd-cart-container'))	
+		  		showClass(document.querySelector('.sr-cart-container'))	
 			  	
 			  	//add item to cart
-			  	var productlist = document.getElementById('cartlistitems');
+			  	var productlist = document.getElementById('sr-cartlistitems');
 				var itemlist  = document.createElement('li');
-				itemlist.className = 'product ';
+				itemlist.className = 'sr-product ';
 
 				//build produt
 				var prodcuthtml = '';
-				//product image		
-				var prodcuthtml = prodcuthtml +'<div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div>';
+				//display default image or the one supplied	
+				if (preview == "")
+				{
+					var prodcuthtml = prodcuthtml +'<div class="sr-product-image"><a href="#0"><img src="'+cdnurl+'img/sr-product-preview.png" alt="placeholder"></a></div>';
+				}
+				else
+				{
+					var prodcuthtml = prodcuthtml +'<div class="sr-product-image"><a href="#0"><img src="'+preview+'" alt="placeholder"></a></div>';
+				}
 				//product name
 				prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
 				//product price
-				prodcuthtml = prodcuthtml + '<span class="price">'+price+' BTC</span>';
+				prodcuthtml = prodcuthtml + '<div class="sr-price">'+price+' BTC</div>';
 				//actions div
-				prodcuthtml = prodcuthtml + '<div class="actions">';
+				prodcuthtml = prodcuthtml + '<div class="sr-actions">';
 
 				//delete option
-				prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="delete-item">Delete</a>';
-				prodcuthtml = prodcuthtml + '<div class="quantity">';
+				prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="sr-delete-item">Delete</a>';
+				prodcuthtml = prodcuthtml + '<div class="sr-quantity">';
 				//quantity label
-				prodcuthtml = prodcuthtml + '<label for="cd-product-'+ productid +'">Qty</label>';
 				//quantity select
-				prodcuthtml = prodcuthtml + '<span class="select"><select id="productquantity" name="productquantity" onchange="SR.changequantity()">';
+				prodcuthtml = prodcuthtml + '<span class="select"><select id="sr-productquantity" name="sr-productquantity" onchange="SR.changequantity()">';
 				var i = 0;
 				for (i = 1; i < quantity; i++) 
 				{ 
@@ -533,28 +625,29 @@ var SR = SR || (function()
 				//add to the list		
 				itemlist.innerHTML = prodcuthtml;
 				// append  to the end of theParent
-				productlist.innerHTML = "";
-				productlist.appendChild(itemlist);
+				productlist.innerHTML = prodcuthtml;
+				//note we have to fix this when we add multipile products. 
+				//productlist.appendChild(itemlist);
 	  		}
 		});
 		//cart clicked element
-		document.querySelector('.cd-cart-trigger').addEventListener('click', function () {
+		document.querySelector('.sr-cart-trigger').addEventListener('click', function () {
 	  		//check if cart shoud be shown
 	  		//debug
 	  		//itemcount = 1;
 	  		if (itemcount == 0)
 	  		{
 	  			//always remove as its 0
-	  			removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  			removeClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  		}
 	  		else
 	  		{
 	  			//see if the cart is open and toggle it
-	  			var res = hasClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  			var res = hasClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  			if (res == 1)
 	  			{
 	  				//close it
-	  				removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  				removeClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  			}
 	  			else
 	  			{
@@ -649,7 +742,7 @@ var SR = SR || (function()
        	//		 which means that we have to call it from the onchange in the select old school I.E javascript:SR.chanagequantity() which is not ideal
        	//		 and we will fix it later.
         changequantity : function() {
-        	var elquantity = document.getElementById('productquantity');
+        	var elquantity = document.getElementById('sr-productquantity');
 			itemcountq = elquantity.options[elquantity.selectedIndex];
 			itemcount = parseInt(itemcountq.value);
 			carttotal();	
@@ -662,11 +755,11 @@ var SR = SR || (function()
         deleteitem : function ()
 		{
 			itemcount = 0;
-			var productlist = document.getElementById('cartlistitems');
+			var productlist = document.getElementById('sr-cartlistitems');
 			productlist.innerHTML = "";
 			carttotal();
 			//close it
-	  		removeClass(document.querySelector('.cd-cart-container'),'cart-open');
+	  		removeClass(document.querySelector('.sr-cart-container'),'cart-open');
 		}
    };
 }());
