@@ -10,7 +10,17 @@ if (process.env.walletpassphrase == undefined)
   process.env.walletpassphrase = 'test';
 if (process.env.walletaccount == undefined)
   process.env.walletaccount = 'theaccount';
-
+if (process.env.NETWORK == undefined)
+  process.env.NETWORK = 1;
+if (process.env.RPCUSERNAME == undefined)
+  process.env.RPCUSERNAME = 'test';
+if (process.env.RPCPASSWORD == undefined)
+  process.env.RPCPASSWORD = 'test';
+//note: not sure if it is whise to enable this.
+//if (process.env.RPCHOST == undefined)
+//  process.env.RPCHOST = '127.0.0.1';
+//if (process.env.RPCPASSWORD == undefined)
+//  process.env.RPCPORT = '18332';
 /*
 if (process.env.blockiokey == undefined)
   process.env.blockiokey = '9ccb-fad0-7811-4dfb ';
@@ -25,9 +35,7 @@ if (process.env.PORT == undefined)
 const express = require("express");
 //include the version package
 require( 'pkginfo' )( module, 'version','name','description' );
-//display a message to the console.
-console.log( module.exports.name+": " + module.exports.version );
-console.log( module.exports.description+' is listenting :]');
+
 
 //load the generic functions
 var generichelper = require('./api/helpers/generic.js').Generic;
@@ -252,7 +260,14 @@ END OF API FUNCTIONS
 //This is common practice in AWS I am not sure if all server providers use the same method.
 //note as we are passing this as process env we have to make sure this is set on the server
 var port = process.env.PORT 
+//display a message to the console.
+console.log( module.exports.description+' is listenting :]');
+console.log( module.exports.name+": " + module.exports.version );
 console.log('listenting on port:'+port)
+if (process.env.NETWORK == 2)
+  console.log('connected to mainnet')
+if (process.env.NETWORK == 1)
+  console.log('connected to testnet')
 //listen
 app.listen(port);
 
