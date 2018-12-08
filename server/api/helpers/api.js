@@ -1,22 +1,39 @@
+
+
+//1 = testnet
+//2 = mainnet
+const network = process.env.NETWORK;
+//console.log(network)
+
 //load bitcoin core
 const Client = require("bitcoin-core");
 //open a connection to the RPC client
-const client = new Client({
-  host: "127.0.0.1",
-  port: 18332,
-  username: "test",
-  password: "test"
-});
+let client = '';
+if (network == 1)
+{
+  client = new Client({
+    host: "127.0.0.1",
+    port: 18332,
+    username: process.env.RPCUSERNAME,
+    password: process.env.RPCPASSWORD
+  });
+}
+
+if (network == 2)
+{
+  client = new Client({
+    host: "127.0.0.1",
+    port: 8332,
+    username: process.env.RPCUSERNAME,
+    password: process.env.RPCPASSWORD
+  });
+}
 
 //load the generic functions
 //note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that. 
 var generichelper = require('./generic.js').Generic;
 var generic = new generichelper();
 
-
-//1 = testnet
-//2 = mainnet
-const network = "1";
 
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
