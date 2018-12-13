@@ -9,7 +9,6 @@
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
     "bitcoin-core": "^2.0.0",
-    "bitcoin-lightning-nodejs": "^1.0.5",
     "bitcoinjs-lib": "^4.0.2",
     "block_io": "^1.0.9-5",
     "commander": "^2.19.0",
@@ -18,6 +17,7 @@
     "install": "^0.12.1",
     "nodemailer": "^4.6.8",
     "npm": "^6.4.1",
+    "paypercall": "^0.1.4",
     "pkginfo": "^0.4.1",
     "sqlite3": "^4.0.2"
   }

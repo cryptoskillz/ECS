@@ -31,6 +31,9 @@ if (process.env.blockiosecret == undefined)
 if (process.env.PORT == undefined)
   process.env.PORT = 8080;
 
+const pay = require('paypercall')({ chargeToken: 'myToken'})
+
+
 //load express
 const express = require("express");
 //include the version package
@@ -66,6 +69,8 @@ app.get("/backoffice/test", (req, res) => {
 END OF BACKOFFICE ROUTING
 =============================
 */
+
+
 
 /*
 ========================
