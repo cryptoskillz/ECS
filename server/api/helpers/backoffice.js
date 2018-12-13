@@ -21,7 +21,7 @@ let db = new sqlite3.Database("./db/db.db", err => {
   }
 });
 
-
+//note why uppercase here?
 var backOffice = function ()
 {
 	this.test = function test(req,res) 

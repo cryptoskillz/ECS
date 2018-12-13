@@ -54,6 +54,9 @@ const app = express();
 START OF BACKOFFICE ROUTING
 =============================
 */
+
+
+
 app.get("/backoffice/test", (req, res) => {
   //load the back office helper
   let backofficehelper = require('./api/helpers/backoffice.js').backOffice;
@@ -70,6 +73,51 @@ END OF BACKOFFICE ROUTING
 =============================
 */
 
+/*
+========================
+START OF WEBHOOK FUNCTION
+========================
+*/
+
+/*
+This function is used to create a check function to check if a payment has been made
+
+At present I use the bitcoin wallet to check the address for confirmations.  We could also 
+use the flags processed and swept in the session table if we wanted but it is not really essential.
+because we are using the wallet to check it can only check on addresses that it created which is fine
+but if we wanted to make it very generic and check any address we could use the block.io code we have to do 
+that.
+
+The usage for this function is so that the sr.js can check for payments and update the UI accordingly if it finds 
+a sucessful payment. 
+
+
+*/
+app.get("/webhook/checkpayment", (req, res) => {
+  //set the headers
+  res = generic.setHeaders(res);
+  //right now we only check the address is there we could also check token if we wanted to 
+  //but it is read only so not overly concerened with doing this. 
+  if ((req.query.address == undefined) || (req.query.address == ''))
+  {
+     res.send(JSON.stringify({ error: "no address" }));
+     return;
+  }
+  //load the webhook helper helper
+  let webhookhelper = require('./api/helpers/webhook.js').webhook;
+  let webhook = new webhookhelper();
+  //check for payment
+  webhook.checkPayment(req.query.token,req.query.address,res);
+
+});
+
+/*
+========================
+END OF WEBHOOK FUNCTION
+========================
+*/
+
+
 
 
 /*
@@ -85,7 +133,7 @@ app.get("/admin/updatesettings", (req, res) => {
 
   //check if it is a zero and if so return error
   //todo : check for duplicate address and validate the btc adddress
-  if (req.query.address == '')
+  if ((req.query.address == undefined) || (req.query.address == ''))
   {
      res.send(JSON.stringify({ error: "no address" }));
      return;
@@ -105,7 +153,7 @@ app.get("/admin/deletesettingsaddress", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
   //check if it is a zero and if so return error
-  if (req.query.address == '')
+  if ((req.query.address == undefined) || (req.query.address == ''))
   {
      res.send(JSON.stringify({ error: "no address" }));
      return;
@@ -123,7 +171,7 @@ app.get("/admin/settings", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
   //check if it is a zero and if so return error
-  if (req.query.address == '')
+  if ((req.query.address == undefined) || (req.query.address == ''))    
   {
      res.send(JSON.stringify({ error: "no address" }));
      return;
@@ -140,7 +188,7 @@ app.get("/admin/order", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
   //check if it is a zero and if so return error
-  if (req.query.address == '')
+  if ((req.query.address == undefined) || (req.query.address == ''))
   {
      res.send(JSON.stringify({ error: "no address" }));
      return;
@@ -157,7 +205,7 @@ app.get("/admin/payments", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
   //check if it is a zero and if so return error
-  if (req.query.address == '')
+  if ((req.query.address == undefined) || (req.query.address == ''))
   {
      res.send(JSON.stringify({ error: "no address" }));
      return;
