@@ -1,16 +1,28 @@
-//load bitcoin core
-const Client = require("bitcoin-core");
-//open a connection to the RPC client
-const client = new Client({
-  host: "127.0.0.1",
-  port: 18332,
-  username: "test",
-  password: "test"
-});
+const config = require('./config');
+//console.log(config.bitcoin.network)
 
-//1 = testnet
-//2 = mainnet
-const network = "1";
+//load bitcoin core
+//open a connection to the RPC client
+const Client = require("bitcoin-core");
+if (process.env.NETWORK == 1)
+{
+  client = new Client({
+    host: "127.0.0.1",
+    port: 18332,
+    username: process.env.RPCUSERNAME,
+    password: process.env.RPCPASSWORD
+  });
+}
+
+if (process.env.NETWORK == 2)
+{
+  client = new Client({
+    host: "127.0.0.1",
+    port: 8332,
+    username: process.env.RPCUSERNAME,
+    password: process.env.RPCPASSWORD
+  });
+}
 
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();

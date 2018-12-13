@@ -1,48 +1,18 @@
 
-
-//1 = testnet
-//2 = mainnet
-const network = process.env.NETWORK;
-//console.log(network)
-
-//load bitcoin core
-const Client = require("bitcoin-core");
-//open a connection to the RPC client
-let client = '';
-if (network == 1)
-{
-  client = new Client({
-    host: "127.0.0.1",
-    port: 18332,
-    username: process.env.RPCUSERNAME,
-    password: process.env.RPCPASSWORD
-  });
-}
-
-if (network == 2)
-{
-  client = new Client({
-    host: "127.0.0.1",
-    port: 8332,
-    username: process.env.RPCUSERNAME,
-    password: process.env.RPCPASSWORD
-  });
-}
-
-//load the generic functions
-//note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that. 
-var generichelper = require('./generic.js').Generic;
-var generic = new generichelper();
-
-
+const config = require('./config');
+//open a database connection
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
-//open a database connection
 let db = new sqlite3.Database("./db/db.db", err => {
   if (err) {
     console.error(err.message);
   }
 });
+
+//load the generic functions
+//note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that. 
+var generichelper = require('./generic.js').Generic;
+var generic = new generichelper();
 
 var api = function() {
 
@@ -172,19 +142,24 @@ var api = function() {
   */
   this.generateAddress = function generateAddress(uid,res)
   {
+    //call the mock test
+    var mockres = generic.mock(1,res);
+    if (mockres == true)
+      return;
+
     //unlock the wallet
     //debug
     //console.log(process.env.walletpassphrase)
-    client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
+    client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
       //create a new address in theaccount account :]
-      client.getNewAddress(process.env.walletaccount).then(address => {
+      client.getNewAddress(process.env.WALLETACCOUNT).then(address => {
         //debug
-        //console.log(address);
+        console.log(address);
 
         //insert it into the database
         db.run(
           `INSERT INTO sessions(address,userid,net) VALUES(?,?,?)`,
-          [address, uid, network],
+          [address, uid, process.env.NETWORK],
           function(err) {
             if (err) {
               //debug
@@ -419,7 +394,5 @@ var api = function() {
       });
     });
   };
-
-
 };
 exports.api = api;

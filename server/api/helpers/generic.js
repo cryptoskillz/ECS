@@ -1,3 +1,5 @@
+
+
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
 //open a database connection
@@ -12,6 +14,25 @@ var Generic = function ()
 	this.test = function test() {
 		console.log('yay')
 		console.log(mailOptions);
+	}
+
+	/*
+
+		This function mocks the API calls so you can test the API without having to have
+		bitcoin core etc set up.  It essentially fakes the output.
+	*/
+	this.mock = function mock(fakefunction,res)
+	{
+		//check we are in mock mode
+		if (process.env.MOCK == 1)
+    	{
+    		//todo make switch
+			if (fakefunction == 1)
+			{
+				res.send(JSON.stringify({ address: "2MunEhszXsxiXC1eq4FNpnbH3w5qbyYnooB" }));
+				return true;
+			}
+		}
 	}
 
 	/*

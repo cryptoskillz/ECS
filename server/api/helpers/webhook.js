@@ -1,3 +1,5 @@
+const config = require('./config');
+//console.log(config.bitcoin.network)
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
 //open a database connection
@@ -17,8 +19,9 @@ const network = process.env.NETWORK;
 //load bitcoin core
 const Client = require("bitcoin-core");
 //open a connection to the RPC client
-let client = '';
-if (network == 1)
+//open a connection to the RPC client
+const Client = require("bitcoin-core");
+if (process.env.NETWORK == 1)
 {
   client = new Client({
     host: "127.0.0.1",
@@ -28,7 +31,7 @@ if (network == 1)
   });
 }
 
-if (network == 2)
+if (process.env.NETWORK == 2)
 {
   client = new Client({
     host: "127.0.0.1",

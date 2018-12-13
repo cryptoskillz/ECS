@@ -13,11 +13,11 @@
     "block_io": "^1.0.9-5",
     "commander": "^2.19.0",
     "const": "^1.0.0",
+    "dotenv": "^6.2.0",
     "express": "^4.16.3",
     "install": "^0.12.1",
     "nodemailer": "^4.6.8",
     "npm": "^6.4.1",
-    "paypercall": "^0.1.4",
     "pkginfo": "^0.4.1",
     "sqlite3": "^4.0.2"
   }

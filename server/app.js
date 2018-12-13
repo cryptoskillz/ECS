@@ -1,38 +1,5 @@
 //check the process env vars
-
-if (process.env.emailsmtp == undefined)
-  process.env.emailsmtp = 'smtp.ethereal.email';
-if (process.env.emailusername == undefined)
-  process.env.emailusername = 'rjf2z2dghi4bn3yv@ethereal.email';
-if (process.env.emailpassword == undefined)
-  process.env.emailpassword = 'NG4PPPuqvZaagwSjWV';
-if (process.env.walletpassphrase == undefined)
-  process.env.walletpassphrase = 'test';
-if (process.env.walletaccount == undefined)
-  process.env.walletaccount = 'theaccount';
-if (process.env.NETWORK == undefined)
-  process.env.NETWORK = 1;
-if (process.env.RPCUSERNAME == undefined)
-  process.env.RPCUSERNAME = 'test';
-if (process.env.RPCPASSWORD == undefined)
-  process.env.RPCPASSWORD = 'test';
-//note: not sure if it is whise to enable this.
-//if (process.env.RPCHOST == undefined)
-//  process.env.RPCHOST = '127.0.0.1';
-//if (process.env.RPCPASSWORD == undefined)
-//  process.env.RPCPORT = '18332';
-/*
-if (process.env.blockiokey == undefined)
-  process.env.blockiokey = '9ccb-fad0-7811-4dfb ';
-if (process.env.blockiosecret == undefined)
-  process.env.blockiosecret = '2N3Xtg7pBjUG4RPaiwfc2t3wftvLGWv6i2K';
-*/
-
-if (process.env.PORT == undefined)
-  process.env.PORT = 8080;
-
-const pay = require('paypercall')({ chargeToken: 'myToken'})
-
+require('dotenv').config();
 
 //load express
 const express = require("express");

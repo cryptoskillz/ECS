@@ -1,3 +1,6 @@
+const config = require('./config');
+//console.log(config.bitcoin.network)
+
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
 //open a database connection
