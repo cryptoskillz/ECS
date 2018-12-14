@@ -368,10 +368,12 @@ var SR = SR || (function()
 
 		if (checkbox.checked) 
 		{
+
 		    //Checkbox has been checked
 	        showClass(document.getElementById('sr-pay'));
 		    hideClass(document.getElementById('sr-billing'));
 	        hideClass(document.getElementById('sr-shipping'));
+
 
 		} 
 		else 
@@ -495,6 +497,18 @@ var SR = SR || (function()
 		//payment click
 		document.getElementById('sr-pay').addEventListener('click', function () 
 		{
+			var checkbox =  document.getElementById('sr-billingandshippingcheck');
+			if (checkbox.checked) 
+			{
+				//note we could do this at the server end and cut down on the size of the call but I prefer
+				//to keep the server failry agnostic and keep the logic here in this usecase.
+				document.getElementById("sr-shippingaddress1").value = document.getElementById("sr-billingaddress1").value;
+				document.getElementById("sr-shippingcity").value = document.getElementById("sr-billingcity").value;
+				document.getElementById("sr-shippingstate").value = document.getElementById("sr-billingstate").value;
+				document.getElementById("sr-shippingzip").value = document.getElementById("sr-billingzip").value;
+				document.getElementById("sr-shippingcountry").value = document.getElementById("sr-billingcountry").value;
+
+			}
 			var cartstring = "";
 			var elements = document.getElementsByClassName("sr-input");
 			for (var i = 0, len = elements.length; i < len; i++) {

@@ -23,13 +23,14 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
+    console.log(req.query);
     let data = [req.query.address];
     //console.log(data)
     let sql = `SELECT * FROM product where address = "`+req.query.address+`"`;
     //debug
 
     db.get(sql, [], (err, result) => {
-      console.log(result)
+      //console.log(result)
       if (err) {
         console.log(err)
       }
@@ -169,6 +170,8 @@ var api = function() {
               res.send(JSON.stringify({ error: err.message }));
               return;
             }
+
+            console.log('ddd');
             //return the address
             res.send(JSON.stringify({ address: address }));
           }
