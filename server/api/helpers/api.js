@@ -40,32 +40,75 @@ var api = function() {
         if (err) {
           return console.error(err.message);
         }
-        for (var metaname in req.query) 
-        {
-            if (req.query.hasOwnProperty(metaname)) 
-            {
-                var metavalue = req.query[metaname]
-                metaname = metaname.replace("sr-", "");
-
-
-                db.run(
-                `INSERT INTO order_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
-                [
-                  result.id,
-                  metaname,
-                  metavalue
-                ],
-                function(err) {
-                  if (err) {
-                    return console.log(err.message);
-                  }
-                }
-              );
-              //debug
-              //console.log(metaname, metavalue);
+        let data = [result.id];
+        let sql = `delete FROM product_meta WHERE productid = ?`;
+        db.run(sql, data, function(err) {
+            if (err) {
+              return console.error(err.message);
             }
-        }
-        res.send(JSON.stringify({ status: "ok" }));
+            for (var metaname in req.query) 
+            {
+
+                if (req.query.hasOwnProperty(metaname)) 
+                {
+                    var metavalue = req.query[metaname]
+                    
+                    if(metaname.indexOf("sr-product-") > -1) 
+                    {
+                      //console.log('prod:'+req.query[metaname])
+                      //inser into proiduct meta
+                      if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
+                      {
+                        metaname = metaname.replace("sr-product-", "");
+                        //insert into oder meta
+                        db.run(
+                          `INSERT INTO product_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                          [
+                            result.id,
+                            metaname,
+                            metavalue
+                          ],
+                          function(err) {
+                            if (err) {
+                              return console.log(err.message);
+                            }
+                          }
+                        );
+                      }
+
+                    }
+                    else
+                    {
+                        //note we should change this to sr-order so it is not just an if else check in the future
+                        //debug
+                        //console.log('order:'+req.query[metaname])
+                        //note the undefined should be cleaned in sr.js but does hurt to also check here
+                        if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
+                        {
+                          metaname = metaname.replace("sr-", "");
+                          //insert into oder meta
+                          db.run(
+                            `INSERT INTO order_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                            [
+                              result.id,
+                              metaname,
+                              metavalue
+                            ],
+                            function(err) {
+                              if (err) {
+                                return console.log(err.message);
+                              }
+                            }
+                          );
+                        }
+                      //debug
+                      //console.log(metaname, metavalue);
+                    }
+
+                }
+            }
+            res.send(JSON.stringify({ status: "ok" }));
+          });
         });
     });
   }

@@ -498,6 +498,7 @@ var SR = SR || (function()
 		document.getElementById('sr-pay').addEventListener('click', function () 
 		{
 			var checkbox =  document.getElementById('sr-billingandshippingcheck');
+			//check if it the shipping / billing the same has been clicked
 			if (checkbox.checked) 
 			{
 				//note we could do this at the server end and cut down on the size of the call but I prefer
@@ -524,10 +525,24 @@ var SR = SR || (function()
 			    //console.log(elements[i].name);
 			    //console.log(elements[i].value);
 			}
-			///console.log(cartstring);
+
+
+			//get the product meta
+			var elements = document.getElementsByClassName("sr-productmeta");
+			//loop through them 
+			for (var i = 0, len = elements.length; i < len; i++) {
+				 if (cartstring == "" )
+			    {
+			    	cartstring = "?"+elements[i].name+'='+elements[i].value;
+			    }
+			    else
+			    {
+			    	cartstring = cartstring+"&"+elements[i].name+'='+elements[i].value;
+			    }
+			}
 
 			var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+address;
-			console.log(url)
+			//console.log(url)
 			//call the store produt endpoint
 			fetchurl(url,'storeuserdetails')		
 			
@@ -572,6 +587,27 @@ var SR = SR || (function()
 		//add to cart click element
 		document.querySelector('.sr-add-to-cart').addEventListener('click', function () 
 		{
+			//note we ought to move this string creator into its own function now as it is bound to be used
+			//by others
+
+			//get all the product meta
+			var elements = document.getElementsByClassName("sr-productmeta");
+			//loop through them 
+			for (var i = 0, len = elements.length; i < len; i++) {
+				//get if is required 
+				var required = 0;
+				required = elements[i].getAttribute('sr-required');
+				//chek it is required and been selectd otherwise halt
+				if ((elements[i].value == '') && (required==1))
+				{
+					var productnametmp = elements[i].name;
+					productnametmp = productnametmp.replace("sr-product-", "");
+					alert('please select a '+productnametmp);
+					return;
+				}
+			   
+			}
+			
 			//get details
 			var elproduct = document.getElementById('sr-add-to-cart');
 			price =elproduct.getAttribute('data-price');
