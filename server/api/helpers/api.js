@@ -23,7 +23,7 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
-    console.log(req.query);
+    //console.log(req.query);
     let data = [req.query.address];
     //console.log(data)
     let sql = `SELECT * FROM product where address = "`+req.query.address+`"`;
@@ -74,6 +74,8 @@ var api = function() {
   /*
   *
   * This function stores the product in the database
+  *
+  *  TODO: make sure we have an adddress before we store the product without there is no way to process the order
   *
   */
   this.storeProduct = function storeProduct(req,res)
@@ -140,6 +142,9 @@ var api = function() {
   *
   *  This function generate a new address
   *
+  *. Note if Bitcoin core is slow in returning an addresss this could have an adverse impact on the functionality
+  *.      to aboid this we could cache a number of addresses ready to use in the database. 
+  *
   */
   this.generateAddress = function generateAddress(uid,res)
   {
@@ -155,7 +160,7 @@ var api = function() {
       //create a new address in theaccount account :]
       client.getNewAddress(process.env.WALLETACCOUNT).then(address => {
         //debug
-        console.log(address);
+        //console.log(address);
 
         //insert it into the database
         db.run(
@@ -171,7 +176,6 @@ var api = function() {
               return;
             }
 
-            console.log('ddd');
             //return the address
             res.send(JSON.stringify({ address: address }));
           }
