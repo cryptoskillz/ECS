@@ -15,31 +15,6 @@ let db = new sqlite3.Database("./db/db.db", err => {
 const network = process.env.NETWORK;
 //console.log(network)
 
-//note this is used in every helper there is a good call to move this to a base class
-//load bitcoin core
-const Client = require("bitcoin-core");
-//open a connection to the RPC client
-//open a connection to the RPC client
-const Client = require("bitcoin-core");
-if (process.env.NETWORK == 1)
-{
-  client = new Client({
-    host: "127.0.0.1",
-    port: 18332,
-    username: process.env.RPCUSERNAME,
-    password: process.env.RPCPASSWORD
-  });
-}
-
-if (process.env.NETWORK == 2)
-{
-  client = new Client({
-    host: "127.0.0.1",
-    port: 8332,
-    username: process.env.RPCUSERNAME,
-    password: process.env.RPCPASSWORD
-  });
-}
 
 
 var webhook = function ()
@@ -54,10 +29,10 @@ var webhook = function ()
 	this.checkPayment = function checkPayment(token,address,res) 
 	{
 		//debug
-		//console.log(address)
+		console.log(address)
 
 		//decryop the wallet
-		client.walletPassphrase(process.env.walletpassphrase, 10).then(() => 
+		client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => 
 		{
 			//get the unspent transaxtions for the address we are intrested in.
 			client.listUnspent(1, 9999999, [address]).then(result => 

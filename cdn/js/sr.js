@@ -5,6 +5,9 @@ var SR = SR || (function()
 	*START OF GLOBAL FUNCTIONS
 	*=========================
 	*/
+
+	//hold the checkpayment interval function
+	var checkpaymentres = ''
 	//holdthe number of product
 	var itemcount = 0;
 	//hold the price of the product
@@ -60,6 +63,22 @@ var SR = SR || (function()
 	*START OF GENERIC FUNCTIONS
 	*=========================
 	*/
+
+
+	function stopPaymentCheck()
+	{
+    	clearInterval(checkpaymentres);
+	}
+
+	function checkPayment()
+	{
+		//debug
+		//console.log('check payment ticker')
+		//var url = serverurl+"/webhook/checkpayment?address="+address+"&token="+token;
+		var url = serverurl+"webhook/checkpayment?address="+address;
+		fetchurl(url,'checkpayment')
+
+	}
 
 	//this function loops through a JSON object and adds the items to a select. 
 	//note: It makes the assumpation that you pass it a json object with a Name and Code key value pair, anything else will break
@@ -305,6 +324,13 @@ var SR = SR || (function()
 		    	cartstate(4);
 		    }
 
+		    if (method == "checkpayment")
+		    {
+		    	var data = JSON.parse(request.responseText);
+		    	console.log(data)
+		    	//cartstate(7)
+		    }
+
 		  } 
 		  else
 		  {
@@ -398,10 +424,13 @@ var SR = SR || (function()
 			4 = custmer details pay click
 			5 = bitcoin details back click*
 			6 = shipping button clicked
+			7 = check payment result
 		*/
 		//alert(state);
 		switch (state) {
 		    case 1:
+		    	stopPaymentCheck()
+		    	hideClass(document.getElementById('sr-confirmation'));
 		    	hideClass(document.getElementById('sr-billing'));
 		        hideClass(document.getElementById('sr-shipping'));
 		    	//hide the address
@@ -451,6 +480,8 @@ var SR = SR || (function()
 				//hide the customer details			  					
 				showClass(document.getElementById('sr-back-button'));
 				hideClass(document.getElementById('sr-customerdetailswrapper'));
+				//call the check payment
+				checkpaymentres = setInterval(checkPayment, 3000)
 		        break;
 		    case 5:
 		    	//check address
@@ -468,6 +499,8 @@ var SR = SR || (function()
 		     	showClass(document.getElementById('sr-shippingaddresswrapper'));
 		     	showClass(document.getElementById('sr-pay'));
 		     	hideClass(document.getElementById('sr-shipping'));
+		     case 7:
+		     	break;
 
 
 		     	
@@ -680,11 +713,16 @@ var SR = SR || (function()
 				//productlist.appendChild(itemlist);
 	  		}
 		});
-		//cart clicked element
-		document.querySelector('.sr-cart-trigger').addEventListener('click', function () {
-	  		//check if cart shoud be shown
+		/*
+			cart clicked element
+
+			//todo: should show the product variants in the cart view
+		*/
+		document.querySelector('.sr-cart-trigger').addEventListener('click', function () {	  		
 	  		//debug
 	  		//itemcount = 1;
+
+	  		//check if cart shoud be shown
 	  		if (itemcount == 0)
 	  		{
 	  			//always remove as its 0
@@ -696,6 +734,8 @@ var SR = SR || (function()
 	  			var res = hasClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  			if (res == 1)
 	  			{
+	  				//stop payment check
+	  				stopPaymentCheck()
 	  				//close it
 	  				removeClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  			}
@@ -777,12 +817,8 @@ var SR = SR || (function()
 			{
 				startcountry = _args[8]
 			}
-
-
 			//load css
-
         	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
-
 			//fetch the template so we can use themes 
 			fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
         }

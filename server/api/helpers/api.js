@@ -221,9 +221,10 @@ var api = function() {
 
             //return the address
             res.send(JSON.stringify({ address: address }));
+            //client.walletLock();
           }
         );
-        client.walletLock();
+        //client.walletLock();
         return;
         });
       });
@@ -318,7 +319,7 @@ var api = function() {
 
               //check the confirmation count
               //note it is set to 1 for now as I want to play with it as soon as possible.  It should 3 - 6 when we are happy
-              if (result[0].confirmations >= 1) {
+              if (result[0].confirmations >= process.env.CONFIRMATIONS) {
                 //estimate fee
                 client.estimateSmartFee(6).then(fee => {
                   //debug
