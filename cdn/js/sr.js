@@ -324,6 +324,7 @@ var SR = SR || (function()
 		    	cartstate(4);
 		    }
 
+		    //process the check
 		    if (method == "checkpayment")
 		    {
 		    	//process the resulrs
