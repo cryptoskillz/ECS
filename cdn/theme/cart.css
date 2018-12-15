@@ -607,6 +607,10 @@ Main Components
   }
 }
 
+.sr-paid  {
+  text-align: center;
+}
+
 .sr-cart .sr-back  {
     font-size: 62.5% !important;
     letter-spacing: .1em

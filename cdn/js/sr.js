@@ -326,9 +326,14 @@ var SR = SR || (function()
 
 		    if (method == "checkpayment")
 		    {
+		    	//process the resulrs
 		    	var data = JSON.parse(request.responseText);
-		    	console.log(data)
-		    	//cartstate(7)
+		    	//debug
+		    	//console.log(data.status)
+
+		    	//check if we have enough confirmartions
+		    	if (data.status == 1)
+		    		cartstate(7)
 		    }
 
 		  } 
@@ -430,7 +435,7 @@ var SR = SR || (function()
 		switch (state) {
 		    case 1:
 		    	stopPaymentCheck()
-		    	hideClass(document.getElementById('sr-confirmation'));
+		    	hideClass(document.getElementById('sr-paid'));
 		    	hideClass(document.getElementById('sr-billing'));
 		        hideClass(document.getElementById('sr-shipping'));
 		    	//hide the address
@@ -500,6 +505,9 @@ var SR = SR || (function()
 		     	showClass(document.getElementById('sr-pay'));
 		     	hideClass(document.getElementById('sr-shipping'));
 		     case 7:
+		     	stopPaymentCheck()
+		     	hideClass(document.getElementById('sr-bitcoinaddresswrapper'))
+		    	showClass(document.getElementById('sr-paid'));
 		     	break;
 
 

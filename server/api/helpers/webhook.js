@@ -29,7 +29,7 @@ var webhook = function ()
 	this.checkPayment = function checkPayment(token,address,res) 
 	{
 		//debug
-		console.log(address)
+		//console.log(address)
 
 		//decryop the wallet
 		client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => 
@@ -37,20 +37,29 @@ var webhook = function ()
 			//get the unspent transaxtions for the address we are intrested in.
 			client.listUnspent(1, 9999999, [address]).then(result => 
 			{
+				//console.log(result);
 				//note we only check the first one as should only use each address once but we can 
 				//easily update this to run through all the results to check for an active paymebt in
 				//the array
 
-				//note confirmations should be a var at this point
-				if (result[0].confirmations >= 1) 
+				//check there is a result
+				if (result.length > 0)
 				{
-					//valid
-					res.send(JSON.stringify({ status: 1 }));
+					//check the confirmations
+					if (result[0].confirmations >= process.env.CONFIRMATIONS) 
+					{
+						//valid
+						res.send(JSON.stringify({ status: 1 }));
+					}
+					else
+					{
+						//not valid
+						res.send(JSON.stringify({ status: 0 }));
+					}
 				}
 				else
 				{
-					//not valid
-					res.send(JSON.stringify({ status: 0 }));
+					res.send(JSON.stringify({ status: 0 }));	
 				}
 			});
 		});
