@@ -59,7 +59,7 @@ var webhook = function ()
 				}
 				else
 				{
-					res.send(JSON.stringify({ status: 0 }));	
+					res.send(JSON.stringify({ status: 1 }));	
 				}
 			});
 		});

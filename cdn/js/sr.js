@@ -506,8 +506,13 @@ var SR = SR || (function()
 		     	showClass(document.getElementById('sr-pay'));
 		     	hideClass(document.getElementById('sr-shipping'));
 		     case 7:
+		     	//stop payment timer
 		     	stopPaymentCheck()
+		     	//hide back button
+				hideClass(document.getElementById('sr-back-button'));
+				//hide payment details
 		     	hideClass(document.getElementById('sr-bitcoinaddresswrapper'))
+		     	//show paid screeb
 		    	showClass(document.getElementById('sr-paid'));
 		     	break;
 

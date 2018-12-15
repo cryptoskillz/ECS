@@ -1,4 +1,7 @@
-
+/*
+  todo:
+  cache pay to adddress
+*/
 const config = require('./config');
 //open a database connection
 //load SQLlite (use any database you want or none)
