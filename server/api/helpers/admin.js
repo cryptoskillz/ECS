@@ -122,7 +122,8 @@ var admin = function ()
 	*/
 	this.getOrder = function getOrder(address,res)
 	{
-		console.log(address);
+		//debug
+		//console.log(address);
 		//create a reults object
 		let jsonStr = '{"results":[]}';
 		let obj = JSON.parse(jsonStr);
@@ -130,7 +131,8 @@ var admin = function ()
 		let data = [address];
 		//build the query
 		let sql = `select * from product WHERE product.address = ?`;
-		console.log(sql)
+		//debug
+		//console.log(sql)
 		//run the query
 		db.all(sql, data, (err, rows) => {
 			if (err) 

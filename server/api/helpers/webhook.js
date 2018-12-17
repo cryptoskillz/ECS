@@ -43,7 +43,7 @@ var webhook = function ()
 				//the array
 
 				//check there is a result
-				if (result.length > 0)
+				if (result.length > process.env.CONFIRMATIONS)
 				{
 					//check the confirmations
 					if (result[0].confirmations >= process.env.CONFIRMATIONS) 

@@ -1,6 +1,11 @@
 /*
-  todo:
-  cache pay to adddress
+  todo: *more details in the section where this todo is required
+  Cache pay to adddress so it will work with no Bitcoin Core
+  Check that bticoin is running and not frozen before calling it
+  Finish Mock API calls
+  Finish email temaplates.  Note complitaing removing these complelty out of the database.
+
+
 */
 const config = require('./config');
 //open a database connection
@@ -122,6 +127,8 @@ var api = function() {
   * This function stores the product in the database
   *
   *  TODO: make sure we have an adddress before we store the product without there is no way to process the order
+           and we will get result.id errors this falls into the same area as caching addrress we could also benefot 
+           from having a check to see if bitcoin core is running correctly.
   *
   */
   this.storeProduct = function storeProduct(req,res)
@@ -237,13 +244,23 @@ var api = function() {
   /*
 	*
 	*	This function check if payment has been sent to the address
+  *
+  * todo: check client is running
+          fix small amounts been written to the data base incorrectly (ie 0.00002000 as 2.0e-05) most likely we will have 
+          parse it as a string before we write to the database
 	*
 	*/
   this.monitor = function monitor(address, res) {
+
     //call the recieved by address RPC call
+    //console.log(address)
     client.getReceivedByAddress(address).then(result => {
       //check it is more tha 0
       //note may want to check confirmations here
+
+      //debug
+      //console.log(result);
+
       if (result > 0) {
         //build a data array
         let data = ["1", result, address];
@@ -290,12 +307,12 @@ var api = function() {
       var coldstorageaddress = result.address;
       //get the sweep address
       //unlock the wallet
-      client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
+      client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
         //get the unspent transaxtions for the address we are intrested in.
         client.listUnspent(1, 9999999, [address]).then(result => {
           //debug
-          console.log('listUnspent')
-          console.log(result)
+          //console.log('listUnspent')
+          //console.log(result)
 
           //get the private key
           client.dumpPrivKey(address).then(pkey => {
@@ -333,7 +350,7 @@ var api = function() {
                   var amounttosend = result[0].amount - fee.feerate;
                   amounttosend = amounttosend.toFixed(8);
                   //debug
-                  console.log(amounttosend)
+                  //console.log(amounttosend)
                   //return
 
                   //create raw transaction
@@ -412,8 +429,8 @@ var api = function() {
                                 let sql = `UPDATE coldstorageaddresses
 	                          SET used = ?
 	                          WHERE coldstorageaddress = ?`;
-                            console.log(coldstorageaddress)
-                            console.log(sql)
+                            //console.log(coldstorageaddress)
+                            //console.log(sql)
 
                                 //run sql
                                 db.run(sql, sqldata, function(err) {

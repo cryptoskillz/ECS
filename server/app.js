@@ -24,6 +24,7 @@ START OF BACKOFFICE ROUTING
 
 
 
+
 app.get("/backoffice/test", (req, res) => {
   //load the back office helper
   let backofficehelper = require('./api/helpers/backoffice.js').backOffice;
@@ -137,12 +138,6 @@ app.get("/admin/deletesettingsaddress", (req, res) => {
 app.get("/admin/settings", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
-  //check if it is a zero and if so return error
-  if ((req.query.address == undefined) || (req.query.address == ''))    
-  {
-     res.send(JSON.stringify({ error: "no address" }));
-     return;
-  }
   //load the admin helper
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
@@ -171,12 +166,6 @@ app.get("/admin/order", (req, res) => {
 app.get("/admin/payments", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
-  //check if it is a zero and if so return error
-  if ((req.query.address == undefined) || (req.query.address == ''))
-  {
-     res.send(JSON.stringify({ error: "no address" }));
-     return;
-  }
   //load the admin helper
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
