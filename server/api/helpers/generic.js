@@ -1,3 +1,5 @@
+
+
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
 //open a database connection
@@ -15,6 +17,25 @@ var Generic = function ()
 	}
 
 	/*
+
+		This function mocks the API calls so you can test the API without having to have
+		bitcoin core etc set up.  It essentially fakes the output.
+	*/
+	this.mock = function mock(fakefunction,res)
+	{
+		//check we are in mock mode
+		if (process.env.MOCK == 1)
+    	{
+    		//todo make switch
+			if (fakefunction == 1)
+			{
+				res.send(JSON.stringify({ address: "2MunEhszXsxiXC1eq4FNpnbH3w5qbyYnooB" }));
+				return true;
+			}
+		}
+	}
+
+	/*
 	*
 	*	This function sends an email. 
 	*
@@ -27,16 +48,15 @@ var Generic = function ()
 		//console.log(process.env.emailsmtp);
 
 		const nodemailer = require('nodemailer');
-
 		//create reusable transporter object using the default SMTP transport
 		//note : We are usint hte ethereal email servie which fake emails for this demo you can repalce the details with amazons ses, send grid or whatever your preference is.
 		let transporter = nodemailer.createTransport({
-		    host: process.env.emailsmtp,
+		    host: process.env.EMAILSMTP,
 		    port: 587,
 		    secure: false, // true for 465, false for other ports
 		    auth: {
-		        user: process.env.emailusername, // generated ethereal user
-		        pass: process.env.emailpassword // generated ethereal password
+		        user: process.env.EMAILUSERNAME, // generated ethereal user
+		        pass: process.env.EMAILPASSWORD // generated ethereal password
 		    }
 		});
 
@@ -94,7 +114,6 @@ var Generic = function ()
 
 
 		});
-
        
     };
 

@@ -1,48 +1,26 @@
+/*
+  todo: *more details in the section where this todo is required
+  Cache pay to adddress so it will work with no Bitcoin Core
+  Check that bticoin is running and not frozen before calling it
+  Finish Mock API calls
+  Finish email temaplates.  Note complitaing removing these complelty out of the database.
 
 
-//1 = testnet
-//2 = mainnet
-const network = process.env.NETWORK;
-//console.log(network)
-
-//load bitcoin core
-const Client = require("bitcoin-core");
-//open a connection to the RPC client
-let client = '';
-if (network == 1)
-{
-  client = new Client({
-    host: "127.0.0.1",
-    port: 18332,
-    username: process.env.RPCUSERNAME,
-    password: process.env.RPCPASSWORD
-  });
-}
-
-if (network == 2)
-{
-  client = new Client({
-    host: "127.0.0.1",
-    port: 8332,
-    username: process.env.RPCUSERNAME,
-    password: process.env.RPCPASSWORD
-  });
-}
-
-//load the generic functions
-//note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that. 
-var generichelper = require('./generic.js').Generic;
-var generic = new generichelper();
-
-
+*/
+const config = require('./config');
+//open a database connection
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
-//open a database connection
 let db = new sqlite3.Database("./db/db.db", err => {
   if (err) {
     console.error(err.message);
   }
 });
+
+//load the generic functions
+//note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that. 
+var generichelper = require('./generic.js').Generic;
+var generic = new generichelper();
 
 var api = function() {
 
@@ -53,13 +31,14 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
+    //console.log(req.query);
     let data = [req.query.address];
     //console.log(data)
     let sql = `SELECT * FROM product where address = "`+req.query.address+`"`;
     //debug
 
     db.get(sql, [], (err, result) => {
-      console.log(result)
+      //console.log(result)
       if (err) {
         console.log(err)
       }
@@ -69,32 +48,75 @@ var api = function() {
         if (err) {
           return console.error(err.message);
         }
-        for (var metaname in req.query) 
-        {
-            if (req.query.hasOwnProperty(metaname)) 
-            {
-                var metavalue = req.query[metaname]
-                metaname = metaname.replace("sr-", "");
-
-
-                db.run(
-                `INSERT INTO order_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
-                [
-                  result.id,
-                  metaname,
-                  metavalue
-                ],
-                function(err) {
-                  if (err) {
-                    return console.log(err.message);
-                  }
-                }
-              );
-              //debug
-              //console.log(metaname, metavalue);
+        let data = [result.id];
+        let sql = `delete FROM product_meta WHERE productid = ?`;
+        db.run(sql, data, function(err) {
+            if (err) {
+              return console.error(err.message);
             }
-        }
-        res.send(JSON.stringify({ status: "ok" }));
+            for (var metaname in req.query) 
+            {
+
+                if (req.query.hasOwnProperty(metaname)) 
+                {
+                    var metavalue = req.query[metaname]
+                    
+                    if(metaname.indexOf("sr-product-") > -1) 
+                    {
+                      //console.log('prod:'+req.query[metaname])
+                      //inser into proiduct meta
+                      if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
+                      {
+                        metaname = metaname.replace("sr-product-", "");
+                        //insert into oder meta
+                        db.run(
+                          `INSERT INTO product_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                          [
+                            result.id,
+                            metaname,
+                            metavalue
+                          ],
+                          function(err) {
+                            if (err) {
+                              return console.log(err.message);
+                            }
+                          }
+                        );
+                      }
+
+                    }
+                    else
+                    {
+                        //note we should change this to sr-order so it is not just an if else check in the future
+                        //debug
+                        //console.log('order:'+req.query[metaname])
+                        //note the undefined should be cleaned in sr.js but does hurt to also check here
+                        if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
+                        {
+                          metaname = metaname.replace("sr-", "");
+                          //insert into oder meta
+                          db.run(
+                            `INSERT INTO order_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                            [
+                              result.id,
+                              metaname,
+                              metavalue
+                            ],
+                            function(err) {
+                              if (err) {
+                                return console.log(err.message);
+                              }
+                            }
+                          );
+                        }
+                      //debug
+                      //console.log(metaname, metavalue);
+                    }
+
+                }
+            }
+            res.send(JSON.stringify({ status: "ok" }));
+          });
         });
     });
   }
@@ -103,6 +125,10 @@ var api = function() {
   /*
   *
   * This function stores the product in the database
+  *
+  *  TODO: make sure we have an adddress before we store the product without there is no way to process the order
+           and we will get result.id errors this falls into the same area as caching addrress we could also benefot 
+           from having a check to see if bitcoin core is running correctly.
   *
   */
   this.storeProduct = function storeProduct(req,res)
@@ -169,22 +195,30 @@ var api = function() {
   *
   *  This function generate a new address
   *
+  *. Note if Bitcoin core is slow in returning an addresss this could have an adverse impact on the functionality
+  *.      to aboid this we could cache a number of addresses ready to use in the database. 
+  *
   */
   this.generateAddress = function generateAddress(uid,res)
   {
+    //call the mock test
+    var mockres = generic.mock(1,res);
+    if (mockres == true)
+      return;
+
     //unlock the wallet
     //debug
     //console.log(process.env.walletpassphrase)
-    client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
+    client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
       //create a new address in theaccount account :]
-      client.getNewAddress(process.env.walletaccount).then(address => {
+      client.getNewAddress(process.env.WALLETACCOUNT).then(address => {
         //debug
         //console.log(address);
 
         //insert it into the database
         db.run(
           `INSERT INTO sessions(address,userid,net) VALUES(?,?,?)`,
-          [address, uid, network],
+          [address, uid, process.env.NETWORK],
           function(err) {
             if (err) {
               //debug
@@ -194,11 +228,13 @@ var api = function() {
               res.send(JSON.stringify({ error: err.message }));
               return;
             }
+
             //return the address
             res.send(JSON.stringify({ address: address }));
+            //client.walletLock();
           }
         );
-        client.walletLock();
+        //client.walletLock();
         return;
         });
       });
@@ -208,13 +244,23 @@ var api = function() {
   /*
 	*
 	*	This function check if payment has been sent to the address
+  *
+  * todo: check client is running
+          fix small amounts been written to the data base incorrectly (ie 0.00002000 as 2.0e-05) most likely we will have 
+          parse it as a string before we write to the database
 	*
 	*/
   this.monitor = function monitor(address, res) {
+
     //call the recieved by address RPC call
+    //console.log(address)
     client.getReceivedByAddress(address).then(result => {
       //check it is more tha 0
       //note may want to check confirmations here
+
+      //debug
+      //console.log(result);
+
       if (result > 0) {
         //build a data array
         let data = ["1", result, address];
@@ -261,12 +307,12 @@ var api = function() {
       var coldstorageaddress = result.address;
       //get the sweep address
       //unlock the wallet
-      client.walletPassphrase(process.env.walletpassphrase, 10).then(() => {
+      client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
         //get the unspent transaxtions for the address we are intrested in.
         client.listUnspent(1, 9999999, [address]).then(result => {
           //debug
-          console.log('listUnspent')
-          console.log(result)
+          //console.log('listUnspent')
+          //console.log(result)
 
           //get the private key
           client.dumpPrivKey(address).then(pkey => {
@@ -293,7 +339,7 @@ var api = function() {
 
               //check the confirmation count
               //note it is set to 1 for now as I want to play with it as soon as possible.  It should 3 - 6 when we are happy
-              if (result[0].confirmations >= 1) {
+              if (result[0].confirmations >= process.env.CONFIRMATIONS) {
                 //estimate fee
                 client.estimateSmartFee(6).then(fee => {
                   //debug
@@ -304,7 +350,7 @@ var api = function() {
                   var amounttosend = result[0].amount - fee.feerate;
                   amounttosend = amounttosend.toFixed(8);
                   //debug
-                  console.log(amounttosend)
+                  //console.log(amounttosend)
                   //return
 
                   //create raw transaction
@@ -383,8 +429,8 @@ var api = function() {
                                 let sql = `UPDATE coldstorageaddresses
 	                          SET used = ?
 	                          WHERE coldstorageaddress = ?`;
-                            console.log(coldstorageaddress)
-                            console.log(sql)
+                            //console.log(coldstorageaddress)
+                            //console.log(sql)
 
                                 //run sql
                                 db.run(sql, sqldata, function(err) {
@@ -419,7 +465,5 @@ var api = function() {
       });
     });
   };
-
-
 };
 exports.api = api;

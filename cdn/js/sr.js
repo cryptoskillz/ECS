@@ -5,6 +5,9 @@ var SR = SR || (function()
 	*START OF GLOBAL FUNCTIONS
 	*=========================
 	*/
+
+	//hold the checkpayment interval function
+	var checkpaymentres = ''
 	//holdthe number of product
 	var itemcount = 0;
 	//hold the price of the product
@@ -60,6 +63,22 @@ var SR = SR || (function()
 	*START OF GENERIC FUNCTIONS
 	*=========================
 	*/
+
+
+	function stopPaymentCheck()
+	{
+    	clearInterval(checkpaymentres);
+	}
+
+	function checkPayment()
+	{
+		//debug
+		//console.log('check payment ticker')
+		//var url = serverurl+"/webhook/checkpayment?address="+address+"&token="+token;
+		var url = serverurl+"webhook/checkpayment?address="+address;
+		fetchurl(url,'checkpayment')
+
+	}
 
 	//this function loops through a JSON object and adds the items to a select. 
 	//note: It makes the assumpation that you pass it a json object with a Name and Code key value pair, anything else will break
@@ -305,6 +324,19 @@ var SR = SR || (function()
 		    	cartstate(4);
 		    }
 
+		    //process the check
+		    if (method == "checkpayment")
+		    {
+		    	//process the resulrs
+		    	var data = JSON.parse(request.responseText);
+		    	//debug
+		    	//console.log(data.status)
+
+		    	//check if we have enough confirmartions
+		    	if (data.status == 1)
+		    		cartstate(7)
+		    }
+
 		  } 
 		  else
 		  {
@@ -368,10 +400,12 @@ var SR = SR || (function()
 
 		if (checkbox.checked) 
 		{
+
 		    //Checkbox has been checked
 	        showClass(document.getElementById('sr-pay'));
 		    hideClass(document.getElementById('sr-billing'));
 	        hideClass(document.getElementById('sr-shipping'));
+
 
 		} 
 		else 
@@ -396,10 +430,13 @@ var SR = SR || (function()
 			4 = custmer details pay click
 			5 = bitcoin details back click*
 			6 = shipping button clicked
+			7 = check payment result
 		*/
 		//alert(state);
 		switch (state) {
 		    case 1:
+		    	stopPaymentCheck()
+		    	hideClass(document.getElementById('sr-paid'));
 		    	hideClass(document.getElementById('sr-billing'));
 		        hideClass(document.getElementById('sr-shipping'));
 		    	//hide the address
@@ -449,6 +486,8 @@ var SR = SR || (function()
 				//hide the customer details			  					
 				showClass(document.getElementById('sr-back-button'));
 				hideClass(document.getElementById('sr-customerdetailswrapper'));
+				//call the check payment
+				checkpaymentres = setInterval(checkPayment, 3000)
 		        break;
 		    case 5:
 		    	//check address
@@ -466,6 +505,16 @@ var SR = SR || (function()
 		     	showClass(document.getElementById('sr-shippingaddresswrapper'));
 		     	showClass(document.getElementById('sr-pay'));
 		     	hideClass(document.getElementById('sr-shipping'));
+		     case 7:
+		     	//stop payment timer
+		     	stopPaymentCheck()
+		     	//hide back button
+				hideClass(document.getElementById('sr-back-button'));
+				//hide payment details
+		     	hideClass(document.getElementById('sr-bitcoinaddresswrapper'))
+		     	//show paid screeb
+		    	showClass(document.getElementById('sr-paid'));
+		     	break;
 
 
 		     	
@@ -495,6 +544,19 @@ var SR = SR || (function()
 		//payment click
 		document.getElementById('sr-pay').addEventListener('click', function () 
 		{
+			var checkbox =  document.getElementById('sr-billingandshippingcheck');
+			//check if it the shipping / billing the same has been clicked
+			if (checkbox.checked) 
+			{
+				//note we could do this at the server end and cut down on the size of the call but I prefer
+				//to keep the server failry agnostic and keep the logic here in this usecase.
+				document.getElementById("sr-shippingaddress1").value = document.getElementById("sr-billingaddress1").value;
+				document.getElementById("sr-shippingcity").value = document.getElementById("sr-billingcity").value;
+				document.getElementById("sr-shippingstate").value = document.getElementById("sr-billingstate").value;
+				document.getElementById("sr-shippingzip").value = document.getElementById("sr-billingzip").value;
+				document.getElementById("sr-shippingcountry").value = document.getElementById("sr-billingcountry").value;
+
+			}
 			var cartstring = "";
 			var elements = document.getElementsByClassName("sr-input");
 			for (var i = 0, len = elements.length; i < len; i++) {
@@ -510,10 +572,24 @@ var SR = SR || (function()
 			    //console.log(elements[i].name);
 			    //console.log(elements[i].value);
 			}
-			///console.log(cartstring);
+
+
+			//get the product meta
+			var elements = document.getElementsByClassName("sr-productmeta");
+			//loop through them 
+			for (var i = 0, len = elements.length; i < len; i++) {
+				 if (cartstring == "" )
+			    {
+			    	cartstring = "?"+elements[i].name+'='+elements[i].value;
+			    }
+			    else
+			    {
+			    	cartstring = cartstring+"&"+elements[i].name+'='+elements[i].value;
+			    }
+			}
 
 			var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+address;
-			console.log(url)
+			//console.log(url)
 			//call the store produt endpoint
 			fetchurl(url,'storeuserdetails')		
 			
@@ -558,6 +634,27 @@ var SR = SR || (function()
 		//add to cart click element
 		document.querySelector('.sr-add-to-cart').addEventListener('click', function () 
 		{
+			//note we ought to move this string creator into its own function now as it is bound to be used
+			//by others
+
+			//get all the product meta
+			var elements = document.getElementsByClassName("sr-productmeta");
+			//loop through them 
+			for (var i = 0, len = elements.length; i < len; i++) {
+				//get if is required 
+				var required = 0;
+				required = elements[i].getAttribute('sr-required');
+				//chek it is required and been selectd otherwise halt
+				if ((elements[i].value == '') && (required==1))
+				{
+					var productnametmp = elements[i].name;
+					productnametmp = productnametmp.replace("sr-product-", "");
+					alert('please select a '+productnametmp);
+					return;
+				}
+			   
+			}
+			
 			//get details
 			var elproduct = document.getElementById('sr-add-to-cart');
 			price =elproduct.getAttribute('data-price');
@@ -630,11 +727,16 @@ var SR = SR || (function()
 				//productlist.appendChild(itemlist);
 	  		}
 		});
-		//cart clicked element
-		document.querySelector('.sr-cart-trigger').addEventListener('click', function () {
-	  		//check if cart shoud be shown
+		/*
+			cart clicked element
+
+			//todo: should show the product variants in the cart view
+		*/
+		document.querySelector('.sr-cart-trigger').addEventListener('click', function () {	  		
 	  		//debug
 	  		//itemcount = 1;
+
+	  		//check if cart shoud be shown
 	  		if (itemcount == 0)
 	  		{
 	  			//always remove as its 0
@@ -646,6 +748,8 @@ var SR = SR || (function()
 	  			var res = hasClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  			if (res == 1)
 	  			{
+	  				//stop payment check
+	  				stopPaymentCheck()
 	  				//close it
 	  				removeClass(document.querySelector('.sr-cart-container'),'cart-open');
 	  			}
@@ -727,12 +831,8 @@ var SR = SR || (function()
 			{
 				startcountry = _args[8]
 			}
-
-
 			//load css
-
         	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
-
 			//fetch the template so we can use themes 
 			fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
         }

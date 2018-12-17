@@ -6,7 +6,8 @@ var serverurl = "https://ecs.cryptoskillz.com/";
 //note : set this whatever your local instance is 127.0.0.1 for example
 if(window.location.href.indexOf("127.0.0.1") > -1) 
 {
-	serverurl = "http://127.0.0.1:3000/";
+	serverurl = "http://127.0.0.1:3030/";
+
 	//alert(serverurl)
 }
 
