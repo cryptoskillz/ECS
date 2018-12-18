@@ -16,6 +16,33 @@ var generic = new generichelper();
 //init it
 const app = express();
 
+
+/*
+==============================
+START OF STRIKE ROUTING
+=============================
+*/
+
+
+
+
+app.get("/strike/charge", (req, res) => {
+  //load the back office helper
+  let chargehelper = require('./api/helpers/charge.js').charge;
+  let charge = new chargehelper();
+
+  //debug
+  charge.charge(req,res);
+});
+
+
+/*
+==============================
+END OF END ROUTING
+=============================
+*/
+
+
 /*
 ==============================
 START OF BACKOFFICE ROUTING
