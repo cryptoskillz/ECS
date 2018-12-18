@@ -25,6 +25,15 @@ var webhook = function ()
 		
 	}
 
+	//this function checks for a payment from strike 
+	this.checkStrikePayment = function checkStrikePayment(paymentRequest)
+	{
+		//todo : check database for completed payment
+		//not valid
+		res.send(JSON.stringify({ status: 0 }));
+
+	}
+
 	//note we could pass down the whole req here is we use more of it in the future
 	this.checkPayment = function checkPayment(token,address,res) 
 	{

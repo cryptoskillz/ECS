@@ -1,3 +1,12 @@
+/*
+
+
+Just as we did with BTC we started off using a 3rd party API and once we had an understanding of how things work 
+we moved onto owing the entire stack.  We are doing the exact same thing with Lightning
+
+We are using the rather excellent https://strike.acinq.co for this purpose.  
+
+*/
 const config = require('./config');
 //console.log(config.bitcoin.network)
 
@@ -13,10 +22,10 @@ let db = new sqlite3.Database("./db/db.db", err => {
 var request = require("request");
 
 var endpoint = 'https://api.strike.acinq.co';
-var api_key = 'sk_EiDnzvAf3BnjV432esHKXU75YqBmy';
+var api_key = process.env.STRIKE;
 
 //note why uppercase here?
-var charge = function ()
+var strike = function ()
 {
 	this.test = function test(req,res) 
 	{
@@ -25,6 +34,15 @@ var charge = function ()
      
 	}
 
+	//recieve a payment notificaiotn from strike
+	this.notificaton = function notificaton(req,res)
+	{
+		//todo: store the payment in the databsae
+		res.send(JSON.stringify({ "status": "ok" }));
+
+	}
+
+	//create a charge
 	this.charge = function charge(req,res)
 	{
 		//console.log(api_key);
@@ -48,11 +66,14 @@ var charge = function ()
 
 		request(options, function (error, response, body) {
 		  if (error) throw new Error(error);
-		  res.send(JSON.stringify({ payment_request: body.payment_request }));
+		  	//todo : store payment request in the database.
+		  	console.log(body)
+		  	var obj = {id:body.id,amount:body.amount,payment_request:body.payment_request}
+		  	res.send(JSON.stringify({ payment: obj }));
 		  //console.log(body.payment_request);
 		});
 	}
 
 
 }
-exports.charge = charge;
+exports.strike = strike;

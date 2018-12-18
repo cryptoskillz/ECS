@@ -27,12 +27,13 @@ START OF STRIKE ROUTING
 
 
 app.get("/strike/charge", (req, res) => {
+  res = generic.setHeaders(res);
   //load the back office helper
-  let chargehelper = require('./api/helpers/charge.js').charge;
-  let charge = new chargehelper();
+  let strikehelper = require('./api/helpers/strike.js').strike;
+  let strike = new strikehelper();
 
   //debug
-  charge.charge(req,res);
+  strike.charge(req,res);
 });
 
 
