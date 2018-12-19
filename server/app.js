@@ -25,7 +25,6 @@ START OF STRIKE ROUTING
 
 
 
-
 app.get("/strike/charge", (req, res) => {
   res = generic.setHeaders(res);
   //load the back office helper
@@ -35,6 +34,7 @@ app.get("/strike/charge", (req, res) => {
   //debug
   strike.charge(req,res);
 });
+
 
 
 /*
@@ -106,6 +106,25 @@ app.get("/webhook/checkpayment", (req, res) => {
   webhook.checkPayment(req.query.token,req.query.address,res);
 
 });
+
+/*
+
+This function checks for strike payments to be processed
+
+
+
+*/
+
+app.get("/webhook/checkstrikepayment", (req, res) => {
+  res = generic.setHeaders(res);
+  //load the back office helper
+  let webhookhelper = require('./api/helpers/webhook.js').webhook;
+  let webhook = new webhookhelper();
+
+  //debug
+  webhook.checkStrikePayment(req,res);
+});
+
 
 /*
 ========================

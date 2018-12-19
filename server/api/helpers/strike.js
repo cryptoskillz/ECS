@@ -21,9 +21,6 @@ let db = new sqlite3.Database("./db/db.db", err => {
 
 var request = require("request");
 
-var endpoint = 'https://api.strike.acinq.co';
-var api_key = process.env.STRIKE;
-
 //note why uppercase here?
 var strike = function ()
 {
@@ -45,32 +42,86 @@ var strike = function ()
 	//create a charge
 	this.charge = function charge(req,res)
 	{
-		//console.log(api_key);
+		//build the options object
 		var options = {
 		  method: 'POST',
-		  url: endpoint + '/api/v1/charges',
+		  url: process.env.STRIKEENDPOINT + '/api/v1/charges',
 		  headers: {
 		    'cache-control': 'no-cache',
 		    'Content-Type': 'application/json' },
 		  body: {
-		    amount: 1000,
-		    description: 'example charge',
-		    currency: 'btc'
+		    amount: parseFloat(req.query.amount),
+		    description: req.query.desc,
+		    currency: req.query.currency
 		  },
 		  json: true,
 		  auth: {
-		    user: api_key,
+		    user: process.env.STRIKE,
 		    pass: '',
 		  }
 		};
 
+		//call strike
 		request(options, function (error, response, body) {
 		  if (error) throw new Error(error);
-		  	//todo : store payment request in the database.
-		  	console.log(body)
-		  	var obj = {id:body.id,amount:body.amount,payment_request:body.payment_request}
-		  	res.send(JSON.stringify({ payment: obj }));
-		  //console.log(body.payment_request);
+		  	//debug
+		  	//console.log(body)
+
+		  	//turn it into a BTC amount
+		  	//note : in a future update we may go ahead and store everything Satoshis. 
+		  	//		 we could also use req.query.amount here
+		  	//		 we may want to store order_meta and product_meta here in the future if so we will make those generic functions
+			var amount = parseFloat(body.amount) * 0.00000001;
+			
+			//insert a session
+			db.run(
+				`INSERT INTO sessions(address,userid,net,amount,paymenttype) VALUES(?,?,?,?,?)`,
+				[body.payment_request, req.query.uid, process.env.LIGHTNETWORK,String(amount),2],
+				function(err) 
+				{
+					if (err) 
+					{
+					  //return error
+					  res.send(JSON.stringify({ error: err.message }));
+					  return;
+					}
+
+					//store the order product details 
+					db.run(
+						`INSERT INTO order_product(address,name,price,quantity) VALUES(?,?,?,?)`,
+						[body.payment_request,req.query.desc, String(amount),1],
+						function(err) 
+						{
+							if (err) 
+							{
+							  //return error
+							  res.send(JSON.stringify({ error: err.message }));
+							  return;
+							}
+							//store the order_payment_details 
+							db.run(
+								`INSERT INTO order_payment_details(address,providerid,paymentobject) VALUES(?,?,?)`,
+								[body.payment_request,2, JSON.stringify(body)],
+								function(err) 
+								{
+									if (err) 
+									{
+									  //return error
+									  res.send(JSON.stringify({ error: err.message }));
+									  return;
+									}
+									//return the required details to the front end
+									var obj = {id:body.id,amount:body.amount,payment_request:body.payment_request}
+									res.send(JSON.stringify({ payment: obj }));
+									//debug
+									//console.log(body.payment_request);
+								}
+							);
+						}
+					);
+				}
+			);
+		  	
 		});
 	}
 

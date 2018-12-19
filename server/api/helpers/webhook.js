@@ -16,7 +16,6 @@ const network = process.env.NETWORK;
 //console.log(network)
 
 
-
 var webhook = function ()
 {
 	this.test = function test() 
@@ -26,12 +25,23 @@ var webhook = function ()
 	}
 
 	//this function checks for a payment from strike 
-	this.checkStrikePayment = function checkStrikePayment(paymentRequest)
+	this.checkStrikePayment = function checkStrikePayment(req,res)
 	{
-		//todo : check database for completed payment
-		//not valid
-		res.send(JSON.stringify({ status: 0 }));
+		let sqldata = [req.query.address];
+    	let sql = `select * from sessions where address = ?`;
 
+	    //get a cold storage address
+	    db.get(sql, sqldata, (err, result) => {
+			if (err) {
+			return console.error(err.message);
+			}
+			//debug
+			//console.log(result.processed)
+			if (result.processed == 0)
+				res.send(JSON.stringify({ status: 0 }));
+			else
+				res.send(JSON.stringify({ status: 1 }));
+		 });
 	}
 
 	//note we could pass down the whole req here is we use more of it in the future
