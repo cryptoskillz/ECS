@@ -111,8 +111,6 @@ app.get("/webhook/checkpayment", (req, res) => {
 
 This function checks for strike payments to be processed
 
-
-
 */
 
 app.get("/webhook/checkstrikepayment", (req, res) => {
@@ -124,6 +122,26 @@ app.get("/webhook/checkstrikepayment", (req, res) => {
   //debug
   webhook.checkStrikePayment(req,res);
 });
+
+
+/*
+
+This function checks for call backs from strike to tell payment has been made
+
+*/
+
+app.get("/webhook/strikenotification", (req, res) => {
+  res = generic.setHeaders(res);
+  //load the back office helper
+  let webhookhelper = require('./api/helpers/webhook.js').webhook;
+  let webhook = new webhookhelper();
+
+  //debug
+  webhook.strikeNotification(req,res);
+});
+
+
+
 
 
 /*

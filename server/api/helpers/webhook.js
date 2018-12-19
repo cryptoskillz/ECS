@@ -24,6 +24,23 @@ var webhook = function ()
 		
 	}
 
+		//recieve a payment notificaiotn from strike
+	this.strikeNotification = function strikeNotification(req,res)
+	{
+		//todo: store the payment object     
+		if (req.query.address != '')
+		{
+		let data = [1,1, req.query.address];
+		  let sql = `UPDATE sessions SET processed = ?,swept=? WHERE address = ?`;
+		  db.run(sql, data, function(err) {
+		    if (err) {
+		      return console.error(err.message);
+		    }
+		    res.send(JSON.stringify({ "status": "ok" }));
+		  });
+		 }
+	}
+
 	//this function checks for a payment from strike 
 	this.checkStrikePayment = function checkStrikePayment(req,res)
 	{

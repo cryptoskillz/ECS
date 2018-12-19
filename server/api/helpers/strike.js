@@ -31,13 +31,7 @@ var strike = function ()
      
 	}
 
-	//recieve a payment notificaiotn from strike
-	this.notificaton = function notificaton(req,res)
-	{
-		//todo: store the payment in the databsae
-		res.send(JSON.stringify({ "status": "ok" }));
 
-	}
 
 	//create a charge
 	this.charge = function charge(req,res)
