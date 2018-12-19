@@ -50,7 +50,7 @@ var strike = function ()
 		  },
 		  json: true,
 		  auth: {
-		    user: process.env.STRIKE,
+		    user: process.env.STRIKEAPIKEY,
 		    pass: '',
 		  }
 		};
