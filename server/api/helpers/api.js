@@ -27,6 +27,8 @@ var api = function() {
    /*
   *
   * This function stores the user details 
+
+    note : Check why it is storing adddress in this table (not required)
   *
   */
   this.storeUserDetails = function storeUserDetails(req,res)
@@ -34,7 +36,7 @@ var api = function() {
     //console.log(req.query);
     let data = [req.query.address];
     //console.log(data)
-    let sql = `SELECT * FROM product where address = "`+req.query.address+`"`;
+    let sql = `SELECT * FROM order_product where address = "`+req.query.address+`"`;
     //debug
 
     db.get(sql, [], (err, result) => {
@@ -49,7 +51,7 @@ var api = function() {
           return console.error(err.message);
         }
         let data = [result.id];
-        let sql = `delete FROM product_meta WHERE productid = ?`;
+        let sql = `delete FROM order_product_meta WHERE productid = ?`;
         db.run(sql, data, function(err) {
             if (err) {
               return console.error(err.message);
@@ -70,7 +72,7 @@ var api = function() {
                         metaname = metaname.replace("sr-product-", "");
                         //insert into oder meta
                         db.run(
-                          `INSERT INTO product_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                          `INSERT INTO order_product_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
                           [
                             result.id,
                             metaname,
@@ -137,7 +139,7 @@ var api = function() {
     if (req.query.quantity == 0) {
       //delete the record
       let data = [req.query.address];
-      let sql = `delete FROM product WHERE address = ?`;
+      let sql = `delete FROM order_product WHERE address = ?`;
       db.run(sql, data, function(err) {
         if (err) {
           return console.error(err.message);
@@ -146,7 +148,7 @@ var api = function() {
     } else {
       //see if we have it already
       let sql =
-        `SELECT * FROM product where address = "` + req.query.address + `"`;
+        `SELECT * FROM order_product where address = "` + req.query.address + `"`;
       //debug
       //console.log(sql);
 
@@ -159,7 +161,7 @@ var api = function() {
           //insert it
           //delete the record
           db.run(
-            `INSERT INTO product(address,name,price,quantity) VALUES(?,?,?,?)`,
+            `INSERT INTO order_product(address,name,price,quantity) VALUES(?,?,?,?)`,
             [
               req.query.address,
               req.query.name,
@@ -175,7 +177,7 @@ var api = function() {
         } else {
           //update it
           let data = [req.query.quantity, req.query.address];
-          let sql = `UPDATE product SET quantity = ? WHERE address = ?`;
+          let sql = `UPDATE order_product SET quantity = ? WHERE address = ?`;
           db.run(sql, data, function(err) {
             if (err) {
               return console.error(err.message);

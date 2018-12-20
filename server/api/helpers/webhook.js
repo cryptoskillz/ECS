@@ -73,13 +73,15 @@ var webhook = function ()
 			//get the unspent transaxtions for the address we are intrested in.
 			client.listUnspent(1, 9999999, [address]).then(result => 
 			{
+				//debug
 				//console.log(result);
+				//console.log(result.length)
 				//note we only check the first one as should only use each address once but we can 
 				//easily update this to run through all the results to check for an active paymebt in
 				//the array
 
 				//check there is a result
-				if (result.length > process.env.CONFIRMATIONS)
+				if (result.length > 0)
 				{
 					//check the confirmations
 					if (result[0].confirmations >= process.env.CONFIRMATIONS) 
@@ -95,7 +97,7 @@ var webhook = function ()
 				}
 				else
 				{
-					res.send(JSON.stringify({ status: 1 }));	
+					res.send(JSON.stringify({ status: 0 }));	
 				}
 			});
 		});

@@ -6,7 +6,6 @@ const express = require("express");
 //include the version package
 require( 'pkginfo' )( module, 'version','name','description' );
 
-
 //load the generic functions
 var generichelper = require('./api/helpers/generic.js').Generic;
 var generic = new generichelper();
@@ -343,11 +342,11 @@ if (process.env.NETWORK == 2)
 if (process.env.NETWORK == 1)
   console.log('connected to BTC testnet')
 if (process.env.LIGHTNETWORK == 0)
-  console.log('not using lightning ')
+  console.log('not using Lightning ')
 if (process.env.LIGHTNETWORK == 1)
-  console.log('connected to lightning testnet')
+  console.log('connected to Lightning testnet')
 if (process.env.LIGHTNETWORK == 2)
-  console.log('connected to lightning mainnet')
+  console.log('connected to Lightning mainnet')
 //listen
 app.listen(port);
 

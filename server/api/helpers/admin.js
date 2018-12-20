@@ -130,7 +130,7 @@ var admin = function ()
 		//store the data for the query 
 		let data = [address];
 		//build the query
-		let sql = `select * from product WHERE product.address = ?`;
+		let sql = `select * from order_product WHERE product.address = ?`;
 		//debug
 		//console.log(sql)
 		//run the query
