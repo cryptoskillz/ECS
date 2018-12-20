@@ -23,7 +23,7 @@ var admin = function ()
 		//get username and password passed up
 		let data = [uname,pass];
 		//build sql
-		let sql = `select * from user WHERE username = ? and password = ?`;
+		let sql = `select * from ecs_user WHERE username = ? and password = ?`;
 
 		//run the sql
 		db.all(sql, data, (err, rows) => {
@@ -46,7 +46,7 @@ var admin = function ()
 				sessiontoken = u;
 		  		//update the table with the guid
 		  		let data = [sessiontoken, rows[0].id];
-		 		let sql = `UPDATE user SET sessiontoken = ? WHERE id = ? `;
+		 		let sql = `UPDATE ecs_user SET sessiontoken = ? WHERE id = ? `;
 				db.run(sql, data, function(err) {
 				    if (err) 
 				    {
@@ -79,9 +79,9 @@ var admin = function ()
 		let data = [token];
 		//build the query
 	  	let sql =`select sessions.id,sessions.address,sessions.processed,sessions.swept,sessions.net,sessions.amount
-	    		  from user
-	    		  INNER JOIN sessions ON user.id = sessions.userid
-		          WHERE user.sessiontoken = ?`;
+	    		  from ecs_user
+	    		  INNER JOIN sessions ON ecs_user.id = sessions.userid
+		          WHERE ecs_user.sessiontoken = ?`;
 		 //debug
 		 //console.log(sql)
 
@@ -130,7 +130,7 @@ var admin = function ()
 		//store the data for the query 
 		let data = [address];
 		//build the query
-		let sql = `select * from order_product WHERE product.address = ?`;
+		let sql = `select * from order_product WHERE order_product.address = ?`;
 		//debug
 		//console.log(sql)
 		//run the query
@@ -168,10 +168,10 @@ var admin = function ()
 		//store the data for the query 
 		let data = [token];
 		//build the sql query
-		let sql = `select coldstorageaddresses.address 
-				   from user
-				   INNER JOIN coldstorageaddresses ON user.id = coldstorageaddresses.userid
-		           WHERE user.sessiontoken = ?`;
+		let sql = `select ecs_coldstorageaddresses.address 
+				   from ecs_user
+				   INNER JOIN ecs_coldstorageaddresses ON ecs_user.id = ecs_coldstorageaddresses.userid
+		           WHERE ecs_user.sessiontoken = ?`;
 		 //debug
 		 //console.log(sql)
 
@@ -217,7 +217,7 @@ var admin = function ()
 		//store the data for the query 
 		let data = [address];
 		//build the sql query
-		let sql = `delete FROM coldstorageaddresses WHERE address = ?`;
+		let sql = `delete FROM ecs_coldstorageaddresses WHERE address = ?`;
 		//run the sql
 		db.run(sql, data, function(err) {
 			if (err) 
@@ -237,7 +237,7 @@ var admin = function ()
 		//store the data for the query 
 		let data = [token];
 		//build the sql query
-		let sql =  `select user.id from user WHERE user.sessiontoken = ?`;
+		let sql =  `select ecs_user.id from ecs_user WHERE ecs_user.sessiontoken = ?`;
 
 		//debug
 	  	//console.log(sql);
@@ -260,7 +260,7 @@ var admin = function ()
 			{
 				//insert it into the cold storage address
 				db.run(
-					`INSERT INTO coldstorageaddresses(address,userid) VALUES(?,?)`,
+					`INSERT INTO ecs_coldstorageaddresses(address,userid) VALUES(?,?)`,
 					[address,rows[0].id],
 					function(err) 
 					{

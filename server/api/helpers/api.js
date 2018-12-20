@@ -298,7 +298,7 @@ var api = function() {
   this.sweep = function sweep(address, res) {
 
     let sqldata = [0];
-    let sql = `select * from coldstorageaddresses where used = ?`;
+    let sql = `select * from ecs_coldstorageaddresses where used = ?`;
 
     //get a cold storage address
     db.get(sql, sqldata, (err, result) => {
@@ -428,9 +428,9 @@ var api = function() {
                                 //update the address in cold storage so it is not used again.
                                 //build sql
                                 let sqldata = ["1", coldstorageaddress];
-                                let sql = `UPDATE coldstorageaddresses
+                                let sql = `UPDATE ecs_coldstorageaddresses
 	                          SET used = ?
-	                          WHERE coldstorageaddress = ?`;
+	                          WHERE ecs_coldstorageaddress = ?`;
                             //console.log(coldstorageaddress)
                             //console.log(sql)
 
