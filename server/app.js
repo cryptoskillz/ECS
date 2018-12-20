@@ -339,9 +339,15 @@ console.log( module.exports.description+' is listenting :]');
 console.log( module.exports.name+": " + module.exports.version );
 console.log('listenting on port:'+port)
 if (process.env.NETWORK == 2)
-  console.log('connected to mainnet')
+  console.log('connected to BTC mainnet')
 if (process.env.NETWORK == 1)
-  console.log('connected to testnet')
+  console.log('connected to BTC testnet')
+if (process.env.LIGHTNETWORK == 0)
+  console.log('not using lightning ')
+if (process.env.LIGHTNETWORK == 1)
+  console.log('connected to lightning testnet')
+if (process.env.LIGHTNETWORK == 2)
+  console.log('connected to lightning mainnet')
 //listen
 app.listen(port);
 

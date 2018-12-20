@@ -24,7 +24,7 @@ var webhook = function ()
 		
 	}
 
-		//recieve a payment notificaiotn from strike
+	//recieve a payment notificaiotn from strike
 	this.strikeNotification = function strikeNotification(req,res)
 	{
 		//todo: store the payment object     
