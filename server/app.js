@@ -3,6 +3,7 @@ require('dotenv').config();
 
 //load express
 const express = require("express");
+const bodyParser = require('body-parser');
 //include the version package
 require( 'pkginfo' )( module, 'version','name','description' );
 
@@ -15,6 +16,7 @@ var generic = new generichelper();
 //init it
 const app = express();
 
+app.use(bodyParser.json());
 
 /*
 ==============================
@@ -89,6 +91,10 @@ a sucessful payment.
 
 */
 app.get("/webhook/checkpayment", (req, res) => {
+  //debug
+  //console.log(req.body.data.payment_request)
+  //res.send(JSON.stringify({ status: "ok" }));//return;
+
   //set the headers
   res = generic.setHeaders(res);
   //right now we only check the address is there we could also check token if we wanted to 
@@ -112,7 +118,7 @@ This function checks for strike payments to be processed
 
 */
 
-app.get("/webhook/checkstrikepayment", (req, res) => {
+app.post("/webhook/checkstrikepayment", (req, res) => {
   res = generic.setHeaders(res);
   //load the back office helper
   let webhookhelper = require('./api/helpers/webhook.js').webhook;
