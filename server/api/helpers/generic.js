@@ -63,7 +63,7 @@ var Generic = function ()
 		//set up the mail options object
 		let mailOptions = {};
 		let data = [id]; 
-		let sql = `select * FROM emailtemplates where id = ?`;
+		let sql = `select * FROM ecs_emailtemplates where id = ?`;
 		db.all(sql, data, (err, rows) => {
 			if (err) {
 			   console.error('sql error ' + err.message);

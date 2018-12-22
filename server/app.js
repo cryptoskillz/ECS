@@ -3,9 +3,9 @@ require('dotenv').config();
 
 //load express
 const express = require("express");
+const bodyParser = require('body-parser');
 //include the version package
 require( 'pkginfo' )( module, 'version','name','description' );
-
 
 //load the generic functions
 var generichelper = require('./api/helpers/generic.js').Generic;
@@ -15,6 +15,35 @@ var generic = new generichelper();
 
 //init it
 const app = express();
+
+app.use(bodyParser.json());
+
+/*
+==============================
+START OF STRIKE ROUTING
+=============================
+*/
+
+
+
+app.get("/strike/charge", (req, res) => {
+  res = generic.setHeaders(res);
+  //load the back office helper
+  let strikehelper = require('./api/helpers/strike.js').strike;
+  let strike = new strikehelper();
+
+  //debug
+  strike.charge(req,res);
+});
+
+
+
+/*
+==============================
+END OF END ROUTING
+=============================
+*/
+
 
 /*
 ==============================
@@ -62,6 +91,10 @@ a sucessful payment.
 
 */
 app.get("/webhook/checkpayment", (req, res) => {
+  //debug
+  //console.log(req.body.data.payment_request)
+  //res.send(JSON.stringify({ status: "ok" }));//return;
+
   //set the headers
   res = generic.setHeaders(res);
   //right now we only check the address is there we could also check token if we wanted to 
@@ -78,6 +111,43 @@ app.get("/webhook/checkpayment", (req, res) => {
   webhook.checkPayment(req.query.token,req.query.address,res);
 
 });
+
+/*
+
+This function checks for strike payments to be processed
+
+*/
+
+app.post("/webhook/checkstrikepayment", (req, res) => {
+  res = generic.setHeaders(res);
+  //load the back office helper
+  let webhookhelper = require('./api/helpers/webhook.js').webhook;
+  let webhook = new webhookhelper();
+
+  //debug
+  webhook.checkStrikePayment(req,res);
+});
+
+
+/*
+
+This function checks for call backs from strike to tell payment has been made
+
+*/
+
+app.get("/webhook/strikenotification", (req, res) => {
+  res = generic.setHeaders(res);
+  //load the back office helper
+  let webhookhelper = require('./api/helpers/webhook.js').webhook;
+  let webhook = new webhookhelper();
+
+  //debug
+  webhook.strikeNotification(req,res);
+});
+
+
+
+
 
 /*
 ========================
@@ -274,9 +344,15 @@ console.log( module.exports.description+' is listenting :]');
 console.log( module.exports.name+": " + module.exports.version );
 console.log('listenting on port:'+port)
 if (process.env.NETWORK == 2)
-  console.log('connected to mainnet')
+  console.log('connected to BTC mainnet')
 if (process.env.NETWORK == 1)
-  console.log('connected to testnet')
+  console.log('connected to BTC testnet')
+if (process.env.LIGHTNETWORK == 0)
+  console.log('not using Lightning ')
+if (process.env.LIGHTNETWORK == 1)
+  console.log('connected to Lightning testnet')
+if (process.env.LIGHTNETWORK == 2)
+  console.log('connected to Lightning mainnet')
 //listen
 app.listen(port);
 
