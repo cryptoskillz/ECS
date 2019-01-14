@@ -265,6 +265,27 @@ var SR = SR || (function()
 		fetchurl(url,'storeproduct')
 	}
 
+	//this function fetches a payment address.
+	function getAddress(type)
+	{
+		/* 
+		get the correct payment type
+		1 = bitocin
+		2 = lightning
+		*/
+		switch (type) 
+		{
+		    case 1:
+		    	var url = serverurl+"api/address?uid="+uid;
+				fetchurl(url,'getaddress');
+		        break;
+		    case 2: 
+		    	var url = serverurl+"api/address?uid="+uid;
+				fetchurl(url,'getaddress');
+		    	break;
+		}
+	}
+
 	//this function calls endpoints on the server
 	//note : This has to be extended to handle post, put etc it only uses GET at the moment.  
 	//		 Also it would be good to have proper called backs for the method if we add many more we will make it asynv
@@ -294,10 +315,8 @@ var SR = SR || (function()
 			    //set the href
 			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
 	    		//do pay from wallet alo
-
 	    		//debug
 			    //console.log(elbtcaddress)
-
 			    //generate the qr code
 			    var elbtcqr = document.getElementById('sr-bitcoinqrcode');
 				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
@@ -316,10 +335,8 @@ var SR = SR || (function()
 		    	//add the cart templatehtml
 				document.body.insertAdjacentHTML("beforeend", request.responseText);
 				//add the click elements listeners
-				clickElements()
-				//get an address
-				var url = serverurl+"api/address?uid="+uid;
-				fetchurl(url,'getaddress')
+				clickElements();
+				
 		    }
 		    if (method == "storeuserdetails")
 		    {
@@ -463,6 +480,8 @@ var SR = SR || (function()
 
 		    	//check if lighting is enabled
 		    	//note (chris) if we add more payment methods then we should make this generic.
+
+
 		    	if (lightning == 1)
 		    	{
 		    		//hide btc stuff
@@ -471,9 +490,12 @@ var SR = SR || (function()
 					hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 					//show the payment seleciton screen
 		    		showClass(document.getElementById('sr-paymentmethods'));
+		    		getAddress(2);
+
 		    	}
 		    	else
 		    	{
+
 		    		//check address
 			    	checkAddressState();
 			    	//hide btc stuff
@@ -485,9 +507,9 @@ var SR = SR || (function()
 					showClass(document.getElementById('sr-back-button'));
 			    	//hide btc stuff
 					hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+					//get a bitcoin address
+					getAddress(1);
 		    	}
-
-
 		        break;
 		    case 3:
 		    	//check address
