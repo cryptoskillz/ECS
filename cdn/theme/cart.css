@@ -616,6 +616,10 @@ Main Components
     letter-spacing: .1em
 }
 
+#sr-paymentmethods  {
+  text-align: center;
+}
+
 #sr-bitcoinaddresswrapper  {
   text-align: center;
 }

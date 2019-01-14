@@ -44,6 +44,8 @@ var SR = SR || (function()
 	var shippingaddress = 0;
 	//note: we could detect the IP to set this automitcally. 
 	var startcountry = "US"
+	//emable / disable lightning
+	var lightning = 0;
 
 	/*
 	*	List of countries
@@ -424,7 +426,7 @@ var SR = SR || (function()
 		/*
 			* = redundant and will be replaced / removed 
 
-			1 = show cart product details
+			1 = show cart product details (initial click on the cart)
 			2 = show customer details screen
 			3 = customer detals back*
 			4 = custmer details pay click
@@ -435,7 +437,9 @@ var SR = SR || (function()
 		//alert(state);
 		switch (state) {
 		    case 1:
+
 		    	stopPaymentCheck()
+		    	hideClass(document.getElementById('sr-paymentmethods'));
 		    	hideClass(document.getElementById('sr-paid'));
 		    	hideClass(document.getElementById('sr-billing'));
 		        hideClass(document.getElementById('sr-shipping'));
@@ -455,17 +459,35 @@ var SR = SR || (function()
 				showClass(document.getElementById('sr-cartlistitems'));
 		        break;
 		    case 2:
-		    	//check address
-		    	checkAddressState();
-		    	//hide btc stuff
-				hideClass(document.getElementById('sr-checkout'));
-				//hide the product details
-				hideClass(document.getElementById('sr-cartlistitems'));
-				//show the customer details
-				showClass(document.getElementById('sr-customerdetailswrapper'));
-				showClass(document.getElementById('sr-back-button'));
-		    	//hide btc stuff
-				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+		    	//check out button is pressed 
+
+		    	//check if lighting is enabled
+		    	//note (chris) if we add more payment methods then we should make this generic.
+		    	if (lightning == 1)
+		    	{
+		    		//hide btc stuff
+					hideClass(document.getElementById('sr-checkout'));
+					hideClass(document.getElementById('sr-cartlistitems'));
+					hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+					//show the payment seleciton screen
+		    		showClass(document.getElementById('sr-paymentmethods'));
+		    	}
+		    	else
+		    	{
+		    		//check address
+			    	checkAddressState();
+			    	//hide btc stuff
+					hideClass(document.getElementById('sr-checkout'));
+					//hide the product details
+					hideClass(document.getElementById('sr-cartlistitems'));
+					//show the customer details
+					showClass(document.getElementById('sr-customerdetailswrapper'));
+					showClass(document.getElementById('sr-back-button'));
+			    	//hide btc stuff
+					hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+		    	}
+
+
 		        break;
 		    case 3:
 		    	//check address
@@ -534,6 +556,22 @@ var SR = SR || (function()
 		*START OF ELEMENT CLICK FUNCTIONS
 		*================================
 		*/
+
+		//lightning payment button
+		document.getElementById('sr-lightningpaymentbutton').addEventListener('click', function () 
+		{
+			//reset cart
+			//cartstate(1);
+			alert('light chosen')
+		});
+
+		//bitocoin payment button
+		document.getElementById('sr-bitcoinpaymentbutton').addEventListener('click', function () 
+		{
+			//reset cart
+			//cartstate(1);
+			alert('bitcoin chosen')
+		});
 
 		//bitcoin back click
 		document.getElementById('sr-back-button').addEventListener('click', function () 
@@ -781,6 +819,7 @@ var SR = SR || (function()
 			6 = billing address 
 			7 = shipping address
 			8 = start country
+			9 = lightning
 
         	*/
 			_args = Args;
@@ -794,43 +833,49 @@ var SR = SR || (function()
 			//check if it is a boolean and if so then set it.
 			if (typeof(_args[1]) === "boolean")
 			{
-				animating = _args[1]
+				animating = _args[1];
 			}
 			//quantity
 			if (_args[2] != "")
 			{
-				quantity = _args[2]
+				quantity = _args[2];
 			}
 			//cdn url
 			if (_args[3] != "")
 			{
-				cdnurl = _args[3]
+				cdnurl = _args[3];
 			}	
 			//uid
 			if (_args[4] != "")
 			{
-				uid = _args[4]
+				uid = _args[4];
 			}
 			//theme
 			if (_args[5] != "")
 			{
-				theme = _args[5]
+				theme = _args[5];
 			}
 			//billing address
 			if (_args[6] != "")
 			{
-				billingaddress = _args[6]
+				billingaddress = _args[6];
 			}
 			//shipping address
 			if (_args[7] != "")
 			{
-				shippingaddress = _args[7]
+				shippingaddress = _args[7];
 			}
 			//start country
 			if (_args[8] != "")
 			{
-				startcountry = _args[8]
+				startcountry = _args[8];
 			}
+			//enable lightning
+			if (_args[9] != "")
+			{
+				lightning = _args[9];
+			}
+
 			//load css
         	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
 			//fetch the template so we can use themes 

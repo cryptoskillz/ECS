@@ -99,9 +99,9 @@
         <script src="vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
 
     <script src="js/front.js"></script>
-  <!-- local
-    <script type="text/javascript" src="../cdn/js/sr.js"></script> --> 
-     <script type="text/javascript" src="https://cryptoskillz.com/srcrypto/prod/cdn/js/sr.js"></script>
+  <!-- local-->
+    <script type="text/javascript" src="../cdn/js/sr.js"></script> 
+    <!--- <script type="text/javascript" src="https://cryptoskillz.com/srcrypto/prod/cdn/js/sr.js"></script>-->
    
 
     <script type="text/javascript">
@@ -115,16 +115,19 @@
           6 = billing address 
           7 = shipping address
           8 = start country
+          9 = lighting enabled
        */
 
        //all production (testnet) 
        // SR.init(["https://ecs.cryptoskillz.com/", false,15,"https://cryptoskillz.com/srcrypto/prod/cdn/","3","",1,1,"GB"]);
        //all local
-       SR.init(["http://127.0.0.1:3030/", false,15,"http://127.0.0.1:8080/cdn/","3","",1,1,"GB"]);
+       SR.init(["http://127.0.0.1:3030/", false,15,"http://127.0.0.1:8082/cdn/","3","",1,1,"GB",1]);
 
        // local dev production cdn 
        //SR.init(["http://127.0.0.1:3000/", false,15,"https://cryptoskillz.com/srcrypto/prod/","3","",1,1,"GB"]);
-
+       //live
+       //SR.init(["https://ecslive.cryptoskillz.com/", false,15,"https://cryptoskillz.com/srcrypto/prod/cdn/","3","",1,1,"GB"]);
+       
 
     </script>
 
