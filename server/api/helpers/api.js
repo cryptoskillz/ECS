@@ -32,6 +32,8 @@ var api = function() {
     const uuidv1 = require('uuid/v1');
     //note we could check the database to make sure we have not already used this id
     res.send(JSON.stringify({ sessionid: uuidv1() }));
+    //note here we could generate a BTC / LIGHT address and cache it on the server removing the potential delays
+    //     then it could be called JIT when it is required, this would work if we decide to extened out to many API's
   }
 
    /*
