@@ -17,12 +17,22 @@ let db = new sqlite3.Database("./db/db.db", err => {
   }
 });
 
+
+
 //load the generic functions
 //note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that. 
 var generichelper = require('./generic.js').Generic;
 var generic = new generichelper();
 
 var api = function() {
+
+  this.userSession = function userSession(req,res)
+  {
+
+    const uuidv1 = require('uuid/v1');
+    //note we could check the database to make sure we have not already used this id
+    res.send(JSON.stringify({ sessionid: uuidv1() }));
+  }
 
    /*
   *

@@ -12,6 +12,9 @@ var SR = SR || (function()
 	*=========================
 	*/
 
+	//hold a unique session id
+	//note we could store this as a cookie to make things persistent.
+	var sessionid = '';
 	//hold the checkpayment interval function
 	var checkpaymentres = ''
 	//holdthe number of product
@@ -304,6 +307,14 @@ var SR = SR || (function()
 		//call it
 		request.onload = function() {
 		  if (request.status >= 200 && request.status < 400) {
+
+		  	if (method == "getsession")
+		  	{
+		  		// parse the data
+			    var data = JSON.parse(request.responseText);
+		  		sessionid = data.sessionid;
+		  	}
+
 		    if (method == "getaddress")
 		    {
 
@@ -339,12 +350,11 @@ var SR = SR || (function()
 				clickElements();
 				//get an addres if it is just BTC enabled
 				//note : change this to call a generic init function which will return a session ID which we use 
-				//       for binding in the database. 
+				//       for binding in the database.
 
-				if (lightning == 0)
-				{
-					getAddress(1);
-				}		
+				var url = serverurl+"api/session"
+				fetchurl(url,'getsession')		
+	
 		    }
 		    if (method == "storeuserdetails")
 		    {

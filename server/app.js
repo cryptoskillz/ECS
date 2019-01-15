@@ -269,6 +269,21 @@ START OF API FUNCTIONS
 ========================
 */
 
+/*
+
+generate a user session 
+
+*/
+
+app.get("/api/session", (req,res) => {
+  //set the headers
+  res = generic.setHeaders(res);
+  let apihelper = require('./api/helpers/api.js').api;
+  let api = new apihelper(); 
+  //call the login function
+  api.userSession(req,res);
+});
+
 //pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer. called from admin
 app.get("/api/monitor", (req, res) => {
   //set the headers

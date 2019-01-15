@@ -1,6 +1,6 @@
 {
   "name": "ces",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "cryptokskillz ecommerce server",
   "keywords": [],
   "author": "cryptokskillz",
@@ -21,6 +21,7 @@
     "nodemailer": "^4.6.8",
     "npm": "^6.4.1",
     "pkginfo": "^0.4.1",
-    "sqlite3": "^4.0.2"
+    "sqlite3": "^4.0.2",
+    "uuid": "^3.3.2"
   }
 }
