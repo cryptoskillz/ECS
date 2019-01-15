@@ -61,55 +61,8 @@ var api = function() {
 
   function generateLightAddress(sessionid = '')
   {
-    //hmm we require an amount before we can do this so we cannot cache one ahead of time. 
-    //build the options object
-    var options = {
-      method: 'POST',
-      url: process.env.STRIKEENDPOINT + '/api/v1/charges',
-      headers: {
-        'cache-control': 'no-cache',
-        'Content-Type': 'application/json' },
-      body: {
-        amount: parseFloat(100),
-        description: 'ddd',
-        currency: '$'
-      },
-      json: true,
-      auth: {
-        user: process.env.STRIKEAPIKEY,
-        pass: '',
-      }
-    };
-
-    //call strike
-    request(options, function (error, response, body) {
-      if (error) throw new Error(error);
-        //debug
-        console.log(body)
-
-        //turn it into a BTC amount
-        //note : in a future update we may go ahead and store everything Satoshis. 
-        //     we could also use req.query.amount here
-        //     we may want to store order_meta and product_meta here in the future if so we will make those generic functions
-        var amount = parseFloat(body.amount) * 0.00000001;
-        if (sessionid != '')
-        {
-          //update the session table
-          let data = [body.payment_request, sessionid];
-          let sql = `UPDATE sessions SET lightaddress = ? WHERE sessionid = ?`;
-          db.run(sql, data, function(err) {
-            if (err) {
-              return console.error(err.message);
-            }
-          });
-        }
-      
-
-        
-    });
-  }
-   
-
+    //to implement.
+    //as lighting requests require a payment amount we can do them ahead of time. 
   }
 
 
@@ -162,7 +115,8 @@ var api = function() {
             //note here we could generate a BTC / LIGHT address and cache it on the server removing the potential delays
             //then it could be called JIT when it is required, this would work if we decide to extened out to many API's
             generateBTCAddress(sessionid);
-            generateLightAddress(sessionid);
+            //note whislt we are using strike there is no reason to use, we will implement when we have LND or c-lightning support
+            //generateLightAddress(sessionid);
           }
         );
       }
@@ -176,7 +130,7 @@ var api = function() {
     });
   }
 
-   /*
+  /*
   *
   * This function stores the user details 
 
