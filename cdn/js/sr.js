@@ -352,7 +352,7 @@ var SR = SR || (function()
 				//note : change this to call a generic init function which will return a session ID which we use 
 				//       for binding in the database.
 
-				var url = serverurl+"api/session"
+				var url = serverurl+"api/session?uid="+uid;
 				fetchurl(url,'getsession')		
 	
 		    }
