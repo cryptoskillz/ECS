@@ -5,6 +5,10 @@
   Finish Mock API calls
   Finish email temaplates.  Note complitaing removing these complelty out of the database.
 
+  update generateaddress function to use the getBTCaddress an GetLigtAddres functions instead of genrating on its own
+  this function now is now designed to override the one we get at default so I actually may repalce it and use it 
+  to only return the cached address we geneated at the start for simplicty. This would have the downside of it not 
+  working outside of SR.js of course. 
 
 */
 const config = require('./config');
@@ -25,6 +29,53 @@ var generichelper = require('./generic.js').Generic;
 var generic = new generichelper();
 
 var api = function() {
+
+  function getBTCAddress(sessionid = '')
+  {
+
+    //unlock the wallet
+    //debug
+    //console.log(process.env.walletpassphrase)
+    client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
+      //create a new address in theaccount account :]
+      client.getNewAddress(process.env.WALLETACCOUNT).then(address => {
+          //debug
+          //console.log(address);
+          //console.log(sessionid);
+
+          if (sessionid != '')
+          {
+            //update the session table
+            let data = [address, sessionid];
+            let sql = `UPDATE sessions SET btcaddress = ? WHERE sessionid = ?`;
+            db.run(sql, data, function(err) {
+              if (err) {
+                return console.error(err.message);
+              }
+            });
+          }
+        
+        });
+      });
+  }
+
+  function getLightAddress(sessionid = '')
+  {
+    let address = '12345';
+    if (sessionid != '')
+    {
+      //update the session table
+      let data = [address, sessionid];
+      let sql = `UPDATE sessions SET lightaddress = ? WHERE sessionid = ?`;
+      db.run(sql, data, function(err) {
+        if (err) {
+          return console.error(err.message);
+        }
+      });
+    }
+
+  }
+
 
   /*
 
@@ -58,10 +109,12 @@ var api = function() {
       //note : we could do this better by checking the array length. 
       if (result == undefined )
       {
+        //get the timestamp
+        var ts = Math.round((new Date()).getTime() / 1000);
         //store in the sessions database
         db.run(
-          `INSERT INTO sessions(sessionid,userid,net) VALUES(?,?,?)`,
-          [sessionid, req.query.uid, process.env.NETWORK],
+          `INSERT INTO sessions(sessionid,userid,net,sessiontime) VALUES(?,?,?,?)`,
+          [sessionid, req.query.uid, process.env.NETWORK,ts],
           function(err) {
             if (err) {
               //there was an error
@@ -70,21 +123,21 @@ var api = function() {
             }
             //out the session id
             res.send(JSON.stringify({ sessionid: sessionid }));
+            //note here we could generate a BTC / LIGHT address and cache it on the server removing the potential delays
+            //then it could be called JIT when it is required, this would work if we decide to extened out to many API's
+            getBTCAddress(sessionid);
+            getLightAddress(sessionid);
           }
         );
       }
       else
       {
-        //we go again. as the session id was in the database
+        //we go again as the session id was in the database
         this.userSession(req,res);
       }
      
 
     });
-
-
-    //note here we could generate a BTC / LIGHT address and cache it on the server removing the potential delays
-    //     then it could be called JIT when it is required, this would work if we decide to extened out to many API's
   }
 
    /*

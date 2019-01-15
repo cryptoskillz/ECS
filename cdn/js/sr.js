@@ -1,7 +1,6 @@
 /*
 
-	TODO : add a session as we can no longer bind to the BTC address it can be lighing and or BTC.  This will allow 
-	to invoke an address when we require it only
+replace the getaddress function with a functuin that checks fro an address and if its not found only then returns it
 
 */
 var SR = SR || (function()
