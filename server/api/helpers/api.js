@@ -33,12 +33,56 @@ var api = function() {
   */
   this.userSession = function userSession(req,res)
   {
-    const uuidv1 = require('uuid/v1');
+    //laods the UID 
+    let uuidv1 = require('uuid/v1');
     //get a session id
     let sessionid  = uuidv1();
-    //todo : we could check the database to make sure we have not already used this id
-    //todo : Store in session table
-    res.send(JSON.stringify({ sessionid: uuidv1() }));
+    //debug
+    //let sessionid  = "44b2f5c0-189a-11e9-91a4-a59245cc45cb";
+    //build the SQL 
+    let sqldata = [sessionid ];
+    let sql = `select * from sessions where sessionid = ?`;
+
+    //run it and see if it is in the database
+    db.get(sql, sqldata, (err, result) => {
+      if (err) 
+      {
+        //there was an error
+        res.send(JSON.stringify({ error: err.message }));
+        return;
+      }
+      //debug
+      //console.log(result);
+
+      //check that it is not in the database
+      //note : we could do this better by checking the array length. 
+      if (result == undefined )
+      {
+        //store in the sessions database
+        db.run(
+          `INSERT INTO sessions(sessionid,userid,net) VALUES(?,?,?)`,
+          [sessionid, req.query.uid, process.env.NETWORK],
+          function(err) {
+            if (err) {
+              //there was an error
+              res.send(JSON.stringify({ error: err.message }));
+              return;
+            }
+            //out the session id
+            res.send(JSON.stringify({ sessionid: sessionid }));
+          }
+        );
+      }
+      else
+      {
+        //we go again. as the session id was in the database
+        this.userSession(req,res);
+      }
+     
+
+    });
+
+
     //note here we could generate a BTC / LIGHT address and cache it on the server removing the potential delays
     //     then it could be called JIT when it is required, this would work if we decide to extened out to many API's
   }

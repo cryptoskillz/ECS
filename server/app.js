@@ -368,6 +368,9 @@ if (process.env.LIGHTNETWORK == 1)
   console.log('connected to Lightning testnet')
 if (process.env.LIGHTNETWORK == 2)
   console.log('connected to Lightning mainnet')
+if (process.env.STRIKEENDPOINT != '')
+    console.log('Using Strike for Lightning ')
+
 //listen
 app.listen(port);
 
