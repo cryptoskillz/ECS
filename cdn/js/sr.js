@@ -270,7 +270,7 @@ var SR = SR || (function()
 		//update counter
 	  	changeClassText(document.querySelector('.sr-count'),itemcount);	
 	  	//store product
-		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+btcaddress+"&price="+price;
+		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&sessionid="+sessionid+"&price="+price;
 		//call the store produt endpoint
 		fetchurl(url,'storeproduct')
 	}

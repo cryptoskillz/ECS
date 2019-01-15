@@ -30,8 +30,13 @@ var generic = new generichelper();
 
 var api = function() {
 
-  function generateBTCAddress(sessionid = '')
+  //note : could move this to generic functions
+  function generateBTCAddress(sessionid,res='')
   {
+    //call the mock test
+    var mockres = generic.mock(1,res);
+    if (mockres == true)
+      return;
 
     //unlock the wallet
     //debug
@@ -43,18 +48,20 @@ var api = function() {
           //console.log(address);
           //console.log(sessionid);
 
-          if (sessionid != '')
+          //update the session table
+          let data = [address, sessionid];
+          let sql = `UPDATE sessions SET btcaddress = ? WHERE sessionid = ?`;
+          db.run(sql, data, function(err) 
           {
-            //update the session table
-            let data = [address, sessionid];
-            let sql = `UPDATE sessions SET btcaddress = ? WHERE sessionid = ?`;
-            db.run(sql, data, function(err) {
-              if (err) {
-                return console.error(err.message);
-              }
-            });
-          }
-        
+            if (err) 
+            {
+              return console.error(err.message);
+            }
+
+            if (res != '')
+              res.send(JSON.stringify({ address: address }));
+
+          });
         });
       });
   }
@@ -245,7 +252,7 @@ var api = function() {
     if (req.query.quantity == 0) {
       //delete the record
       let data = [req.query.address];
-      let sql = `delete FROM order_product WHERE address = ?`;
+      let sql = `delete FROM order_product WHERE sessionid = ?`;
       db.run(sql, data, function(err) {
         if (err) {
           return console.error(err.message);
@@ -254,7 +261,7 @@ var api = function() {
     } else {
       //see if we have it already
       let sql =
-        `SELECT * FROM order_product where address = "` + req.query.address + `"`;
+        `SELECT * FROM order_product where sessionid = "` + req.query.sessionid + `"`;
       //debug
       //console.log(sql);
 
@@ -283,7 +290,7 @@ var api = function() {
         } else {
           //update it
           let data = [req.query.quantity, req.query.address];
-          let sql = `UPDATE order_product SET quantity = ? WHERE address = ?`;
+          let sql = `UPDATE order_product SET quantity = ? WHERE sessionid = ?`;
           db.run(sql, data, function(err) {
             if (err) {
               return console.error(err.message);
@@ -309,46 +316,10 @@ var api = function() {
   *  Note: Is this now required or should we chnage it to use generate BTC function?
   *
   */
-  this.generateAddress = function generateAddress(uid,res)
+  this.generateAddress = function generateAddress(sessionid,res)
   {
-    //call the mock test
-    var mockres = generic.mock(1,res);
-    if (mockres == true)
-      return;
-
-    //unlock the wallet
-    //debug
-    //console.log(process.env.walletpassphrase)
-    client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
-      //create a new address in theaccount account :]
-      client.getNewAddress(process.env.WALLETACCOUNT).then(address => {
-        //debug
-        //console.log(address);
-
-        //insert it into the database
-        db.run(
-          `INSERT INTO sessions(address,userid,net) VALUES(?,?,?)`,
-          [address, uid, process.env.NETWORK],
-          function(err) {
-            if (err) {
-              //debug
-              //return console.log(err.message);
-
-              //return error
-              res.send(JSON.stringify({ error: err.message }));
-              return;
-            }
-
-            //return the address
-            res.send(JSON.stringify({ address: address }));
-            //client.walletLock();
-          }
-        );
-        //client.walletLock();
-        return;
-        });
-      });
-    }
+    generateBTCAddress(sessionid,res);
+  }
 
 
   /*
