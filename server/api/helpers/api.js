@@ -30,7 +30,7 @@ var generic = new generichelper();
 
 var api = function() {
 
-  function getBTCAddress(sessionid = '')
+  function generateBTCAddress(sessionid = '')
   {
 
     //unlock the wallet
@@ -59,7 +59,7 @@ var api = function() {
       });
   }
 
-  function getLightAddress(sessionid = '')
+  function generateLightAddress(sessionid = '')
   {
     let address = '12345';
     if (sessionid != '')
@@ -125,8 +125,8 @@ var api = function() {
             res.send(JSON.stringify({ sessionid: sessionid }));
             //note here we could generate a BTC / LIGHT address and cache it on the server removing the potential delays
             //then it could be called JIT when it is required, this would work if we decide to extened out to many API's
-            getBTCAddress(sessionid);
-            getLightAddress(sessionid);
+            generateBTCAddress(sessionid);
+            generateLightAddress(sessionid);
           }
         );
       }
@@ -315,6 +315,8 @@ var api = function() {
   *
   *. Note if Bitcoin core is slow in returning an addresss this could have an adverse impact on the functionality
   *.      to aboid this we could cache a number of addresses ready to use in the database. 
+  *
+  *  Note: Is this now required or should we chnage it to use generate BTC function?
   *
   */
   this.generateAddress = function generateAddress(uid,res)
