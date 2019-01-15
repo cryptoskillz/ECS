@@ -26,11 +26,18 @@ var generic = new generichelper();
 
 var api = function() {
 
+  /*
+
+    This function generate session for sr.js to use to intreact with the server.
+
+  */
   this.userSession = function userSession(req,res)
   {
-
     const uuidv1 = require('uuid/v1');
-    //note we could check the database to make sure we have not already used this id
+    //get a session id
+    let sessionid  = uuidv1();
+    //todo : we could check the database to make sure we have not already used this id
+    //todo : Store in session table
     res.send(JSON.stringify({ sessionid: uuidv1() }));
     //note here we could generate a BTC / LIGHT address and cache it on the server removing the potential delays
     //     then it could be called JIT when it is required, this would work if we decide to extened out to many API's
