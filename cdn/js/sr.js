@@ -1,3 +1,9 @@
+/*
+
+	TODO : add a session as we can no longer bind to the BTC address it can be lighing and or BTC.  This will allow 
+	to invoke an address when we require it only
+
+*/
 var SR = SR || (function()
 {
 	/*
@@ -15,7 +21,9 @@ var SR = SR || (function()
 	//hold the name of the product
 	var name = '';
 	//hold the addres of the product
-	var address = '';
+	var btcaddress = '';
+	//hold the lighing object;
+	var lighingobject = '';
 	//hold the preview image
 	var preview = '';
 
@@ -77,7 +85,7 @@ var SR = SR || (function()
 		//debug
 		//console.log('check payment ticker')
 		//var url = serverurl+"/webhook/checkpayment?address="+address+"&token="+token;
-		var url = serverurl+"webhook/checkpayment?address="+address;
+		var url = serverurl+"webhook/checkpayment?address="+btcaddress;
 		fetchurl(url,'checkpayment')
 
 	}
@@ -260,7 +268,7 @@ var SR = SR || (function()
 		//update counter
 	  	changeClassText(document.querySelector('.sr-count'),itemcount);	
 	  	//store product
-		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
+		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+btcaddress+"&price="+price;
 		//call the store produt endpoint
 		fetchurl(url,'storeproduct')
 	}
@@ -280,8 +288,8 @@ var SR = SR || (function()
 				fetchurl(url,'getaddress');
 		        break;
 		    case 2: 
-		    	var url = serverurl+"api/address?uid="+uid;
-				fetchurl(url,'getaddress');
+		    	var url = serverurl+"strike/charge?uid=3&currency=btc&amount=2000&desc=free btc"
+				fetchurl(url,'getaddressslight');
 		    	break;
 		}
 	}
@@ -298,30 +306,23 @@ var SR = SR || (function()
 		  if (request.status >= 200 && request.status < 400) {
 		    if (method == "getaddress")
 		    {
+
 		    	// parse the data
 			    var data = JSON.parse(request.responseText);
 			    //debug
-			    //console.log(data)
-			    //set the address
-			    address = data.address;
-			    //set the address in the checkout
-			    var elbtcaddress = document.getElementById('sr-bitcoinaddress');
-			    //set the href
-			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
-			    //set the address
-	    		elbtcaddress.innerText =address;
-	    		//do pay from wallet also
-	    		var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
-			    //set the href
-			    elbtcaddress.setAttribute('href', "bitcoin:"+address);
-	    		//do pay from wallet alo
-	    		//debug
-			    //console.log(elbtcaddress)
-			    //generate the qr code
-			    var elbtcqr = document.getElementById('sr-bitcoinqrcode');
-				elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
-		    	//debug
-			    //console.log(elbtcqr)
+		    	//console.log(data)
+		    	//set the address
+		   		btcaddress = data.address;
+			    showPayment(1);
+			    
+		    }
+		    if (method == "getaddressslight")
+		    {
+		    	//todo
+		    	// parse the data
+			    var data = JSON.parse(request.responseText);
+			    //debug
+			    console.log(data)
 		    }
 		    if (method == "storeproduct")
 		    {
@@ -336,7 +337,14 @@ var SR = SR || (function()
 				document.body.insertAdjacentHTML("beforeend", request.responseText);
 				//add the click elements listeners
 				clickElements();
-				
+				//get an addres if it is just BTC enabled
+				//note : change this to call a generic init function which will return a session ID which we use 
+				//       for binding in the database. 
+
+				if (lightning == 0)
+				{
+					getAddress(1);
+				}		
 		    }
 		    if (method == "storeuserdetails")
 		    {
@@ -367,6 +375,52 @@ var SR = SR || (function()
 			  // There was a connection error of some sort
 		};
 		request.send();
+	}
+
+	function showPayment(type)
+	{
+		/*
+		types 
+		1 = btc
+		2 = lightning
+		*/
+		if (type == 1)
+		{
+		    //set the address in the checkout
+		    var elbtcaddress = document.getElementById('sr-bitcoinaddress');
+		    //set the href
+		    elbtcaddress.setAttribute('href', "bitcoin:"+btcaddress);
+		    //set the address
+    		elbtcaddress.innerText =btcaddress;
+    		//do pay from wallet also
+    		var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
+		    //set the href
+		    elbtcaddress.setAttribute('href', "bitcoin:"+btcaddress);
+    		//debug
+		    //console.log(elbtcaddress)
+		    //generate the qr code
+		    var elbtcqr = document.getElementById('sr-bitcoinqrcode');
+			elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+btcaddress);
+	    	//debug
+		    //console.log(elbtcqr)
+
+		    //show it
+		    //note this can now move to the resolution of this.
+    		//check address
+	    	checkAddressState();
+	    	//hide the payment methods
+			hideClass(document.getElementById('sr-paymentmethods'));
+	    	//hide btc stuff
+			hideClass(document.getElementById('sr-checkout'));
+			//hide the product details
+			hideClass(document.getElementById('sr-cartlistitems'));
+			//show the customer details
+			showClass(document.getElementById('sr-customerdetailswrapper'));
+			showClass(document.getElementById('sr-back-button'));
+	    	//hide btc stuff
+			hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+		}
+
 	}
 
 	//this function sets the correct addres state. billing / shipping etc
@@ -480,35 +534,30 @@ var SR = SR || (function()
 
 		    	//check if lighting is enabled
 		    	//note (chris) if we add more payment methods then we should make this generic.
+		    	//note (chris) if it is to slow getting the address at this point then we can move it to the 
+		    	//			   start of the flow
 
 
 		    	if (lightning == 1)
 		    	{
+		    		//note (chris) we could fetch a light address and a btc adress here or wait until they select.
+		    		//getAddress(2);
 		    		//hide btc stuff
 					hideClass(document.getElementById('sr-checkout'));
 					hideClass(document.getElementById('sr-cartlistitems'));
 					hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 					//show the payment seleciton screen
 		    		showClass(document.getElementById('sr-paymentmethods'));
-		    		getAddress(2);
+
 
 		    	}
 		    	else
 		    	{
-
-		    		//check address
-			    	checkAddressState();
-			    	//hide btc stuff
-					hideClass(document.getElementById('sr-checkout'));
-					//hide the product details
-					hideClass(document.getElementById('sr-cartlistitems'));
-					//show the customer details
-					showClass(document.getElementById('sr-customerdetailswrapper'));
-					showClass(document.getElementById('sr-back-button'));
-			    	//hide btc stuff
-					hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
-					//get a bitcoin address
-					getAddress(1);
+		    		//fetch a BTC address as there is only one payment method so it is fine to do it here
+		    		//getAddress(1);
+		    		//show the payment screen
+		    		showPayment(1);
+		    	
 		    	}
 		        break;
 		    case 3:
@@ -579,21 +628,8 @@ var SR = SR || (function()
 		*================================
 		*/
 
-		//lightning payment button
-		document.getElementById('sr-lightningpaymentbutton').addEventListener('click', function () 
-		{
-			//reset cart
-			//cartstate(1);
-			alert('light chosen')
-		});
 
-		//bitocoin payment button
-		document.getElementById('sr-bitcoinpaymentbutton').addEventListener('click', function () 
-		{
-			//reset cart
-			//cartstate(1);
-			alert('bitcoin chosen')
-		});
+		
 
 		//bitcoin back click
 		document.getElementById('sr-back-button').addEventListener('click', function () 
@@ -648,7 +684,7 @@ var SR = SR || (function()
 			    }
 			}
 
-			var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+address;
+			var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+btcaddress;
 			//console.log(url)
 			//call the store produt endpoint
 			fetchurl(url,'storeuserdetails')		
@@ -927,6 +963,10 @@ var SR = SR || (function()
 			carttotal();
 			//close it
 	  		removeClass(document.querySelector('.sr-cart-container'),'cart-open');
+		},
+		bitcoinpayment : function ()
+		{
+			getAddress(1);
 		}
    };
 }());
