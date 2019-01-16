@@ -141,7 +141,9 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
-    console.log(req.query);
+    //debug
+    //console.log(req.query);
+    
     let data = [req.query.sessionid];
     //console.log(data)
     let sql = `SELECT * FROM order_product where sessionid = ?`;

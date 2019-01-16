@@ -565,6 +565,7 @@ var SR = SR || (function()
 		    		//fetch a BTC address as there is only one payment method so it is fine to do it here
 		    		//getAddress(1);
 		    		//show the payment screen
+		    		getAddress(1);
 		    		showPayment(1);
 		    	
 		    	}
