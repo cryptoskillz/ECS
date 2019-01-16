@@ -5,11 +5,6 @@
   Finish Mock API calls
   Finish email temaplates.  Note complitaing removing these complelty out of the database.
 
-  update generateaddress function to use the getBTCaddress an GetLigtAddres functions instead of genrating on its own
-  this function now is now designed to override the one we get at default so I actually may repalce it and use it 
-  to only return the cached address we geneated at the start for simplicty. This would have the downside of it not 
-  working outside of SR.js of course. 
-
 */
 const config = require('./config');
 //open a database connection
@@ -308,17 +303,50 @@ var api = function() {
   }
   /*
   *
-  *  This function generate a new address
+  *   This function get the address from the database
+  * 
+  *   Note: this could handle light and BTC address in the future
   *
-  *. Note if Bitcoin core is slow in returning an addresss this could have an adverse impact on the functionality
-  *.      to aboid this we could cache a number of addresses ready to use in the database. 
-  *
-  *  Note: Is this now required or should we chnage it to use generate BTC function?
   *
   */
-  this.generateAddress = function generateAddress(sessionid,res)
+  this.getBTCAddress = function getBTCAddress(sessionid,res)
   {
-    generateBTCAddress(sessionid,res);
+    let sqldata = [sessionid ];
+    let sql = `select btcaddress from sessions where sessionid = ?`;
+
+    //run it and see if it is in the database
+    db.get(sql, sqldata, (err, result) => {
+      if (err) 
+      {
+        //there was an error
+        res.send(JSON.stringify({ error: err.message }));
+        return;
+      }
+      //debug
+      //console.log(result);
+
+      //check that it is not in the database
+      //note : we could do this better by checking the array length. 
+      if (result != undefined )
+      {
+        //check if a btc address is set
+        if (result.btcaddress == '')
+        {
+          //generate 1
+          generateBTCAddress(sessionid,res);
+        }
+        else
+        {
+          //return it
+          res.send(JSON.stringify({ address: result.btcaddress }));   
+        }
+      }
+      else
+      {
+        //generate an address
+        generateBTCAddress(sessionid,res);
+      }
+    });
   }
 
 

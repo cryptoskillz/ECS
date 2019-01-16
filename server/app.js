@@ -318,7 +318,7 @@ app.get("/api/address", (req, res) => {
   let apihelper = require('./api/helpers/api.js').api;
   let api = new apihelper(); 
   //call the login function
-  api.generateAddress(req.query.uid,res);
+  api.getBTCAddress(req.query.sessionid,res);
 });
 
 //store user details called rom sr.js
