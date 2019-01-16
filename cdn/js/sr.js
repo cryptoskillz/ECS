@@ -286,7 +286,7 @@ var SR = SR || (function()
 		switch (type) 
 		{
 		    case 1:
-		    	var url = serverurl+"api/address?uid="+uid;
+		    	var url = serverurl+"api/address?uid="+uid+'sessionid='+sessionid;
 				fetchurl(url,'getaddress');
 		        break;
 		    case 2: 
@@ -693,7 +693,7 @@ var SR = SR || (function()
 			    }
 			}
 
-			var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+btcaddress;
+			var url = serverurl+"api/storeuserdetails"+cartstring+"&sessionid="+sessionid;
 			//console.log(url)
 			//call the store produt endpoint
 			fetchurl(url,'storeuserdetails')		

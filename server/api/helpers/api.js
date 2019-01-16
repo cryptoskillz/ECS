@@ -141,13 +141,13 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
-    //console.log(req.query);
-    let data = [req.query.address];
+    console.log(req.query);
+    let data = [req.query.sessionid];
     //console.log(data)
-    let sql = `SELECT * FROM order_product where address = "`+req.query.address+`"`;
+    let sql = `SELECT * FROM order_product where sessionid = ?`;
     //debug
 
-    db.get(sql, [], (err, result) => {
+    db.get(sql, data, (err, result) => {
       //console.log(result)
       if (err) {
         console.log(err)
@@ -175,7 +175,7 @@ var api = function() {
                     {
                       //console.log('prod:'+req.query[metaname])
                       //inser into proiduct meta
-                      if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
+                      if ((req.query[metaname] != '') && (req.query[metaname] != "undefined") && (req.query[metaname] != "sessionid"))
                       {
                         metaname = metaname.replace("sr-product-", "");
                         //insert into oder meta
@@ -269,9 +269,9 @@ var api = function() {
           //insert it
           //delete the record
           db.run(
-            `INSERT INTO order_product(address,name,price,quantity) VALUES(?,?,?,?)`,
+            `INSERT INTO order_product(sessionid,name,price,quantity) VALUES(?,?,?,?)`,
             [
-              req.query.address,
+              req.query.sessionid,
               req.query.name,
               req.query.price,
               req.query.quantity
@@ -284,7 +284,7 @@ var api = function() {
           );
         } else {
           //update it
-          let data = [req.query.quantity, req.query.address];
+          let data = [req.query.quantity, req.query.sessionid];
           let sql = `UPDATE order_product SET quantity = ? WHERE sessionid = ?`;
           db.run(sql, data, function(err) {
             if (err) {
