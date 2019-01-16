@@ -1,9 +1,12 @@
 /*
   todo: *more details in the section where this todo is required
+  
   Cache pay to adddress so it will work with no Bitcoin Core
   Check that bticoin is running and not frozen before calling it
   Finish Mock API calls
   Finish email temaplates.  Note complitaing removing these complelty out of the database.
+  Move this. monitor logic into a generic funciton so webhook can benefit from it
+
 
 */
 const config = require('./config');
@@ -143,7 +146,7 @@ var api = function() {
   {
     //debug
     //console.log(req.query);
-    
+
     let data = [req.query.sessionid];
     //console.log(data)
     let sql = `SELECT * FROM order_product where sessionid = ?`;
@@ -362,7 +365,6 @@ var api = function() {
 	*
 	*/
   this.monitor = function monitor(address, res) {
-
     //call the recieved by address RPC call
     //console.log(address)
     client.getReceivedByAddress(address).then(result => {

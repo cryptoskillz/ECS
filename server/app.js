@@ -108,7 +108,7 @@ app.get("/webhook/checkpayment", (req, res) => {
   let webhookhelper = require('./api/helpers/webhook.js').webhook;
   let webhook = new webhookhelper();
   //check for payment
-  webhook.checkPayment(req.query.token,req.query.address,res);
+  webhook.checkPayment(req,res);
 
 });
 

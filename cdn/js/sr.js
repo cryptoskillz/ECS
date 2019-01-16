@@ -86,8 +86,23 @@ var SR = SR || (function()
 	{
 		//debug
 		//console.log('check payment ticker')
-		//var url = serverurl+"/webhook/checkpayment?address="+address+"&token="+token;
-		var url = serverurl+"webhook/checkpayment?address="+btcaddress;
+
+		//set vars
+		var address = '';
+		var type = '';
+		//check if it is a BTC payment
+		if (btcaddress !='')
+		{
+			address = btcaddress;
+			type = 'BTC'
+		}
+		//todo : check if it is a lightning payment. 
+
+		//Call the server
+		//Note : 	We could send up the session here and get the address on the server that way BTC and Lightning 
+		//			could benefit from being called fron the same endpoint.  We are already sending up the type
+		//			maybe we do this when we add LDN / C-Lightning support. 
+		var url = serverurl+"webhook/checkpayment?address="+address+'&type='+type;
 		fetchurl(url,'checkpayment')
 
 	}

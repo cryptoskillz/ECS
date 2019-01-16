@@ -1,3 +1,12 @@
+/*
+	TODO : 	
+
+	update the checkpayment fucntion to check for lightning
+	update the checkpayment functuin to update he state as API monitor does. 
+
+
+*/
+
 const config = require('./config');
 //console.log(config.bitcoin.network)
 //load SQLlite (use any database you want or none)
@@ -82,47 +91,49 @@ var webhook = function ()
 
 	}	
 	
-
-	//note we could pass down the whole req here is we use more of it in the future
-	this.checkPayment = function checkPayment(token,address,res) 
+	
+	this.checkPayment = function checkPayment(req,res) 
 	{
 		//debug
 		//console.log(address)
 
-		//decryop the wallet
-		client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => 
+		if (req.query.type == "BTC")
 		{
-			//get the unspent transaxtions for the address we are intrested in.
-			client.listUnspent(1, 9999999, [address]).then(result => 
+			//decryop the wallet
+			client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => 
 			{
-				//debug
-				//console.log(result);
-				//console.log(result.length)
-				//note we only check the first one as should only use each address once but we can 
-				//easily update this to run through all the results to check for an active paymebt in
-				//the array
-
-				//check there is a result
-				if (result.length > 0)
+				//get the unspent transaxtions for the address we are intrested in.
+				client.listUnspent(1, 9999999, [req.query.address]).then(result => 
 				{
-					//check the confirmations
-					if (result[0].confirmations >= process.env.CONFIRMATIONS) 
+					//debug
+					//console.log(result);
+					//console.log(result.length)
+					//note we only check the first one as should only use each address once but we can 
+					//easily update this to run through all the results to check for an active paymebt in
+					//the array
+
+					//check there is a result
+					if (result.length > 0)
 					{
-						//valid
-						res.send(JSON.stringify({ status: 1 }));
+						//check the confirmations
+						if (result[0].confirmations >= process.env.CONFIRMATIONS) 
+						{
+							//valid
+							res.send(JSON.stringify({ status: 1 }));
+						}
+						else
+						{
+							//not valid
+							res.send(JSON.stringify({ status: 0 }));
+						}
 					}
 					else
 					{
-						//not valid
-						res.send(JSON.stringify({ status: 0 }));
+						res.send(JSON.stringify({ status: 0 }));	
 					}
-				}
-				else
-				{
-					res.send(JSON.stringify({ status: 0 }));	
-				}
+				});
 			});
-		});
+		}
 	}
 }
 exports.webhook = webhook;
