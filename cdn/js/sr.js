@@ -304,13 +304,12 @@ var SR = SR || (function()
 		    case 1:
 		    	if (btcaddress == '')
 		    	{
-		    		var url = serverurl+"api/address?uid="+uid+'sessionid='+sessionid;
+		    		var url = serverurl+"api/address?uid="+uid+'&sessionid='+sessionid;
 					fetchurl(url,'getaddressbtc');
 				}
 				else
 				{
-					//just show it
-					showPayment(1);
+					checkAddressState(1);
 				}
 		        break;
 		    case 2: 
@@ -322,8 +321,7 @@ var SR = SR || (function()
 				}
 				else
 				{
-					//just show it
-					showPayment(2);
+					checkAddressState(2);
 				}
 		    	break;
 		}
@@ -334,11 +332,21 @@ var SR = SR || (function()
 	//		 Also it would be good to have proper called backs for the method if we add many more we will make it asynv
 	function fetchurl(url,method)
 	{
+		//todo : start a aimation
+		showClass(document.getElementById('sr-loading-Animation'));
+
+		
+
 		var request = new XMLHttpRequest();
 		request.open('GET',url, true);
 		//call it
 		request.onload = function() {
 		  if (request.status >= 200 && request.status < 400) {
+
+		  	//stop animation
+		  	//todo : start a aimation
+			hideClass(document.getElementById('sr-loading-Animation'));
+
 
 		  	if (method == "getsession")
 		  	{
@@ -356,7 +364,7 @@ var SR = SR || (function()
 		    	//console.log(data)
 		    	//set the address
 		   		btcaddress = data.address;
-			    showPayment(1);
+			   	checkAddressState(1);
 			    
 		    }
 		    if (method == "getaddressslight")
@@ -366,7 +374,7 @@ var SR = SR || (function()
 			    var data = JSON.parse(request.responseText);
 			    lightaddress = data.payment.payment_request;
 			    //may have to store the light object but maybe not as we have it on the server
-			   	showPayment(2);
+			   	checkAddressState(2);
 		    }
 		    if (method == "storeproduct")
 		    {
@@ -384,7 +392,6 @@ var SR = SR || (function()
 				//get an addres if it is just BTC enabled
 				//note : change this to call a generic init function which will return a session ID which we use 
 				//       for binding in the database.
-
 				var url = serverurl+"api/session?uid="+uid;
 				fetchurl(url,'getsession')		
 	
@@ -423,6 +430,7 @@ var SR = SR || (function()
 	function showPayment(type)
 	{
 		/*
+		refactor this into checkAddressState function
 		types 
 		1 = btc
 		2 = lightning
@@ -455,6 +463,7 @@ var SR = SR || (function()
 		    //note this can now move to the resolution of this.
     		//check address
 			var res = checkAddressState();
+			alert(res)
 			if (res == false)
 			{
 				//todo : make sure this renders correctly
@@ -464,6 +473,9 @@ var SR = SR || (function()
 				hideClass(document.getElementById('sr-checkout'));
 				//hide the product details
 				hideClass(document.getElementById('sr-cartlistitems'));
+				//show the customer details
+				showClass(document.getElementById('sr-customerdetailswrapper'));
+				showClass(document.getElementById('sr-back-button'));
 		    	//hide btc stuff
 				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 			}
@@ -473,7 +485,6 @@ var SR = SR || (function()
 			//set payment details
 			//note make sure light address object is accessiable here.
 			var res = checkAddressState();
-			alert(res);
 			if (res == false)
 			{
 				//hide the payment methods
@@ -494,8 +505,9 @@ var SR = SR || (function()
 	}
 
 	//this function sets the correct addres state. billing / shipping etc
-	function checkAddressState()
+	function checkAddressState(type = 1)
 	{
+		var showUserSetailsScreen = true;
 		checkAddressClickState();
 		//check if shipping and billing has been enabled
 		if ((shippingaddress == 1) && ( billingaddress == 1))
@@ -512,7 +524,8 @@ var SR = SR || (function()
 			showClass(document.getElementById('sr-back-button'));
     		//populate countries dropdown
     		populateDropdown(['sr-billingcountry','sr-shippingcountry'],countries,startcountry);
-			return(true);
+			//return(true);
+			showUserSetailsScreen = false;
     	}
     	else
     	{
@@ -524,7 +537,8 @@ var SR = SR || (function()
     			showClass(document.getElementById('sr-addresswrapper'));
     			showClass(document.getElementById('sr-shippingaddresswrapper'));
     			hideClass(document.getElementById('sr-sbillingaddressswrapper'));
-				return(true);
+				//return(true);
+				showUserSetailsScreen = false;
 
     		}
     		//check if billing is enabled
@@ -535,11 +549,26 @@ var SR = SR || (function()
     			showClass(document.getElementById('addresswrapper'));
     			hideClass(document.getElementById('shippingaddresswrapper'));
     			showClass(document.getElementById('billingaddressswrapper'));
-    			return(true);
+    			//return(true);
+    			showUserSetailsScreen = false;
     		}
     	}
     	//no address stuff
-    	return(false);
+    	//return(false);
+    	if (showUserSetailsScreen = true)
+    	{
+    		//hide the payment methods
+			hideClass(document.getElementById('sr-paymentmethods'));
+		    //hide btc stuff
+			hideClass(document.getElementById('sr-checkout'));
+			//hide the product details
+			hideClass(document.getElementById('sr-cartlistitems'));
+			//show the customer details
+			showClass(document.getElementById('sr-customerdetailswrapper'));
+			showClass(document.getElementById('sr-back-button'));
+		    //hide btc stuff
+			hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+    	}
 	}
 
 
@@ -637,11 +666,7 @@ var SR = SR || (function()
 		    	else
 		    	{
 		    		//fetch a BTC address as there is only one payment method so it is fine to do it here
-		    		//getAddress(1);
-		    		//show the payment screen
-		    		getAddress(1);
-		    		showPayment(1);
-		    	
+		    		getAddress(1);		    	
 		    	}
 		        break;
 		    case 3:

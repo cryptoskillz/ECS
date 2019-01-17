@@ -41,7 +41,7 @@ var strike = function ()
 	this.charge = function charge(req,res)
 	{
 		//debug
-		console.log(req.query);
+		//console.log(req.query);
 
 		//get the details from database
 		let data = [req.query.sessionid];

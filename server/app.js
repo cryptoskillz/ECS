@@ -1,3 +1,9 @@
+/*
+todo
+
+add a function which checks if btc server exists.
+
+*/
 //check the process env vars
 require('dotenv').config();
 

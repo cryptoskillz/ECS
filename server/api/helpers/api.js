@@ -12,6 +12,8 @@
         `INSERT INTO usersessions(lightaddress,userid,net,amount,paymenttype) VALUES(?,?,?,?,?)`,
       
   May move the insert to a generic function. 
+  add a time out in btc generation
+  get address function throw an error if no btc
 
 
 
@@ -339,6 +341,7 @@ var api = function() {
   this.getBTCAddress = function getBTCAddress(sessionid,res)
   {
     let sqldata = [sessionid ];
+    //console.log(sqldata);
     let sql = `select btcaddress from usersessions where sessionid = ?`;
 
     //run it and see if it is in the database
@@ -350,6 +353,7 @@ var api = function() {
         return;
       }
       //debug
+      //console.log('res');
       //console.log(result);
 
       //check that it is not in the database
@@ -361,6 +365,7 @@ var api = function() {
         {
           //generate 1
           generateBTCAddress(sessionid,res);
+          return;
         }
         else
         {
@@ -372,6 +377,7 @@ var api = function() {
       {
         //generate an address
         generateBTCAddress(sessionid,res);
+        return;
       }
     });
   }
