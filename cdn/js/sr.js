@@ -25,6 +25,7 @@ var SR = SR || (function()
 	//hold the addres of the product
 	var btcaddress = '';
 	//hold the lighing object;
+	var lightaddress = '';
 	var lighingobject = '';
 	//hold the preview image
 	var preview = '';
@@ -301,12 +302,29 @@ var SR = SR || (function()
 		switch (type) 
 		{
 		    case 1:
-		    	var url = serverurl+"api/address?uid="+uid+'sessionid='+sessionid;
-				fetchurl(url,'getaddress');
+		    	if (btcaddress == '')
+		    	{
+		    		var url = serverurl+"api/address?uid="+uid+'sessionid='+sessionid;
+					fetchurl(url,'getaddressbtc');
+				}
+				else
+				{
+					//just show it
+					showPayment(1);
+				}
 		        break;
 		    case 2: 
-		    	var url = serverurl+"strike/charge?uid=3&currency=btc&amount=2000&desc=free btc"
-				fetchurl(url,'getaddressslight');
+
+		    	if (lightaddress == '')
+		    	{
+		    		var url = serverurl+"strike/charge?uid=3&sessionid="+sessionid
+					fetchurl(url,'getaddressslight');
+				}
+				else
+				{
+					//just show it
+					showPayment(2);
+				}
 		    	break;
 		}
 	}
@@ -329,7 +347,7 @@ var SR = SR || (function()
 		  		sessionid = data.sessionid;
 		  	}
 
-		    if (method == "getaddress")
+		    if (method == "getaddressbtc")
 		    {
 
 		    	// parse the data
@@ -346,8 +364,9 @@ var SR = SR || (function()
 		    	//todo
 		    	// parse the data
 			    var data = JSON.parse(request.responseText);
-			    //debug
-			    console.log(data)
+			    lightaddress = data.payment.payment_request;
+			    //may have to store the light object but maybe not as we have it on the server
+			   	showPayment(2);
 		    }
 		    if (method == "storeproduct")
 		    {
@@ -408,9 +427,12 @@ var SR = SR || (function()
 		1 = btc
 		2 = lightning
 		*/
+		//note : switch to a switch 
 		if (type == 1)
 		{
 		    //set the address in the checkout
+		    //note : we can move this to the after the checkddresfunction
+		    /*
 		    var elbtcaddress = document.getElementById('sr-bitcoinaddress');
 		    //set the href
 		    elbtcaddress.setAttribute('href', "bitcoin:"+btcaddress);
@@ -427,22 +449,46 @@ var SR = SR || (function()
 			elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+btcaddress);
 	    	//debug
 		    //console.log(elbtcqr)
+			*/
 
 		    //show it
 		    //note this can now move to the resolution of this.
     		//check address
-	    	checkAddressState();
-	    	//hide the payment methods
-			hideClass(document.getElementById('sr-paymentmethods'));
-	    	//hide btc stuff
-			hideClass(document.getElementById('sr-checkout'));
-			//hide the product details
-			hideClass(document.getElementById('sr-cartlistitems'));
-			//show the customer details
-			showClass(document.getElementById('sr-customerdetailswrapper'));
-			showClass(document.getElementById('sr-back-button'));
-	    	//hide btc stuff
-			hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+			var res = checkAddressState();
+			if (res == false)
+			{
+				//todo : make sure this renders correctly
+		    	//hide the payment methods
+				hideClass(document.getElementById('sr-paymentmethods'));
+		    	//hide btc stuff
+				hideClass(document.getElementById('sr-checkout'));
+				//hide the product details
+				hideClass(document.getElementById('sr-cartlistitems'));
+		    	//hide btc stuff
+				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+			}
+		}
+		if (type == 2)
+		{
+			//set payment details
+			//note make sure light address object is accessiable here.
+			var res = checkAddressState();
+			alert(res);
+			if (res == false)
+			{
+				//hide the payment methods
+				hideClass(document.getElementById('sr-paymentmethods'));
+		    	//hide btc stuff
+				hideClass(document.getElementById('sr-checkout'));
+				//hide the product details
+				hideClass(document.getElementById('sr-cartlistitems'));
+				//show the customer details
+				showClass(document.getElementById('sr-customerdetailswrapper'));
+				showClass(document.getElementById('sr-back-button'));
+		    	//hide btc stuff
+				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+			}
+			
 		}
 
 	}
@@ -451,18 +497,22 @@ var SR = SR || (function()
 	function checkAddressState()
 	{
 		checkAddressClickState();
-		//chek if shipping and billing has been enabled
+		//check if shipping and billing has been enabled
 		if ((shippingaddress == 1) && ( billingaddress == 1))
     	{
-
     		//show the both
     		showClass(document.getElementById('sr-addresswrapper'));
     		showClass(document.getElementById('sr-billingaddressswrapper'));
     		//hide shipping
     		hideClass(document.getElementById('sr-shippingaddresswrapper'));
+    		//hide the payment choice
+    		hideClass(document.getElementById('sr-paymentmethods'));
+    		//show the customer details
+			showClass(document.getElementById('sr-customerdetailswrapper'));
+			showClass(document.getElementById('sr-back-button'));
     		//populate countries dropdown
     		populateDropdown(['sr-billingcountry','sr-shippingcountry'],countries,startcountry);
-
+			return(true);
     	}
     	else
     	{
@@ -474,7 +524,7 @@ var SR = SR || (function()
     			showClass(document.getElementById('sr-addresswrapper'));
     			showClass(document.getElementById('sr-shippingaddresswrapper'));
     			hideClass(document.getElementById('sr-sbillingaddressswrapper'));
-
+				return(true);
 
     		}
     		//check if billing is enabled
@@ -485,9 +535,11 @@ var SR = SR || (function()
     			showClass(document.getElementById('addresswrapper'));
     			hideClass(document.getElementById('shippingaddresswrapper'));
     			showClass(document.getElementById('billingaddressswrapper'));
-
+    			return(true);
     		}
     	}
+    	//no address stuff
+    	return(false);
 	}
 
 
@@ -516,6 +568,11 @@ var SR = SR || (function()
 	}
 
 	//this function works with how the cart should look and sets the correct viusal elements
+	/*
+
+		TODO : check the address state here.
+
+	*/
 	function cartstate(state)
 	{
 		/*
@@ -528,6 +585,8 @@ var SR = SR || (function()
 			5 = bitcoin details back click*
 			6 = shipping button clicked
 			7 = check payment result
+
+
 		*/
 		//alert(state);
 		switch (state) {
@@ -992,6 +1051,10 @@ var SR = SR || (function()
 		bitcoinpayment : function ()
 		{
 			getAddress(1);
+		},
+		lightningpayment : function ()
+		{
+			getAddress(2);
 		}
    };
 }());

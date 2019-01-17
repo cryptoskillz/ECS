@@ -6,6 +6,10 @@ we moved onto owing the entire stack.  We are doing the exact same thing with Li
 
 We are using the rather excellent https://strike.acinq.co for this purpose.  
 
+TODO 
+
+update email program and standalone demo (neither using sr.js) to work using new session code (or of course retire them)
+
 */
 const config = require('./config');
 //console.log(config.bitcoin.network)
@@ -36,87 +40,102 @@ var strike = function ()
 	//create a charge
 	this.charge = function charge(req,res)
 	{
-		//build the options object
-		var options = {
-		  method: 'POST',
-		  url: process.env.STRIKEENDPOINT + '/api/v1/charges',
-		  headers: {
-		    'cache-control': 'no-cache',
-		    'Content-Type': 'application/json' },
-		  body: {
-		    amount: parseFloat(req.query.amount),
-		    description: req.query.desc,
-		    currency: req.query.currency
-		  },
-		  json: true,
-		  auth: {
-		    user: process.env.STRIKEAPIKEY,
-		    pass: '',
-		  }
-		};
+		//debug
+		console.log(req.query);
 
-		//call strike
-		request(options, function (error, response, body) {
-		  if (error) throw new Error(error);
-		  	//debug
-		  	//console.log(body)
+		//get the details from database
+		let data = [req.query.sessionid];
+    	//console.log(data)
+   		let sql = `SELECT * FROM order_product where sessionid = ?`;
+    	//debug
 
-		  	//turn it into a BTC amount
-		  	//note : in a future update we may go ahead and store everything Satoshis. 
-		  	//		 we could also use req.query.amount here
-		  	//		 we may want to store order_meta and product_meta here in the future if so we will make those generic functions
-			var amount = parseFloat(body.amount) * 0.00000001;
-			
-			//insert a session
-			db.run(
-				`INSERT INTO sessions(address,userid,net,amount,paymenttype) VALUES(?,?,?,?,?)`,
-				[body.payment_request, req.query.uid, process.env.LIGHTNETWORK,String(amount),2],
-				function(err) 
-				{
-					if (err) 
-					{
-					  //return error
-					  res.send(JSON.stringify({ error: err.message }));
-					  return;
-					}
+    	db.get(sql, data, (err, result) => {
+    		if (err) {
+        		console.log(err)
+      		}
+      		//debug
+      		//console.log(result);
 
-					//store the order product details 
-					db.run(
-						`INSERT INTO order_product(address,name,price,quantity) VALUES(?,?,?,?)`,
-						[body.payment_request,req.query.desc, String(amount),1],
-						function(err) 
-						{
-							if (err) 
+      		if (result != undefined)
+      		{
+      			var price = parseFloat(result.price) * result.quantity;
+
+      			price = parseFloat(price) * 100000000;
+
+      			//build the options object
+				var options = {
+				  method: 'POST',
+				  url: process.env.STRIKEENDPOINT + '/api/v1/charges',
+				  headers: {
+				    'cache-control': 'no-cache',
+				    'Content-Type': 'application/json' },
+				  body: {
+				    amount: price,
+				    description: result.name,
+				    currency: "btc"
+				  },
+				  json: true,
+				  auth: {
+				    user: process.env.STRIKEAPIKEY,
+				    pass: '',
+				  }
+				};
+				//debug
+				//console.log(options);
+
+
+				//call it 
+				request(options, function (error, response, body) {
+				 	if (error) throw new Error(error);
+				  	//debug
+				  	//console.log(body)
+
+				  	//turn it into a BTC amount
+				  	//note : in a future update we may go ahead and store everything Satoshis. 
+				  	//		 we could also use req.query.amount here
+				  	//		 we may want to store order_meta and product_meta here in the future if so we will make those generic functions
+					var amount = parseFloat(body.amount) * 0.00000001;
+
+					//update it
+					let data = [body.payment_request, req.query.sessionid];
+					console.log(data);
+			        //build the query
+			        let sql = `UPDATE usersessions
+							          SET lightaddress=?
+							          WHERE sessionid = ?`;
+			        //run the query
+			        db.run(sql, data, function(err) {
+			        	if (err) {
+			            	return console.error(err.message);
+			          	}
+
+				        //store the order_payment_details 
+						db.run(
+							`INSERT INTO order_payment_details(address,providerid,paymentobject) VALUES(?,?,?)`,
+							[body.payment_request,2, JSON.stringify(body)],
+							function(err) 
 							{
-							  //return error
-							  res.send(JSON.stringify({ error: err.message }));
-							  return;
-							}
-							//store the order_payment_details 
-							db.run(
-								`INSERT INTO order_payment_details(address,providerid,paymentobject) VALUES(?,?,?)`,
-								[body.payment_request,2, JSON.stringify(body)],
-								function(err) 
+								if (err) 
 								{
-									if (err) 
-									{
-									  //return error
-									  res.send(JSON.stringify({ error: err.message }));
-									  return;
-									}
-									//return the required details to the front end
-									var obj = {id:body.id,amount:body.amount,payment_request:body.payment_request}
-									res.send(JSON.stringify({ payment: obj }));
-									//debug
-									//console.log(body.payment_request);
+								  //return error
+								  res.send(JSON.stringify({ error: err.message }));
+								  return;
 								}
-							);
-						}
-					);
-				}
-			);
-		  	
-		});
+								//return the required details to the front end
+								var obj = {id:body.id,amount:body.amount,payment_request:body.payment_request}
+								res.send(JSON.stringify({ payment: obj }));
+								//debug
+								//console.log(body.payment_request);
+							}
+						);
+				     });
+				});
+		    }
+		    else
+		    {
+		    	console.log('not found');
+		    }
+    	});
 	}
 
 

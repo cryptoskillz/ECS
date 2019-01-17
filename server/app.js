@@ -282,6 +282,7 @@ app.get("/api/session", (req,res) => {
   let api = new apihelper(); 
   //call the login function
   api.userSession(req,res);
+  return;
 });
 
 //pass it an address and it will check if payment has been made.  See this just like monitor js does but it is not on a timer. called from admin

@@ -1,11 +1,18 @@
 /*
   todo: *more details in the section where this todo is required
-  
+
   Cache pay to adddress so it will work with no Bitcoin Core
   Check that bticoin is running and not frozen before calling it
   Finish Mock API calls
   Finish email temaplates.  Note complitaing removing these complelty out of the database.
   Move this. monitor logic into a generic funciton so webhook can benefit from it
+
+  Check sesson insert as we add more code when we updated it for strike IE.
+  db.run(
+        `INSERT INTO usersessions(lightaddress,userid,net,amount,paymenttype) VALUES(?,?,?,?,?)`,
+      
+  May move the insert to a generic function. 
+
 
 
 */
@@ -48,7 +55,7 @@ var api = function() {
 
           //update the session table
           let data = [address, sessionid];
-          let sql = `UPDATE sessions SET btcaddress = ? WHERE sessionid = ?`;
+          let sql = `UPDATE usersessions SET btcaddress = ? WHERE sessionid = ?`;
           db.run(sql, data, function(err) 
           {
             if (err) 
@@ -78,6 +85,7 @@ var api = function() {
   */
   this.userSession = function userSession(req,res)
   {
+   // return;
     //laods the UID 
     let uuidv1 = require('uuid/v1');
     //get a session id
@@ -86,7 +94,7 @@ var api = function() {
     //let sessionid  = "44b2f5c0-189a-11e9-91a4-a59245cc45cb";
     //build the SQL 
     let sqldata = [sessionid ];
-    let sql = `select * from sessions where sessionid = ?`;
+    let sql = `select * from usersessions where sessionid = ?`;
 
     //run it and see if it is in the database
     db.get(sql, sqldata, (err, result) => {
@@ -96,6 +104,8 @@ var api = function() {
         res.send(JSON.stringify({ error: err.message }));
         return;
       }
+
+
       //debug
       //console.log(result);
 
@@ -105,10 +115,19 @@ var api = function() {
       {
         //get the timestamp
         var ts = Math.round((new Date()).getTime() / 1000);
-        //store in the sessions database
+        //store in the usersessions database
+        // generateBTCAddress(sessionid);
+         //return;
+     
+        //bug: this function is writing an entry into the order_product table with a quanity of 3 this makes no sense.
         db.run(
-          `INSERT INTO sessions(sessionid,userid,net,sessiontime) VALUES(?,?,?,?)`,
-          [sessionid, req.query.uid, process.env.NETWORK,ts],
+          `INSERT INTO usersessions(sessionid,userid,net,sessiontime) VALUES(?,?,?,?)`,
+          [
+          sessionid, 
+          req.query.uid, 
+          process.env.NETWORK,
+          ts
+          ],
           function(err) {
             if (err) {
               //there was an error
@@ -116,14 +135,16 @@ var api = function() {
               return;
             }
             //out the session id
+            //console.log(req.query.uid);
             res.send(JSON.stringify({ sessionid: sessionid }));
             //note here we could generate a BTC / LIGHT address and cache it on the server removing the potential delays
             //then it could be called JIT when it is required, this would work if we decide to extened out to many API's
             generateBTCAddress(sessionid);
+            return;
             //note whislt we are using strike there is no reason to use, we will implement when we have LND or c-lightning support
             //generateLightAddress(sessionid);
           }
-        );
+          );
       }
       else
       {
@@ -144,6 +165,7 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
+    console.log('in sud')
     //debug
     //console.log(req.query);
 
@@ -317,7 +339,7 @@ var api = function() {
   this.getBTCAddress = function getBTCAddress(sessionid,res)
   {
     let sqldata = [sessionid ];
-    let sql = `select btcaddress from sessions where sessionid = ?`;
+    let sql = `select btcaddress from usersessions where sessionid = ?`;
 
     //run it and see if it is in the database
     db.get(sql, sqldata, (err, result) => {
@@ -378,7 +400,7 @@ var api = function() {
         //build a data array
         let data = ["1", result, address];
         //build the query
-        let sql = `UPDATE sessions
+        let sql = `UPDATE usersessions
 				          SET processed = ?,
 				            amount = ?
 				          WHERE address = ?`;
@@ -528,7 +550,7 @@ var api = function() {
 
                               //build sql
                               let sqldata = ["1", address];
-                              let sql = `UPDATE sessions
+                              let sql = `UPDATE usersessions
 	                        SET swept = ?
 	                        WHERE address = ?`;
 
