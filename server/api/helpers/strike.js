@@ -41,8 +41,6 @@ var strike = function ()
 
 	create a charge
 
-	todo : check if we already have a charge for this session and if so return that. 
-
 	*/
 
 	this.charge = function charge(req,res)

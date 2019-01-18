@@ -264,9 +264,6 @@ var api = function() {
   *
   * This function stores the product in the database
   *
-  *  TODO: make sure we have an adddress before we store the product without there is no way to process the order
-           and we will get result.id errors this falls into the same area as caching addrress we could also benefot 
-           from having a check to see if bitcoin core is running correctly.
   *
   */
   this.storeProduct = function storeProduct(req,res)
@@ -387,8 +384,6 @@ var api = function() {
 	*	This function check if payment has been sent to the address
   *
   * todo: check client is running
-          fix small amounts been written to the data base incorrectly (ie 0.00002000 as 2.0e-05) most likely we will have 
-          parse it as a string before we write to the database
 	*
 	*/
   this.monitor = function monitor(address, res) {

@@ -396,7 +396,6 @@ var SR = SR || (function()
 		    }
 		    if (method == "getaddressslight")
 		    {
-		    	//todo
 		    	// parse the data
 			    var data = JSON.parse(request.responseText);
 			    lightaddress = data.payment.payment_request;
@@ -558,8 +557,6 @@ var SR = SR || (function()
 
 	//this function works with how the cart should look and sets the correct viusal elements
 	/*
-
-		TODO : check the address state here.
 
 	*/
 	function cartstate(state)
