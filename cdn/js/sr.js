@@ -27,6 +27,7 @@ var SR = SR || (function()
 	//hold the lighing object;
 	var lightaddress = '';
 	var lighingobject = '';
+	var usepaymenttype = 1; //1 btc, light
 	//hold the preview image
 	var preview = '';
 
@@ -309,7 +310,7 @@ var SR = SR || (function()
 				}
 				else
 				{
-					checkAddressState(1);
+					setAddressState(1);
 				}
 		        break;
 		    case 2: 
@@ -321,7 +322,7 @@ var SR = SR || (function()
 				}
 				else
 				{
-					checkAddressState(2);
+					setAddressState(2);
 				}
 		    	break;
 		}
@@ -332,11 +333,8 @@ var SR = SR || (function()
 	//		 Also it would be good to have proper called backs for the method if we add many more we will make it asynv
 	function fetchurl(url,method)
 	{
-		//todo : start a aimation
+		//start a loading aimation
 		showClass(document.getElementById('sr-loading-Animation'));
-
-		
-
 		var request = new XMLHttpRequest();
 		request.open('GET',url, true);
 		//call it
@@ -344,7 +342,6 @@ var SR = SR || (function()
 		  if (request.status >= 200 && request.status < 400) {
 
 		  	//stop animation
-		  	//todo : start a aimation
 			hideClass(document.getElementById('sr-loading-Animation'));
 
 
@@ -364,7 +361,7 @@ var SR = SR || (function()
 		    	//console.log(data)
 		    	//set the address
 		   		btcaddress = data.address;
-			   	checkAddressState(1);
+			   	setAddressState(1);
 			    
 		    }
 		    if (method == "getaddressslight")
@@ -374,7 +371,7 @@ var SR = SR || (function()
 			    var data = JSON.parse(request.responseText);
 			    lightaddress = data.payment.payment_request;
 			    //may have to store the light object but maybe not as we have it on the server
-			   	checkAddressState(2);
+			   	setAddressState(2);
 		    }
 		    if (method == "storeproduct")
 		    {
@@ -427,20 +424,16 @@ var SR = SR || (function()
 		request.send();
 	}
 
+	/*
 	function showPayment(type)
 	{
-		/*
-		refactor this into checkAddressState function
-		types 
-		1 = btc
-		2 = lightning
-		*/
+		
 		//note : switch to a switch 
 		if (type == 1)
 		{
 		    //set the address in the checkout
 		    //note : we can move this to the after the checkddresfunction
-		    /*
+		    
 		    var elbtcaddress = document.getElementById('sr-bitcoinaddress');
 		    //set the href
 		    elbtcaddress.setAttribute('href', "bitcoin:"+btcaddress);
@@ -457,13 +450,12 @@ var SR = SR || (function()
 			elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+btcaddress);
 	    	//debug
 		    //console.log(elbtcqr)
-			*/
+			
 
 		    //show it
 		    //note this can now move to the resolution of this.
     		//check address
-			var res = checkAddressState();
-			alert(res)
+
 			if (res == false)
 			{
 				//todo : make sure this renders correctly
@@ -503,10 +495,13 @@ var SR = SR || (function()
 		}
 
 	}
+	*/
 
 	//this function sets the correct addres state. billing / shipping etc
-	function checkAddressState(type = 1)
+	function setAddressState(type = 1)
 	{
+		//figure out what payment types to use
+		usepaymenttype = type;
 		var showUserSetailsScreen = true;
 		checkAddressClickState();
 		//check if shipping and billing has been enabled
@@ -553,7 +548,7 @@ var SR = SR || (function()
     			showUserSetailsScreen = false;
     		}
     	}
-    	//no address stuff
+    	//no address screen
     	//return(false);
     	if (showUserSetailsScreen = true)
     	{
@@ -671,7 +666,8 @@ var SR = SR || (function()
 		        break;
 		    case 3:
 		    	//check address
-		    	checkAddressState();
+		    	setAddressState();
+		    	//checkAddressState();
 		    	//show the check out button
 				showClass(document.getElementById('sr-checkout'));
 				//show the product details
@@ -681,19 +677,54 @@ var SR = SR || (function()
 			   	hideClass(document.getElementById('sr-back-button'));
 		        break;
 		    case 4:
-				//hide the product details
-		    	hideClass(document.getElementById('sr-cartlistitems'));
-		    	//show btc stuff		    	
-				showClass(document.getElementById('sr-bitcoinaddresswrapper'));
-				//hide the customer details			  					
-				showClass(document.getElementById('sr-back-button'));
-				hideClass(document.getElementById('sr-customerdetailswrapper'));
-				//call the check payment
-				checkpaymentres = setInterval(checkPayment, 3000)
+		    	//when paybutton has been pressed
+
+		    	if (usepaymenttype == 1)
+		    	{
+		    		var elbtcaddress = document.getElementById('sr-bitcoinaddress');
+				    //set the href
+				    elbtcaddress.setAttribute('href', "bitcoin:"+btcaddress);
+				    //set the address
+		    		elbtcaddress.innerText =btcaddress;
+		    		//do pay from wallet also
+		    		var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
+				    //set the href
+				    elbtcaddress.setAttribute('href', "bitcoin:"+btcaddress);
+		    		//debug
+				    //console.log(elbtcaddress)
+				    //generate the qr code
+				    var elbtcqr = document.getElementById('sr-bitcoinqrcode');
+					elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+btcaddress);
+			    	//debug
+				    //console.log(elbtcqr)
+				    
+			    	//hide the payment methods
+					hideClass(document.getElementById('sr-paymentmethods'));
+			    	//hide btc stuff
+					hideClass(document.getElementById('sr-checkout'));
+					//hide the product details
+					hideClass(document.getElementById('sr-cartlistitems'));
+					//show the customer details
+					showClass(document.getElementById('sr-back-button'));
+		    		//show btc stuff		    	
+					showClass(document.getElementById('sr-bitcoinaddresswrapper'));
+					//hide the customer details			  					
+					showClass(document.getElementById('sr-back-button'));
+					hideClass(document.getElementById('sr-customerdetailswrapper'));
+					//call the check payment
+					checkpaymentres = setInterval(checkPayment, 3000)
+		    	}
+		    	if (usepaymenttype == 2)
+		    	{
+		    		//light
+		    		alert('lightning')
+		    	}
+				
 		        break;
 		    case 5:
 		    	//check address
-		    	checkAddressState();
+		    	setAddressState();
+		    	//checkAddressState();
 		    	//hide the product details
 		    	hideClass(document.getElementById('sr-cartlistitems'));
 				//show the customer details
