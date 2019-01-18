@@ -24,7 +24,7 @@ var SR = SR || (function()
 	var name = '';
 	//hold the addres of the product
 	var btcaddress = '';
-	//hold the lighing address;
+	//hold the lighing object;
 	var lightaddress = '';
 	var usepaymenttype = 1; //1 btc, light
 	//hold the preview image
@@ -649,7 +649,7 @@ var SR = SR || (function()
 
 		    	if (usepaymenttype == 2)
 		    	{
-		    		theAddress = lightaddress;
+		    		theAddress = lightaddress
 		    		theType = 'lightning:';
 
 		    	}
@@ -692,101 +692,8 @@ var SR = SR || (function()
 				//hide the customer details			  					
 				showClass(document.getElementById('sr-back-button'));
 				hideClass(document.getElementById('sr-customerdetailswrapper'));
-				//call the check payment
-				checkpaymentres = setInterval(checkPayment, 3000)
-
-
-		    	return;
-		    	if (usepaymenttype == 1)
-		    	{
-		    		var eladdress = document.getElementById('sr-address');
-				    //set the href
-				    eladdress.setAttribute('href', "bitcoin:"+btcaddress);
-				    //set the address
-		    		eladdress.innerText =btcaddress;
-		    		//do pay from wallet also
-		    		var eladdresswallet = document.getElementById('sr-addresswallet');
-				    //set the href
-				    eladdresswallet.setAttribute('href', "bitcoin:"+btcaddress);
-		    		//debug
-				    //console.log(elbtcaddress)
-				    //generate the qr code
-				    var elqr = document.getElementById('sr-qrcode');
-					elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+btcaddress);
-			    	
-			    	//multipily the price by the number of items in the cart
-					var producttotal = price * itemcount;
-					//set it to 8 decimal places as it's Bitcoin
-					//producttotal = parseFloat(producttotal).toFixed(8);
-					var payelement = document.getElementById('sr-payment-pay');
-					payelement.innerText = 'Pay '+producttotal+' BTC';
-
-			    	//debug
-				    //console.log(elbtcqr)
-
-			    	//hide the payment methods
-					hideClass(document.getElementById('sr-paymentmethods'));
-			    	//hide btc stuff
-					hideClass(document.getElementById('sr-checkout'));
-					//hide the product details
-					hideClass(document.getElementById('sr-cartlistitems'));
-					//show the customer details
-					showClass(document.getElementById('sr-back-button'));
-		    		//show btc stuff		    	
-					showClass(document.getElementById('sr-paymentwrapper'));
-					//hide the customer details			  					
-					showClass(document.getElementById('sr-back-button'));
-					hideClass(document.getElementById('sr-customerdetailswrapper'));
-					//call the check payment
-					checkpaymentres = setInterval(checkPayment, 3000)
-		    	}
-		    	if (usepaymenttype == 2)
-		    	{
-
-		    		var eladdress = document.getElementById('sr-address');
-				    //set the href
-				    eladdress.setAttribute('href', "bitcoin:"+lightaddress);
-				    //set the address
-		    		eladdress.innerText =lightaddress;
-		    		//do pay from wallet also
-		    		var eladdresswallet = document.getElementById('sr-addresswallet');
-				    //set the href
-				    eladdresswallet.setAttribute('href', "lightning:"+lightaddress);
-		    		//debug
-				    //console.log(elbtcaddress)
-				    //generate the qr code
-				    var elqr = document.getElementById('sr-qrcode');
-					elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+lightaddress);
-			    	
-
-			    	//multipily the price by the number of items in the cart
-					var producttotal = price * itemcount;
-					//set it to 8 decimal places as it's Bitcoin
-					//producttotal = parseFloat(producttotal).toFixed(8);
-					var payelement = document.getElementById('sr-payment-pay');
-					payelement.innerText = 'Pay '+producttotal+' BTC';
-
-			    	//debug
-				    //console.log(elbtcqr)
-
-			    	//hide the payment methods
-					hideClass(document.getElementById('sr-paymentmethods'));
-			    	//hide btc stuff
-					hideClass(document.getElementById('sr-checkout'));
-					//hide the product details
-					hideClass(document.getElementById('sr-cartlistitems'));
-					//show the customer details
-					showClass(document.getElementById('sr-back-button'));
-		    		//show btc stuff		    	
-					showClass(document.getElementById('sr-paymentwrapper'));
-					//hide the customer details			  					
-					showClass(document.getElementById('sr-back-button'));
-					hideClass(document.getElementById('sr-customerdetailswrapper'));
-					//call the check payment
-					checkpaymentres = setInterval(checkPayment, 3000)
-		    		
-		    	}
-				
+				//start the check payment timer
+				checkpaymentres = setInterval(checkPayment, 3000)				
 		        break;
 		    case 5:
 		    	//check address
