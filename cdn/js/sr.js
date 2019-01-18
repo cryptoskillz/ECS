@@ -79,6 +79,35 @@ var SR = SR || (function()
 	*/
 
 
+	function setCookie(name,value,days) 
+	{
+		alert('setting '+name)
+	    var expires = "";
+	    if (days) 
+	    {
+	        var date = new Date();
+	        date.setTime(date.getTime() + (days*24*60*60*1000));
+	        expires = "; expires=" + date.toUTCString();
+	    }
+	    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+	}
+	function getCookie(name) 
+	{
+	    var nameEQ = name + "=";
+	    var ca = document.cookie.split(';');
+	    for(var i=0;i < ca.length;i++) {
+	        var c = ca[i];
+	        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+	        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	    }
+	    return null;
+	}
+
+	function eraseCookie(name) 
+	{   
+	    document.cookie = name+'=; Max-Age=-99999999;';  
+	}
+
 	function stopPaymentCheck()
 	{
     	clearInterval(checkpaymentres);
@@ -344,12 +373,14 @@ var SR = SR || (function()
 		  	//stop animation
 			hideClass(document.getElementById('sr-loading-Animation'));
 
-
+			//alert(method);
 		  	if (method == "getsession")
 		  	{
 		  		// parse the data
-			    var data = JSON.parse(request.responseText);
+			   	var data = JSON.parse(request.responseText);
 		  		sessionid = data.sessionid;
+		  		setCookie('ecs',sessionid);
+		  		
 		  	}
 
 		    if (method == "getaddressbtc")
@@ -389,8 +420,12 @@ var SR = SR || (function()
 				//get an addres if it is just BTC enabled
 				//note : change this to call a generic init function which will return a session ID which we use 
 				//       for binding in the database.
-				var url = serverurl+"api/session?uid="+uid;
-				fetchurl(url,'getsession')		
+				var ses = getCookie('ecs');
+		  		if (ses == null)
+		  		{
+					var url = serverurl+"api/session?uid="+uid;
+					fetchurl(url,'getsession');
+				}	
 	
 		    }
 		    if (method == "storeuserdetails")
@@ -697,7 +732,7 @@ var SR = SR || (function()
 					elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+btcaddress);
 			    	//debug
 				    //console.log(elbtcqr)
-				    
+
 			    	//hide the payment methods
 					hideClass(document.getElementById('sr-paymentmethods'));
 			    	//hide btc stuff
