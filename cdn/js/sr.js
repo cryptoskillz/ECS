@@ -24,9 +24,8 @@ var SR = SR || (function()
 	var name = '';
 	//hold the addres of the product
 	var btcaddress = '';
-	//hold the lighing object;
+	//hold the lighing address;
 	var lightaddress = '';
-	var lighingobject = '';
 	var usepaymenttype = 1; //1 btc, light
 	//hold the preview image
 	var preview = '';
@@ -524,7 +523,7 @@ var SR = SR || (function()
 			showClass(document.getElementById('sr-customerdetailswrapper'));
 			showClass(document.getElementById('sr-back-button'));
 		    //hide btc stuff
-			hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+			hideClass(document.getElementById('sr-paymentwrapper'));
     	}
 	}
 
@@ -588,7 +587,7 @@ var SR = SR || (function()
 		    	//hide the check out button
 				showClass(document.getElementById('sr-checkout'));
 		    	//hide btc stuff
-				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+				hideClass(document.getElementById('sr-paymentwrapper'));
 				//hide the customer details
 				hideClass(document.getElementById('sr-customerdetailswrapper'));
 				//hide back button
@@ -614,7 +613,7 @@ var SR = SR || (function()
 		    		//hide btc stuff
 					hideClass(document.getElementById('sr-checkout'));
 					hideClass(document.getElementById('sr-cartlistitems'));
-					hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+					hideClass(document.getElementById('sr-paymentwrapper'));
 					//show the payment seleciton screen
 		    		showClass(document.getElementById('sr-paymentmethods'));
 
@@ -640,23 +639,88 @@ var SR = SR || (function()
 		        break;
 		    case 4:
 		    	//when paybutton has been pressed
-
+		    	var theAddress = '';
+		    	var theType = '';
 		    	if (usepaymenttype == 1)
 		    	{
-		    		var elbtcaddress = document.getElementById('sr-bitcoinaddress');
+		    		theAddress = btcaddress;
+		    		theType = 'bitcoin:';
+		    	}
+
+		    	if (usepaymenttype == 2)
+		    	{
+		    		theAddress = lightaddress;
+		    		theType = 'lightning:';
+
+		    	}
+
+		    	var eladdress = document.getElementById('sr-address');
+			    //set the href
+			    eladdress.setAttribute('href', "bitcoin:"+theAddress);
+			    //set the address
+	    		eladdress.innerText =theAddress;
+	    		//do pay from wallet also
+	    		var eladdresswallet = document.getElementById('sr-addresswallet');
+			    //set the href
+			    eladdresswallet.setAttribute('href', theType+":"+theAddress);
+	    		//debug
+			    //console.log(elbtcaddress)
+			    //generate the qr code
+			    var elqr = document.getElementById('sr-qrcode');
+				elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+theAddress);
+		    	
+		    	//multipily the price by the number of items in the cart
+				var producttotal = price * itemcount;
+				//set it to 8 decimal places as it's Bitcoin
+				//producttotal = parseFloat(producttotal).toFixed(8);
+				var payelement = document.getElementById('sr-payment-pay');
+				payelement.innerText = 'Pay '+producttotal+' BTC';
+
+		    	//debug
+			    //console.log(elbtcqr)
+
+		    	//hide the payment methods
+				hideClass(document.getElementById('sr-paymentmethods'));
+		    	//hide btc stuff
+				hideClass(document.getElementById('sr-checkout'));
+				//hide the product details
+				hideClass(document.getElementById('sr-cartlistitems'));
+				//show the customer details
+				showClass(document.getElementById('sr-back-button'));
+	    		//show btc stuff		    	
+				showClass(document.getElementById('sr-paymentwrapper'));
+				//hide the customer details			  					
+				showClass(document.getElementById('sr-back-button'));
+				hideClass(document.getElementById('sr-customerdetailswrapper'));
+				//call the check payment
+				checkpaymentres = setInterval(checkPayment, 3000)
+
+
+		    	return;
+		    	if (usepaymenttype == 1)
+		    	{
+		    		var eladdress = document.getElementById('sr-address');
 				    //set the href
-				    elbtcaddress.setAttribute('href', "bitcoin:"+btcaddress);
+				    eladdress.setAttribute('href', "bitcoin:"+btcaddress);
 				    //set the address
-		    		elbtcaddress.innerText =btcaddress;
+		    		eladdress.innerText =btcaddress;
 		    		//do pay from wallet also
-		    		var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
+		    		var eladdresswallet = document.getElementById('sr-addresswallet');
 				    //set the href
-				    elbtcaddress.setAttribute('href', "bitcoin:"+btcaddress);
+				    eladdresswallet.setAttribute('href', "bitcoin:"+btcaddress);
 		    		//debug
 				    //console.log(elbtcaddress)
 				    //generate the qr code
-				    var elbtcqr = document.getElementById('sr-bitcoinqrcode');
-					elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+btcaddress);
+				    var elqr = document.getElementById('sr-qrcode');
+					elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+btcaddress);
+			    	
+			    	//multipily the price by the number of items in the cart
+					var producttotal = price * itemcount;
+					//set it to 8 decimal places as it's Bitcoin
+					//producttotal = parseFloat(producttotal).toFixed(8);
+					var payelement = document.getElementById('sr-payment-pay');
+					payelement.innerText = 'Pay '+producttotal+' BTC';
+
 			    	//debug
 				    //console.log(elbtcqr)
 
@@ -669,7 +733,7 @@ var SR = SR || (function()
 					//show the customer details
 					showClass(document.getElementById('sr-back-button'));
 		    		//show btc stuff		    	
-					showClass(document.getElementById('sr-bitcoinaddresswrapper'));
+					showClass(document.getElementById('sr-paymentwrapper'));
 					//hide the customer details			  					
 					showClass(document.getElementById('sr-back-button'));
 					hideClass(document.getElementById('sr-customerdetailswrapper'));
@@ -678,8 +742,49 @@ var SR = SR || (function()
 		    	}
 		    	if (usepaymenttype == 2)
 		    	{
-		    		//light
-		    		alert('lightning')
+
+		    		var eladdress = document.getElementById('sr-address');
+				    //set the href
+				    eladdress.setAttribute('href', "bitcoin:"+lightaddress);
+				    //set the address
+		    		eladdress.innerText =lightaddress;
+		    		//do pay from wallet also
+		    		var eladdresswallet = document.getElementById('sr-addresswallet');
+				    //set the href
+				    eladdresswallet.setAttribute('href', "lightning:"+lightaddress);
+		    		//debug
+				    //console.log(elbtcaddress)
+				    //generate the qr code
+				    var elqr = document.getElementById('sr-qrcode');
+					elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+lightaddress);
+			    	
+
+			    	//multipily the price by the number of items in the cart
+					var producttotal = price * itemcount;
+					//set it to 8 decimal places as it's Bitcoin
+					//producttotal = parseFloat(producttotal).toFixed(8);
+					var payelement = document.getElementById('sr-payment-pay');
+					payelement.innerText = 'Pay '+producttotal+' BTC';
+
+			    	//debug
+				    //console.log(elbtcqr)
+
+			    	//hide the payment methods
+					hideClass(document.getElementById('sr-paymentmethods'));
+			    	//hide btc stuff
+					hideClass(document.getElementById('sr-checkout'));
+					//hide the product details
+					hideClass(document.getElementById('sr-cartlistitems'));
+					//show the customer details
+					showClass(document.getElementById('sr-back-button'));
+		    		//show btc stuff		    	
+					showClass(document.getElementById('sr-paymentwrapper'));
+					//hide the customer details			  					
+					showClass(document.getElementById('sr-back-button'));
+					hideClass(document.getElementById('sr-customerdetailswrapper'));
+					//call the check payment
+					checkpaymentres = setInterval(checkPayment, 3000)
+		    		
 		    	}
 				
 		        break;
@@ -693,7 +798,7 @@ var SR = SR || (function()
 				showClass(document.getElementById('sr-back-button'));
 				showClass(document.getElementById('sr-customerdetailswrapper'));
 		    	//show btc stuff
-				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+				hideClass(document.getElementById('sr-paymentwrapper'));
 		        break; 
 		     case 6:
 		     	hideClass(document.getElementById('sr-billingaddressswrapper'));
@@ -706,7 +811,7 @@ var SR = SR || (function()
 		     	//hide back button
 				hideClass(document.getElementById('sr-back-button'));
 				//hide payment details
-		     	hideClass(document.getElementById('sr-bitcoinaddresswrapper'))
+		     	hideClass(document.getElementById('sr-paymentwrapper'))
 		     	//show paid screeb
 		    	showClass(document.getElementById('sr-paid'));
 		     	break;
@@ -796,7 +901,7 @@ var SR = SR || (function()
 		});
 
 		
-		document.getElementById('sr-bitcoinaddresscopy').addEventListener('click', function () 
+		document.getElementById('sr-addresscopy').addEventListener('click', function () 
 		{
 			const el = document.createElement('textarea');  // Create a <textarea> element
 			el.value = address;                                 // Set its value to the string that you want copied

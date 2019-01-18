@@ -1,19 +1,19 @@
 /*select*/
 
-.lds-ripple {
+.loadingAnimation {
   position: relative;
   float: right;
   padding-right: 27px;
   width: 10px;
   height: 10px;
 }
-.lds-ripple div {
+.loadingAnimation div {
   position: absolute;
   border: 2px solid #cef;
   opacity: 1;
   animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
 }
-.lds-ripple div:nth-child(2) {
+.loadingAnimation div:nth-child(2) {
   animation-delay: -0.5s;
 }
 @keyframes lds-ripple {
@@ -654,10 +654,10 @@ Main Components
   text-align: center;
 }
 
-#sr-bitcoinaddresswrapper  {
+#sr-paymentwrapper  {
   text-align: center;
 }
-#sr-bitcoinaddresswrapper img {
+#sr-paymentwrapper img {
   width: 45%;
 }
 
@@ -668,18 +668,35 @@ Main Components
   padding-bottom: 90px;
 }
 
+.sr-addresscopy {
+  float: right;
+  padding-right: 20px;
+}
 
-.sr-bitcoinoptions a {
+
+
+.sr-addresscopy a {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 2px;
 }
 
-.sr-bitcoinaddress {
-  border-bottom: 1px dashed gray;
+
+.sr-addresswallet {
+  float: left;
+}
+
+.sr-addresswallet a {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.sr-address {
+  font-size: 11px;
+  border-bottom: 1px;
   cursor: pointer;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
-.sr-bitcoinoptions {
-  padding-top: 10px;
-  padding-bottom: : 10px;
-}
+

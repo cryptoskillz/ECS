@@ -8,7 +8,7 @@
    <div class="sr-cart">
       <div class="sr-wrapper">
          <sr-header>
-            <h2>Cart</h2>  <div id="sr-loading-Animation" class="lds-ripple" style="display:none"><div></div><div></div></div>
+            <h2>Cart</h2>  <div id="sr-loading-Animation" class="loadingAnimation" style="display:none"><div></div><div></div></div>
 
             <span><a class="sr-back"  id="sr-back-button" href="#0">Back</a></span>
          </sr-header>
@@ -88,21 +88,27 @@
 
             </div>
 
-            <div id="sr-bitcoinaddresswrapper">
-               <div>
-                    <a id="sr-bitcoinaddress" class="sr-bitcoinaddress" href=""></a>
+            <div id="sr-paymentwrapper">
+               <span class="sr-payment-pay" id="sr-payment-pay"></span>
+                <div>
+                  <img id="sr-qrcode" src="" />
                 </div>
-                <div class="sr-bitcoinoptions" >
-                  <a href="#" class="sr-bitcoinaddresscopy" id="sr-bitcoinaddresscopy">
+               <div>
+                    <a id="sr-address" class="sr-address" href=""></a>
+                </div>
+                <div class="sr-addresscopydiv" >
+                  <a href="#" class="sr-addresscopy" id="sr-addresscopy">
                        <i class="fa fa-copy"></i>
                        Copy
                    </a>
-                   <a href="" id="sr-bitcoinaddresswallet">
+                </div>
+                <div class="sr-addresswallet">
+                   <a href="" id="sr-addresswallet" class="sr-addresswallet">
                        <i class="fa fa-btc"></i>
-                       Pay from wallet
+                       Open wallet
                    </a>
                 </div>
-               <img id="sr-bitcoinqrcode" src="" />
+              
             </div>
 
             <div id="sr-paid" class="sr-paid ">
