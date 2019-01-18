@@ -84,16 +84,16 @@ var api = function() {
 
     This function generate session for sr.js to use to intreact with the server.
 
+    todo :  Return the cart
+            
+
   */
   this.userSession = function userSession(req,res)
   {
-   // return;
-    //laods the UID 
+    //laod the UID 
     let uuidv1 = require('uuid/v1');
     //get a session id
     let sessionid  = uuidv1();
-    //debug
-    //let sessionid  = "44b2f5c0-189a-11e9-91a4-a59245cc45cb";
     //build the SQL 
     let sqldata = [sessionid ];
     let sql = `select * from usersessions where sessionid = ?`;
