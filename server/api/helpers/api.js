@@ -167,7 +167,6 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
-    console.log('in sud')
     //debug
     //console.log(req.query);
 

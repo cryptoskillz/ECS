@@ -47,102 +47,131 @@ var strike = function ()
 
 	this.charge = function charge(req,res)
 	{
+
 		//debug
 		//console.log(req.query);
 
-		//get the details from database
-		let data = [req.query.sessionid];
-    	//console.log(data)
-   		let sql = `SELECT * FROM order_product where sessionid = ?`;
-    	//debug
+		let sqldata = [req.query.sessionid];
+    	let sql = `select * from usersessions where sessionid = ?`;
 
-    	db.get(sql, data, (err, result) => {
-    		if (err) {
-        		console.log(err)
-      		}
-      		//debug
-      		//console.log(result);
+    	//run it and see if it is in the database
+    	db.get(sql, sqldata, (err, result) => {
+	      	if (err) 
+	      	{
+	        	//there was an error
+	        	res.send(JSON.stringify({ error: err.message }));
+	        	return;
+	      	}
+			//debug
+			//console.log(result);
 
-      		if (result != undefined)
-      		{
-      			var price = parseFloat(result.price) * result.quantity;
+			//check that it is not in the database
+			//note : we could do this better by checking the array length. 
+			if ((result.lightaddress != null ) && (result.lightaddress != "" ))
+			{
+				//return the required details to the front end
+				var obj = {id:"",amount:"",payment_request:result.lightaddress}
+				res.send(JSON.stringify({ payment: obj }));
+			}
+			else
+			{
 
-      			price = parseFloat(price) * 100000000;
+				//get the details from database
+				let data = [req.query.sessionid];
+		    	//console.log(data)
+		   		let sql = `SELECT * FROM order_product where sessionid = ?`;
+		    	//debug
 
-      			//build the options object
-				var options = {
-				  method: 'POST',
-				  url: process.env.STRIKEENDPOINT + '/api/v1/charges',
-				  headers: {
-				    'cache-control': 'no-cache',
-				    'Content-Type': 'application/json' },
-				  body: {
-				    amount: price,
-				    description: result.name,
-				    currency: "btc"
-				  },
-				  json: true,
-				  auth: {
-				    user: process.env.STRIKEAPIKEY,
-				    pass: '',
-				  }
-				};
-				//debug
-				//console.log(options);
+		    	db.get(sql, data, (err, result) => {
+		    		if (err) {
+		        		console.log(err)
+		      		}
+		      		//debug
+		      		//console.log(result);
+
+		      		if (result != undefined)
+		      		{
+		      			var price = parseFloat(result.price) * result.quantity;
+
+		      			price = parseFloat(price) * 100000000;
+
+		      			//build the options object
+						var options = {
+						  method: 'POST',
+						  url: process.env.STRIKEENDPOINT + '/api/v1/charges',
+						  headers: {
+						    'cache-control': 'no-cache',
+						    'Content-Type': 'application/json' },
+						  body: {
+						    amount: price,
+						    description: result.name,
+						    currency: "btc"
+						  },
+						  json: true,
+						  auth: {
+						    user: process.env.STRIKEAPIKEY,
+						    pass: '',
+						  }
+						};
+						//debug
+						//console.log(options);
 
 
-				//call it 
-				request(options, function (error, response, body) {
-				 	if (error) throw new Error(error);
-				  	//debug
-				  	//console.log(body)
+						//call it 
+						request(options, function (error, response, body) {
+						 	if (error) throw new Error(error);
+						  	//debug
+						  	//console.log(body)
 
-				  	//turn it into a BTC amount
-				  	//note : in a future update we may go ahead and store everything Satoshis. 
-				  	//		 we could also use req.query.amount here
-				  	//		 we may want to store order_meta and product_meta here in the future if so we will make those generic functions
-					var amount = parseFloat(body.amount) * 0.00000001;
+						  	//turn it into a BTC amount
+						  	//note : in a future update we may go ahead and store everything Satoshis. 
+						  	//		 we could also use req.query.amount here
+						  	//		 we may want to store order_meta and product_meta here in the future if so we will make those generic functions
+							var amount = parseFloat(body.amount) * 0.00000001;
 
-					//update it
-					let data = [body.payment_request, req.query.sessionid];
-					console.log(data);
-			        //build the query
-			        let sql = `UPDATE usersessions
-							          SET lightaddress=?
-							          WHERE sessionid = ?`;
-			        //run the query
-			        db.run(sql, data, function(err) {
-			        	if (err) {
-			            	return console.error(err.message);
-			          	}
+							//update it
+							let data = [body.payment_request, req.query.sessionid];
+							console.log(data);
+					        //build the query
+					        let sql = `UPDATE usersessions
+									          SET lightaddress=?
+									          WHERE sessionid = ?`;
+					        //run the query
+					        db.run(sql, data, function(err) {
+					        	if (err) {
+					            	return console.error(err.message);
+					          	}
 
-				        //store the order_payment_details 
-						db.run(
-							`INSERT INTO order_payment_details(address,providerid,paymentobject) VALUES(?,?,?)`,
-							[body.payment_request,2, JSON.stringify(body)],
-							function(err) 
-							{
-								if (err) 
-								{
-								  //return error
-								  res.send(JSON.stringify({ error: err.message }));
-								  return;
-								}
-								//return the required details to the front end
-								var obj = {id:body.id,amount:body.amount,payment_request:body.payment_request}
-								res.send(JSON.stringify({ payment: obj }));
-								//debug
-								//console.log(body.payment_request);
-							}
-						);
-				     });
-				});
-		    }
-		    else
-		    {
-		    	console.log('not found');
-		    }
-    	});
+						        //store the order_payment_details 
+								db.run(
+									`INSERT INTO order_payment_details(address,providerid,paymentobject) VALUES(?,?,?)`,
+									[body.payment_request,2, JSON.stringify(body)],
+									function(err) 
+									{
+										if (err) 
+										{
+										  //return error
+										  res.send(JSON.stringify({ error: err.message }));
+										  return;
+										}
+										//return the required details to the front end
+										var obj = {id:body.id,amount:body.amount,payment_request:body.payment_request}
+										res.send(JSON.stringify({ payment: obj }));
+										//debug
+										//console.log(body.payment_request);
+									}
+								);
+						     });
+						});
+				    }
+				    else
+				    {
+				    	console.log('not found');
+				    }
+		    	});
+
+			}
+		});
 	}
 
 

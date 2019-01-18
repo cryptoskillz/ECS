@@ -424,6 +424,10 @@ var SR = SR || (function()
 		  		{
 					var url = serverurl+"api/session?uid="+uid;
 					fetchurl(url,'getsession');
+				}
+				else
+				{
+					sessionid = ses;
 				}	
 	
 		    }
