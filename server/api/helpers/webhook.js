@@ -32,12 +32,6 @@ var generic = new generichelper();
 
 var webhook = function ()
 {
-	this.test = function test() 
-	{
-		console.log('yay')
-		
-	}
-
 	//recieve a payment notificaiotn from strike
 	this.strikeNotification = function strikeNotification(req,res)
 	{
@@ -55,85 +49,5 @@ var webhook = function ()
 		 }
 	}
 
-	/*
-
-	this function checks for a payment from strike 
-
-	todo : we should check that this is valid request at some point or auth it somehow
-		   send emails to user if email is set
-	*/
-	this.checkStrikePayment = function checkStrikePayment(req,res)
-	{
-		//debug
-		//console.log(req.body.data.payment_request)
-		//return;
-		let data = [1,1, req.body.data.payment_request];
-		let sql = `UPDATE sessions SET processed = ?,swept=? WHERE address = ?`;
-		db.run(sql, data, function(err) {
-			//console.log(result)
-			if (err) {
-				res.send(JSON.stringify({ status: 0 }));
-			}
-			//store payment object
-			let data = [JSON.stringify(req.body.data),req.body.data.payment_request];
-			let sql = `UPDATE order_payment_details SET paymentresponseobject = ? WHERE address = ?`;
-			db.run(sql, data, function(err) 
-			{
-				if (err) {
-					res.send(JSON.stringify({ status: 0 }));
-				}
-				//send emails to admin
-				generic.sendMail(2,'cryptoskillz@protonmail.com');
-
-				res.send(JSON.stringify({ status: 1 }));
-			});
-		});
-
-	}	
-	
-	
-	this.checkPayment = function checkPayment(req,res) 
-	{
-		//debug
-		//console.log(address)
-
-		if (req.query.type == "BTC")
-		{
-			//decryop the wallet
-			client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => 
-			{
-				//get the unspent transaxtions for the address we are intrested in.
-				client.listUnspent(1, 9999999, [req.query.address]).then(result => 
-				{
-					//debug
-					//console.log(result);
-					//console.log(result.length)
-					//note we only check the first one as should only use each address once but we can 
-					//easily update this to run through all the results to check for an active paymebt in
-					//the array
-
-					//check there is a result
-					if (result.length > 0)
-					{
-						//check the confirmations
-						if (result[0].confirmations >= process.env.CONFIRMATIONS) 
-						{
-							//valid
-							res.send(JSON.stringify({ status: 1 }));
-						}
-						else
-						{
-							//not valid
-							res.send(JSON.stringify({ status: 0 }));
-						}
-					}
-					else
-					{
-						res.send(JSON.stringify({ status: 0 }));	
-					}
-				});
-			});
-		}
-	}
 }
 exports.webhook = webhook;

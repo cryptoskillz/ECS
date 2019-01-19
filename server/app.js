@@ -82,58 +82,6 @@ START OF WEBHOOK FUNCTION
 ========================
 */
 
-/*
-This function is used to create a check function to check if a payment has been made
-
-At present I use the bitcoin wallet to check the address for confirmations.  We could also 
-use the flags processed and swept in the session table if we wanted but it is not really essential.
-because we are using the wallet to check it can only check on addresses that it created which is fine
-but if we wanted to make it very generic and check any address we could use the block.io code we have to do 
-that.
-
-The usage for this function is so that the sr.js can check for payments and update the UI accordingly if it finds 
-a sucessful payment. 
-
-
-*/
-app.get("/webhook/checkpayment", (req, res) => {
-  //debug
-  //console.log(req.body.data.payment_request)
-  //res.send(JSON.stringify({ status: "ok" }));//return;
-
-  //set the headers
-  res = generic.setHeaders(res);
-  //right now we only check the address is there we could also check token if we wanted to 
-  //but it is read only so not overly concerened with doing this. 
-  if ((req.query.address == undefined) || (req.query.address == ''))
-  {
-     res.send(JSON.stringify({ error: "no address" }));
-     return;
-  }
-  //load the webhook helper helper
-  let webhookhelper = require('./api/helpers/webhook.js').webhook;
-  let webhook = new webhookhelper();
-  //check for payment
-  webhook.checkPayment(req,res);
-
-});
-
-/*
-
-This function checks for strike payments to be processed
-
-*/
-
-app.post("/webhook/checkstrikepayment", (req, res) => {
-  res = generic.setHeaders(res);
-  //load the back office helper
-  let webhookhelper = require('./api/helpers/webhook.js').webhook;
-  let webhook = new webhookhelper();
-
-  //debug
-  webhook.checkStrikePayment(req,res);
-});
-
 
 /*
 
@@ -271,6 +219,51 @@ END OF ADMIN FUNCTION
 START OF API FUNCTIONS
 ========================
 */
+
+
+/*
+This function is used to create a check function to check if a payment has been made
+
+At present I use the bitcoin wallet to check the address for confirmations.  We could also 
+use the flags processed and swept in the session table if we wanted but it is not really essential.
+because we are using the wallet to check it can only check on addresses that it created which is fine
+but if we wanted to make it very generic and check any address we could use the block.io code we have to do 
+that.
+
+The usage for this function is so that the sr.js can check for payments and update the UI accordingly if it finds 
+a sucessful payment. 
+
+
+*/
+app.get("/api/checkpayment", (req, res) => {
+  //debug
+  //console.log(req.body.data.payment_request)
+  //res.send(JSON.stringify({ status: "ok" }));//return;
+
+  //set the headers
+  res = generic.setHeaders(res);
+  //right now we only check the address is there we could also check token if we wanted to 
+  //but it is read only so not overly concerened with doing this. 
+  if ((req.query.address == undefined) || (req.query.address == ''))
+  {
+     res.send(JSON.stringify({ error: "no address" }));
+     return;
+  }
+
+  //load the api helper helper
+  let apihelper = require('./api/helpers/api.js').api;
+  let api = new apihelper(); 
+  //check for payment
+  if (req.query.type == 1)
+  {
+    api.monitorBTC(req,res);
+  }
+  if (req.query.type == 2)
+  {
+    api.monitorStrike(req,res);
+  }
+
+});
 
 /*
 

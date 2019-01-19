@@ -80,7 +80,6 @@ var SR = SR || (function()
 
 	function setCookie(name,value,days) 
 	{
-		alert('setting '+name)
 	    var expires = "";
 	    if (days) 
 	    {
@@ -119,20 +118,18 @@ var SR = SR || (function()
 
 		//set vars
 		var address = '';
-		var type = '';
 		//check if it is a BTC payment
-		if (btcaddress !='')
+		if (usepaymenttype == 1)
 		{
 			address = btcaddress;
-			type = 'BTC'
 		}
-		//todo : check if it is a lightning payment. 
+		if (usepaymenttype == 2)
+		{
+			address = lightaddress;
+		}
 
 		//Call the server
-		//Note : 	We could send up the session here and get the address on the server that way BTC and Lightning 
-		//			could benefit from being called fron the same endpoint.  We are already sending up the type
-		//			maybe we do this when we add LDN / C-Lightning support. 
-		var url = serverurl+"webhook/checkpayment?address="+address+'&type='+type;
+		var url = serverurl+"api/checkpayment?address="+address+'&type='+usepaymenttype+'&sessionid='+sessionid;
 		fetchurl(url,'checkpayment')
 
 	}
@@ -445,7 +442,10 @@ var SR = SR || (function()
 
 		    	//check if we have enough confirmartions
 		    	if (data.status == 1)
-		    		cartstate(7)
+		    	{
+
+		    		cartstate(7);
+		    	}
 		    }
 
 		  } 
@@ -714,6 +714,10 @@ var SR = SR || (function()
 		     	showClass(document.getElementById('sr-pay'));
 		     	hideClass(document.getElementById('sr-shipping'));
 		     case 7:
+		     	//erase the cookie
+		     	eraseCookie('ecs');
+		     	//delete the seesion id.
+		    	sessionid = '';
 		     	//stop payment timer
 		     	stopPaymentCheck()
 		     	//hide back button

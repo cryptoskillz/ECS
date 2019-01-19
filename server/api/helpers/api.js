@@ -378,6 +378,33 @@ var api = function() {
     });
   }
 
+  this.monitorStrike = function monitorStrike(req,res) {
+   // console.log(req.query);
+    let sqldata = [req.query.sessionid];
+    let sql = `select processed from usersessions where sessionid = ?`;
+    db.get(sql, sqldata, (err, result) => {      
+      //console.log(result)
+      if (err) {
+        res.send(JSON.stringify({ status: 0 }));
+      }
+
+      if (result == undefined)
+      {
+         res.send(JSON.stringify({ status: 0 }));
+         return;
+      }
+      else
+      {
+        if (result.processed == 1)
+        {
+          res.send(JSON.stringify({ status: 1 }));
+         return;
+        }
+      }
+    });
+
+  }
+
 
   /*
 	*
@@ -386,10 +413,11 @@ var api = function() {
   * todo: check client is running
 	*
 	*/
-  this.monitor = function monitor(address, res) {
+  this.monitorBTC = function monitorBTC(req, res) {
     //call the recieved by address RPC call
     //console.log(address)
-    client.getReceivedByAddress(address).then(result => {
+    //todo : move this to a generic function.
+    client.getReceivedByAddress(req.query.address).then(result => {
       //check it is more tha 0
       //note may want to check confirmations here
 
@@ -398,19 +426,19 @@ var api = function() {
 
       if (result > 0) {
         //build a data array
-        let data = ["1", result, address];
+        let data = ["1", result, req.query.sessionid];
         //build the query
         let sql = `UPDATE usersessions
 				          SET processed = ?,
 				            amount = ?
-				          WHERE address = ?`;
+				          WHERE sessionid = ?`;
         //run the query
         db.run(sql, data, function(err) {
           if (err) {
             return console.error(err.message);
           }
           //retun response
-          res.send(JSON.stringify({ status: "confirmed" }));
+          res.send(JSON.stringify({ status: 1 }));
           //todo: send the email confirmations.
           //send email to customer.
           //console.log('send email in monitor')
@@ -418,7 +446,7 @@ var api = function() {
         });
       } else {
         //return error
-        res.send(JSON.stringify({ status: "not confirmed" }));
+        res.send(JSON.stringify({ status: 0 }));
       }
     });
   };
