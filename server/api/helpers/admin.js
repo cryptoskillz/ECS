@@ -78,9 +78,9 @@ var admin = function ()
 		//store the data for the query 
 		let data = [token];
 		//build the query
-	  	let sql =`select sessions.id,sessions.address,sessions.processed,sessions.swept,sessions.net,sessions.amount
+	  	let sql =`select usersessions.id,usersessions.sessionid,usersessions.paymenttype,usersessions.btcaddress,usersessions.lightaddress,usersessions.processed,usersessions.swept,usersessions.net,usersessions.amount
 	    		  from ecs_user
-	    		  INNER JOIN sessions ON ecs_user.id = sessions.userid
+	    		  INNER JOIN usersessions ON ecs_user.id = usersessions.userid
 		          WHERE ecs_user.sessiontoken = ?`;
 		 //debug
 		 //console.log(sql)
@@ -120,17 +120,17 @@ var admin = function ()
 	* 	Note: Not 100% sure that order is the correct name here, we may have to change this in the future
 	*
 	*/
-	this.getOrder = function getOrder(address,res)
+	this.getOrder = function getOrder(sessionid,res)
 	{
 		//debug
-		//console.log(address);
+		//console.log(sessionid);
 		//create a reults object
 		let jsonStr = '{"results":[]}';
 		let obj = JSON.parse(jsonStr);
 		//store the data for the query 
-		let data = [address];
+		let data = [sessionid];
 		//build the query
-		let sql = `select * from order_product WHERE order_product.address = ?`;
+		let sql = `select * from order_product WHERE order_product.sessionid = ?`;
 		//debug
 		//console.log(sql)
 		//run the query

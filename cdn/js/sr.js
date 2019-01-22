@@ -714,6 +714,7 @@ var SR = SR || (function()
 		     	showClass(document.getElementById('sr-pay'));
 		     	hideClass(document.getElementById('sr-shipping'));
 		     case 7:
+		     	//todo: reset the cart counter
 		     	//erase the cookie
 		     	eraseCookie('ecs');
 		     	//delete the seesion id.

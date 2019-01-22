@@ -193,46 +193,77 @@ function paymentsDone()
     //loop through the results returned from the server
 	jQuery.each( result.results, function( index, res )
 	{
-		//console.log(res);
+		
+		//debug
+		//console.log(res)
+
+		//return;
 		//net 1 = live 2 = test
+
+		var address = '';
+		if (res.paymenttype == 1)
+		{
+			if (res.btcaddress != null)
+				address = res.btcaddress;
+		}
+		if (res.paymenttype == 2)
+		{
+			if (res.lightaddress != null)
+				address = res.lightaddress;
+		}
 
 		//vars 
 		var processed = 'Yes';
 		var swept = 'Yes';
 		//set the block explorer url
 		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
-		blockexplorerurl = blockexplorerurl+res.address+'/';
-		//actions column
-		var actions = '<a href="'+blockexplorerurl+'" target="_blank"><i class="fas fa-globe" title="View on blockchain explorer"></i> </a>'
-		//check if the payment was processed
-		if (res.processed == 0)
-		{	
-			//set processed to no
-			processed = 'No';
-			//add to the action
-			actions = actions + '<a href="javascript:checkProcessed(\''+res.address+'\')"><i class="fas fa-money-bill" title="Check for payment"></i> </a>'
+		blockexplorerurl = blockexplorerurl+address+'/';
 
-		}
-		//check if it was swept
-		//note: you should never have an unprocessed payment that was swept but it does not harm to have this additional check.
-		if (res.swept == 0)
+		
+		
+
+		//check for blank address 
+		if (address != '')
 		{
-			//add to the acction 
-			swept = "No";
-			actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-broom" title="Move money to cold storage"></i> </a>'
-		}
+			//actions column
+			//check its not lightning
+			var actions = '';
+			if (res.paymenttype == 1)
+			{	
+				 actions = '<a href="'+blockexplorerurl+'" target="_blank"><i class="fas fa-globe" title="View on blockchain explorer"></i> </a>'
+			
+			
+				//check if the payment was processed
+				if (res.processed == 0)
+				{	
+					//set processed to no
+					processed = 'No';
+					//add to the action
+					actions = actions + '<a href="javascript:checkProcessed(\''+address+'\')"><i class="fas fa-money-bill" title="Check for payment"></i> </a>'
 
-		
-		
-		//add the row to the table
-		t.row.add( [
-			'<a href="order.html?address='+res.address+'" title="View Order details">'+res.id+'</a>',
-			'<a href="'+blockexplorerurl+'" target="_blank" title="View on blockchain explorer">'+res.address+'</a>',
-			processed,
-			swept,
-			'<i class="fab fa-bitcoin"></i>'+res.amount,
-			actions
-		] ).draw( false );
+				}
+				//check if it was swept
+				//note: you should never have an unprocessed payment that was swept but it does not harm to have this additional check.
+				if (res.swept == 0)
+				{
+					//add to the acction 
+					swept = "No";
+					actions = actions + '<a href="javascript:checkSwept(\''+address+'\')"><i class="fas fa-broom" title="Move money to cold storage"></i> </a>'
+				}
+			}
+
+			
+			
+			//add the row to the table
+			t.row.add( [
+				'<a href="order.html?sessionid='+res.sessionid+'" title="View Order details">'+res.id+'</a>',
+				'<a href="'+blockexplorerurl+'" target="_blank" title="View on blockchain explorer">'+address+'</a>',
+				processed,
+				swept,
+				'<i class="fab fa-bitcoin"></i>'+res.amount,
+				actions
+			] ).draw( false );
+			}
 	});
 	
 }
@@ -368,7 +399,7 @@ $(document).ready(function()
 		{
 			//make a server call
 			var urls = new URL(url);
-			var geturl = serverurl+'admin/order?token='+token+'&address='+urls.searchParams.get("address");
+			var geturl = serverurl+'admin/order?token='+token+'&sessionid='+urls.searchParams.get("sessionid");
 			//alert(geturl);
 			ajaxGET(geturl,"orderDone()");
 		}		

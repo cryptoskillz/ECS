@@ -171,16 +171,16 @@ app.get("/admin/order", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
   //check if it is a zero and if so return error
-  if ((req.query.address == undefined) || (req.query.address == ''))
+  if ((req.query.sessionid == undefined) || (req.query.sessionid == ''))
   {
-     res.send(JSON.stringify({ error: "no address" }));
+     res.send(JSON.stringify({ error: "no sessionid" }));
      return;
   }
   //load the admin helper
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
   //get the products
-  admin.getOrder(req.query.address,res);
+  admin.getOrder(req.query.sessionid,res);
 });
 
 //return a list of payments
