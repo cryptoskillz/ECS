@@ -139,9 +139,8 @@ var api = function() {
         var ts = Math.round((new Date()).getTime() / 1000);
         //store in the usersessions database
         // generateBTCAddress(sessionid);
-         //return;
+        //return;
      
-        //bug: this function is writing an entry into the order_product table with a quanity of 3 this makes no sense.
         db.run(
           `INSERT INTO usersessions(sessionid,userid,net,sessiontime) VALUES(?,?,?,?)`,
           [
