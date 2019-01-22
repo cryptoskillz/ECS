@@ -37,6 +37,7 @@ var generic = new generichelper();
 
 var api = function() {
 
+
   //note : could move this to generic functions
   function generateBTCAddress(sessionid,res='')
   {
@@ -56,8 +57,8 @@ var api = function() {
           //console.log(sessionid);
 
           //update the session table
-          let data = [address, sessionid];
-          let sql = `UPDATE usersessions SET btcaddress = ? WHERE sessionid = ?`;
+          let data = [address,1, sessionid];
+          let sql = `UPDATE usersessions SET btcaddress = ?,paymenttype=? WHERE sessionid = ?`;
           db.run(sql, data, function(err) 
           {
             if (err) 
@@ -79,6 +80,25 @@ var api = function() {
     //as lighting requests require a payment amount we can do them ahead of time. 
   }
 
+
+
+  this.setpaymentstate = function setpaymentstate(req,res)
+  {
+    console.log(req.query);
+    let data = [req.query.paymenttype, req.query.sessionid];
+    let sql = `UPDATE usersessions SET paymenttype = ? WHERE sessionid = ?`;
+    db.run(sql, data, function(err) 
+    {
+      if (err) 
+      {
+        return console.error(err.message);
+      }
+
+      if (res != '')
+        res.send(JSON.stringify({ status: "ok" }));
+    });
+
+  }
 
   /*
 
@@ -268,7 +288,10 @@ var api = function() {
   */
   this.storeProduct = function storeProduct(req,res)
   {
+    //console.log(req.query);
     //check if it is in the product table
+
+    //console.log('quantity:'+req.query.quantity);
     if (req.query.quantity == 0) {
       //delete the record
       let data = [req.query.address];
@@ -289,10 +312,17 @@ var api = function() {
         if (err) {
           throw err;
         }
+
+        //console.log(rows.length);
+        console.log('length:'+rows.length);
+
         //check we have a result
-        if (rows.length == 0) {
+        if ((rows.length == 0) && (rows.length != undefined)) {
           //insert it
           //delete the record
+          //console.log('insert:');
+          res.send(JSON.stringify({ status: "ok" }));
+          
           db.run(
             `INSERT INTO order_product(sessionid,name,price,quantity) VALUES(?,?,?,?)`,
             [
@@ -307,8 +337,14 @@ var api = function() {
               }
             }
           );
-        } else {
+          
+        } 
+        else 
+        {
           //update it
+          //console.log('update:');
+
+          
           let data = [req.query.quantity, req.query.sessionid];
           let sql = `UPDATE order_product SET quantity = ? WHERE sessionid = ?`;
           db.run(sql, data, function(err) {
@@ -316,7 +352,9 @@ var api = function() {
               return console.error(err.message);
             }
           });
+          
         }
+
       });
     }
     //debug
@@ -324,7 +362,7 @@ var api = function() {
     //console.log(req.query.price);
     //console.log(req.query.quantity);
     //console.log(req.query.address);
-    res.send(JSON.stringify({ status: "ok" }));
+    
   }
   /*
   *

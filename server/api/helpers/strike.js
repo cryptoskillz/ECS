@@ -28,14 +28,6 @@ var request = require("request");
 //note why uppercase here?
 var strike = function ()
 {
-	this.test = function test(req,res) 
-	{
-
-        res.send(JSON.stringify({ status: "ok" }));
-     
-	}
-
-
 
 	/*
 
@@ -128,11 +120,12 @@ var strike = function ()
 							var amount = parseFloat(body.amount) * 0.00000001;
 
 							//update it
-							let data = [body.payment_request, req.query.sessionid];
-							console.log(data);
+							let data = [body.payment_request,2, req.query.sessionid];
+							//console.log(data);
 					        //build the query
 					        let sql = `UPDATE usersessions
-									          SET lightaddress=?
+									          SET lightaddress=?,
+									          	  paymenttype=?
 									          WHERE sessionid = ?`;
 					        //run the query
 					        db.run(sql, data, function(err) {

@@ -325,16 +325,22 @@ var SR = SR || (function()
 		1 = bitocin
 		2 = lightning
 		*/
+
+
+
 		switch (type) 
 		{
 		    case 1:
 		    	if (btcaddress == '')
 		    	{
-		    		var url = serverurl+"api/address?uid="+uid+'&sessionid='+sessionid;
+		    		var url = serverurl+"api/address?uid="+uid+'&sessionid='+sessionid+'&paymenttype='+usepaymenttype;
 					fetchurl(url,'getaddressbtc');
 				}
 				else
 				{
+					//call the payment state 
+					var url = serverurl+"api/setpaymentstate?uid="+uid+'&sessionid='+sessionid+'&paymenttype=1';
+					fetchurl(url,'');
 					setAddressState(1);
 				}
 		        break;
@@ -342,11 +348,14 @@ var SR = SR || (function()
 
 		    	if (lightaddress == '')
 		    	{
-		    		var url = serverurl+"strike/charge?uid=3&sessionid="+sessionid
+		    		var url = serverurl+"strike/charge?uid=3&sessionid="+sessionid+'&paymenttype=2';
 					fetchurl(url,'getaddressslight');
 				}
 				else
 				{
+					//call the payment state 
+					var url = serverurl+"api/setpaymentstate?uid="+uid+'&sessionid='+sessionid+'&paymenttype='+usepaymenttype;
+					fetchurl(url,'');
 					setAddressState(2);
 				}
 		    	break;
@@ -464,6 +473,7 @@ var SR = SR || (function()
 	//this function sets the correct addres state. billing / shipping etc
 	function setAddressState(type = 1)
 	{
+
 		//figure out what payment types to use
 		usepaymenttype = type;
 		var showUserSetailsScreen = true;

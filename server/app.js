@@ -221,6 +221,18 @@ START OF API FUNCTIONS
 */
 
 
+app.get("/api/setpaymentstate", (req, res) => {
+  //set the headers
+  console.log('d');
+  res = generic.setHeaders(res);
+  //load the api helper helper
+  let apihelper = require('./api/helpers/api.js').api;
+  let api = new apihelper(); 
+  //set payment state
+  api.setpaymentstate(req,res);
+});
+
+
 /*
 This function is used to create a check function to check if a payment has been made
 
