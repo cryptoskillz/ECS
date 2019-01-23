@@ -333,7 +333,7 @@ var SR = SR || (function()
 		    case 1:
 		    	if (btcaddress == '')
 		    	{
-		    		var url = serverurl+"api/address?uid="+uid+'&sessionid='+sessionid+'&paymenttype='+usepaymenttype;
+		    		var url = serverurl+"api/address?uid="+uid+'&sessionid='+sessionid+'&paymenttype='+type;
 					fetchurl(url,'getaddressbtc');
 				}
 				else
@@ -354,7 +354,7 @@ var SR = SR || (function()
 				else
 				{
 					//call the payment state 
-					var url = serverurl+"api/setpaymentstate?uid="+uid+'&sessionid='+sessionid+'&paymenttype='+usepaymenttype;
+					var url = serverurl+"api/setpaymentstate?uid="+uid+'&sessionid='+sessionid+'&paymenttype='+type;
 					fetchurl(url,'');
 					setAddressState(2);
 				}
@@ -426,14 +426,16 @@ var SR = SR || (function()
 				//       for binding in the database.
 				var ses = getCookie('ecs');
 		  		if (ses == null)
-		  		{
-					var url = serverurl+"api/session?uid="+uid;
-					fetchurl(url,'getsession');
-				}
-				else
-				{
-					sessionid = ses;
-				}	
+		  			ses = '';
+		  		//{
+		  		//always call it as it may be deleted / lost on the server ie old cart.
+				var url = serverurl+"api/session?uid="+uid+'&sessionid='+ses;
+				fetchurl(url,'getsession');
+				//}
+				//else
+				//{
+				//	sessionid = ses;
+				//}	
 	
 		    }
 		    if (method == "storeuserdetails")
@@ -633,6 +635,7 @@ var SR = SR || (function()
 		    	else
 		    	{
 		    		//fetch a BTC address as there is only one payment method so it is fine to do it here
+		    		usepaymenttype = 1;
 		    		getAddress(1);		    	
 		    	}
 		        break;
@@ -1096,10 +1099,12 @@ var SR = SR || (function()
 		},
 		bitcoinpayment : function ()
 		{
+			usepaymenttype = 1;
 			getAddress(1);
 		},
 		lightningpayment : function ()
 		{
+			usepaymenttype = 2;
 			getAddress(2);
 		}
    };

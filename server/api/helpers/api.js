@@ -84,7 +84,7 @@ var api = function() {
 
   this.setpaymentstate = function setpaymentstate(req,res)
   {
-    console.log(req.query);
+    //console.log(req.query);
     let data = [req.query.paymenttype, req.query.sessionid];
     let sql = `UPDATE usersessions SET paymenttype = ? WHERE sessionid = ?`;
     db.run(sql, data, function(err) 
@@ -115,11 +115,12 @@ var api = function() {
     //get a session id
     let sessionid  = uuidv1();
     //build the SQL 
-    let sqldata = [sessionid ];
+    let sqldata = [req.query.sessionid ];
     let sql = `select * from usersessions where sessionid = ?`;
 
     //run it and see if it is in the database
     db.get(sql, sqldata, (err, result) => {
+
       if (err) 
       {
         //there was an error
@@ -133,18 +134,22 @@ var api = function() {
 
       //check that it is not in the database
       //note : we could do this better by checking the array length. 
+      
       if (result == undefined )
       {
         //get the timestamp
-        var ts = Math.round((new Date()).getTime() / 1000);
+        let ts = Math.round((new Date()).getTime() / 1000);
         //store in the usersessions database
         // generateBTCAddress(sessionid);
         //return;
+        let ses = sessionid;
+        if (req.query.sessionid != '')
+          ses = req.query.sessionid;
      
         db.run(
           `INSERT INTO usersessions(sessionid,userid,net,sessiontime) VALUES(?,?,?,?)`,
           [
-          sessionid, 
+          ses, 
           req.query.uid, 
           process.env.NETWORK,
           ts
@@ -157,7 +162,7 @@ var api = function() {
             }
             //out the session id
             //console.log(req.query.uid);
-            res.send(JSON.stringify({ sessionid: sessionid }));
+            res.send(JSON.stringify({ sessionid: ses }));
             //note here we could generate a BTC / LIGHT address and cache it on the server removing the potential delays
             //then it could be called JIT when it is required, this would work if we decide to extened out to many API's
             generateBTCAddress(sessionid);
@@ -169,8 +174,17 @@ var api = function() {
       }
       else
       {
-        //we go again as the session id was in the database
-        this.userSession(req,res);
+        if (result.sessionid != '')
+        {
+          res.send(JSON.stringify({ sessionid: req.query.sessionid }));
+          return;
+        }
+        else
+        {
+           //we go again as the session id was in the database
+          this.userSession(req,res);
+        }
+       
       }
      
 

@@ -223,7 +223,6 @@ START OF API FUNCTIONS
 
 app.get("/api/setpaymentstate", (req, res) => {
   //set the headers
-  console.log('d');
   res = generic.setHeaders(res);
   //load the api helper helper
   let apihelper = require('./api/helpers/api.js').api;
@@ -276,6 +275,15 @@ app.get("/api/checkpayment", (req, res) => {
   }
 
 });
+
+
+/*
+
+  check a user session
+
+*/
+
+
 
 /*
 
