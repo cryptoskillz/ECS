@@ -15,12 +15,22 @@ var backOffice = function ()
 {
 	this.test = function test(req,res) 
 	{
-     client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
-      //create a new address in theaccount account :]
-      client.getBlockCount().then(count => {
-        res.send(JSON.stringify({ status: "ok","count":count }));
+    //check if we are using a wallet or not and if it is encrypated.
+    if (process.env.WALLETACCOUNT != '')
+    {
+      client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
+        //create a new address in theaccount account :]
+        client.getBlockCount().then(count => {
+          res.send(JSON.stringify({ status: "ok","count":count }));
+        });
       });
-    });
+    }
+    else
+    {
+        client.getBlockCount().then(count => {
+          res.send(JSON.stringify({ status: "ok","count":count }));
+        });
+    }
 
 	}
 
