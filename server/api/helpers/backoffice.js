@@ -24,10 +24,12 @@ var backOffice = function ()
      a full description of the changes from the ‘account’ API to the ‘label’ API.
     */
 
-    if (process.env.WALLETACCOUNT != '')
+    
+
+    if (process.env.WALLETPASSPHRASE != '')
     {
       client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
-        //create a new address in theaccount account :]
+        //create a new address in account :]
         client.getBlockCount().then(count => {
           res.send(JSON.stringify({ status: "ok","count":count }));
         });
@@ -35,9 +37,9 @@ var backOffice = function ()
     }
     else
     {
-        client.getBlockCount().then(count => {
-          res.send(JSON.stringify({ status: "ok","count":count }));
-        });
+      client.getBlockCount().then(count => {
+        res.send(JSON.stringify({ status: "ok","count":count }));
+      });
     }
 
 	}

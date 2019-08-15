@@ -55,7 +55,7 @@
           'outputs': [
             '<(SHARED_INTERMEDIATE_DIR)/sqlite-autoconf-<@(sqlite_version)/sqlite3.c'
           ],
-          'action': ['python','./extract.py','./sqlite-autoconf-<@(sqlite_version).tar.gz','<(SHARED_INTERMEDIATE_DIR)']
+          'action': ['<!(node -p "process.env.npm_config_python || \\"python\\"")','./extract.py','./sqlite-autoconf-<@(sqlite_version).tar.gz','<(SHARED_INTERMEDIATE_DIR)']
         }
       ],
       'direct_dependent_settings': {
@@ -78,6 +78,7 @@
         'include_dirs': [ '<(SHARED_INTERMEDIATE_DIR)/sqlite-autoconf-<@(sqlite_version)/' ],
         'defines': [
           'SQLITE_THREADSAFE=1',
+          'HAVE_USLEEP=1',
           'SQLITE_ENABLE_FTS3',
           'SQLITE_ENABLE_FTS4',
           'SQLITE_ENABLE_FTS5',
@@ -91,6 +92,7 @@
       'defines': [
         '_REENTRANT=1',
         'SQLITE_THREADSAFE=1',
+        'HAVE_USLEEP=1',
         'SQLITE_ENABLE_FTS3',
         'SQLITE_ENABLE_FTS4',
         'SQLITE_ENABLE_FTS5',

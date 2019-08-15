@@ -17,8 +17,10 @@ if (process.env.NETWORK == 1)
   client = new Client({
     host: "127.0.0.1",
     port: 18332,
+    wallet: process.env.WALLETACCOUNT,
     username: process.env.RPCUSERNAME,
-    password: process.env.RPCPASSWORD
+    password: process.env.RPCPASSWORD,
+
   });
 }
 
@@ -27,6 +29,7 @@ if (process.env.NETWORK == 2)
   client = new Client({
     host: "127.0.0.1",
     port: 8332,
+    wallet: process.env.WALLETACCOUNT,
     username: process.env.RPCUSERNAME,
     password: process.env.RPCPASSWORD
   });

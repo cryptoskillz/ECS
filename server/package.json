@@ -6,20 +6,20 @@
   "author": "cryptokskillz",
   "license": "ISC",
   "dependencies": {
-    "bip32": "^1.0.2",
-    "bip39": "^2.5.0",
-    "bitcoin-core": "^2.0.0",
-    "block_io": "^1.0.9-5",
-    "body-parser": "^1.18.3",
-    "commander": "^2.19.0",
+    "bip32": "^1.0.4",
+    "bip39": "^2.6.0",
+    "bitcoin-core": "^2.2.0",
+    "block_io": "^1.0.9",
+    "body-parser": "^1.19.0",
+    "commander": "^2.20.0",
     "const": "^1.0.0",
     "dotenv": "^6.2.0",
-    "express": "^4.16.3",
+    "express": "^4.17.1",
     "forever": "^0.15.3",
-    "install": "^0.12.1",
-    "nodemailer": "^4.6.8",
+    "install": "^0.12.2",
+    "nodemailer": "^4.7.0",
     "npm": "^6.10.3",
     "pkginfo": "^0.4.1",
-    "sqlite3": "^4.0.2"
+    "sqlite3": "^4.0.9"
   }
 }
