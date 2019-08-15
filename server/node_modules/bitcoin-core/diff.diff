@@ -1,0 +1,169 @@
+be591b6 - (HEAD -> feature/fix-tests) Add test for new wallet method and fix broken tests (14 minutes ago) <Pedro Branco>
+
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 31831db..708d806 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -29,7 +29,7 @@ bitcoin-core:
+     - 18443:18443
+ 
+ bitcoin-core-multi-wallet:
+-  image: ruimarinho/bitcoin-core:0.15-alpine
++  image: ruimarinho/bitcoin-core:0.17-alpine
+   command:
+     -printtoconsole
+     -regtest=1
+diff --git a/test/logging/request-obfuscator_test.js b/test/logging/request-obfuscator_test.js
+index 3bc5fe6..dcaac67 100644
+--- a/test/logging/request-obfuscator_test.js
++++ b/test/logging/request-obfuscator_test.js
+@@ -104,8 +104,8 @@ describe('RequestObfuscator', () => {
+     it('should obfuscate all private keys from `request.body` when `method` is `signrawtransactionwithkey` and RPC is called with named parameters', () => {
+       const request = { body: `{"id":"1485369469422","method":"signrawtransactionwithkey","params":${JSON.stringify({
+         hexstring: 'foo',
+-        privkeys: ['foo', 'bar'],
+         prevtxs: [],
++        privkeys: ['foo', 'bar'],
+         sighashtype: 'bar'
+       })}}`, type: 'request' };
+ 
+@@ -113,8 +113,8 @@ describe('RequestObfuscator', () => {
+ 
+       request.body.should.eql(`{"id":"1485369469422","method":"signrawtransactionwithkey","params":${JSON.stringify({
+         hexstring: 'foo',
+-        privkeys: ['******', '******'],
+         prevtxs: [],
++        privkeys: ['******', '******'],
+         sighashtype: 'bar'
+       })}}`);
+     });
+diff --git a/test/multi_wallet_test.js b/test/multi_wallet_test.js
+index 3f4c4d3..90aed9b 100644
+--- a/test/multi_wallet_test.js
++++ b/test/multi_wallet_test.js
+@@ -12,7 +12,7 @@ import config from './config';
+  * Test instance.
+  */
+ 
+-const client = new Client(defaults({ version: '0.15.0', wallet: 'wallet1' }, config.bitcoinMultiWallet));
++const client = new Client(defaults({ version: '0.17.0', wallet: 'wallet1' }, config.bitcoinMultiWallet));
+ 
+ /**
+  * Test `Client`.
+@@ -56,15 +56,6 @@ describe('Multi Wallet', () => {
+   });
+ 
+   describe('wallet-level requests', () => {
+-    describe('getAccountAddress()', () => {
+-      it('should retrieve an account address', async () => {
+-        const address = await client.getAccountAddress('test');
+-        const account = await client.getAccount(address);
+-
+-        account.should.equal('test');
+-      });
+-    });
+-
+     describe('getBalance()', () => {
+       it('should return the total server\'s balance', async () => {
+         const balance = await client.getBalance();
+@@ -73,22 +64,20 @@ describe('Multi Wallet', () => {
+       });
+ 
+       it('should support named parameters', async () => {
+-        const mainWalletBalance = await client.getBalance({ account: '*', minconf: 0 });
++        const mainWalletBalance = await client.getBalance({ minconf: 0 });
+         const mainWalletBalanceWithoutParameters = await client.getBalance('*', 0);
+-        const testWalletBalance = await client.getBalance({ account: 'test', minconf: 0 });
+ 
+-        mainWalletBalance.should.not.equal(testWalletBalance);
+         mainWalletBalanceWithoutParameters.should.equal(mainWalletBalance);
+       });
+     });
+ 
+     describe('getNewAddress()', () => {
+       it('should return a new bitcoin address', async () => {
+-        await client.getNewAddress('test');
++        const address = await client.getNewAddress('test', 'legacy');
+ 
+-        const addresses = await client.getAddressesByAccount('test');
++        const output = await client.validateAddress(address);
+ 
+-        addresses.length.should.be.above(1);
++        output.isvalid.should.be.true();
+       });
+     });
+ 
+@@ -101,14 +90,13 @@ describe('Multi Wallet', () => {
+           await client.sendToAddress(address, 0.1);
+         }
+ 
+-        const transactions = await client.listTransactions('test', 5);
++        const transactions = await client.listTransactions('*', 5);
+ 
+         transactions.should.be.an.Array();
+         transactions.should.matchEach(value => {
+           // Only a small subset of transaction properties are being asserted here to make
+           // sure we've received a transaction and not an empty object instead.
+           value.should.have.keys(
+-            'account',
+             'address',
+             'amount',
+             'category',
+@@ -129,14 +117,13 @@ describe('Multi Wallet', () => {
+           await client.sendToAddress(address, 0.1);
+         }
+ 
+-        const transactions = await client.listTransactions('test');
++        const transactions = await client.listTransactions('*');
+ 
+         transactions.should.be.an.Array();
+         transactions.should.matchEach(value => {
+           // Only a small subset of transaction properties are being asserted here to make
+           // sure we've received a transaction and not an empty object instead.
+           value.should.have.keys(
+-            'account',
+             'address',
+             'amount',
+             'category',
+@@ -156,13 +143,13 @@ describe('Multi Wallet', () => {
+           await client.sendToAddress(address, 0.1);
+         }
+ 
+-        let transactions = await client.listTransactions({ account: 'test' });
++        let transactions = await client.listTransactions({ account: '*' });
+ 
+         transactions.should.be.an.Array();
+         transactions.length.should.be.greaterThanOrEqual(5);
+ 
+         // Make sure `count` is read correctly.
+-        transactions = await client.listTransactions({ account: 'test', count: 1 });
++        transactions = await client.listTransactions({ account: '*', count: 1 });
+ 
+         transactions.should.be.an.Array();
+         transactions.should.have.length(1);
+@@ -170,7 +157,6 @@ describe('Multi Wallet', () => {
+           // Only a small subset of transaction properties are being asserted here to make
+           // sure we've received a transaction and not an empty object instead.
+           value.should.have.keys(
+-            'account',
+             'address',
+             'amount',
+             'category',
+diff --git a/test/rest_test.js b/test/rest_test.js
+index 505b058..f1dfd7a 100644
+--- a/test/rest_test.js
++++ b/test/rest_test.js
+@@ -22,11 +22,11 @@ describe('REST', () => {
+   before(async () => {
+     const [tip] = await client.getChainTips();
+ 
+-    if (tip.height >= 200) {
++    if (tip.height >= 432) {
+       return null;
+     }
+ 
+-    await client.generate(200);
++    await client.generate(432);
+   });
+ 
+   describe('getTransactionByHash()', () => {

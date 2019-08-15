@@ -19,6 +19,7 @@
     "install": "^0.12.2",
     "nodemailer": "^4.7.0",
     "npm": "^6.10.3",
+    "package.json": "^2.0.1",
     "pkginfo": "^0.4.1",
     "sqlite3": "^4.0.9"
   }

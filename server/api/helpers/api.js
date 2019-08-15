@@ -209,7 +209,7 @@ var api = function() {
       return;
 
     //todo add passphrase back.
-    
+
 
     //console.log(process.env.WALLETACCOUNT)
     //unlock the wallet
@@ -217,7 +217,7 @@ var api = function() {
     //console.log(process.env.walletpassphrase)
     //client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
       //create a new address in theaccount account :]
-      client.getNewAddress(process.env.WALLET).then(address => {
+      client.getNewAddress().then(address => {
         //debug
         //console.log(address);
 
