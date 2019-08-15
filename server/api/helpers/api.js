@@ -203,43 +203,48 @@ var api = function() {
   */
   this.generateAddress = function generateAddress(uid,res)
   {
+
     //call the mock test
     var mockres = generic.mock(1,res);
     if (mockres == true)
       return;
 
+    console.log('dd');
     //unlock the wallet
     //debug
     //console.log(process.env.walletpassphrase)
-    client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
-      //create a new address in theaccount account :]
-      client.getNewAddress(process.env.WALLETACCOUNT).then(address => {
-        //debug
-        //console.log(address);
+    //if (process.env.WALLETACCOUNT != '')
+    //{
+      ///client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
+        //create a new address in theaccount account :]
+        client.getNewAddress().then(address => {
+          //debug
+          //console.log(address);
 
-        //insert it into the database
-        db.run(
-          `INSERT INTO sessions(address,userid,net) VALUES(?,?,?)`,
-          [address, uid, process.env.NETWORK],
-          function(err) {
-            if (err) {
-              //debug
-              //return console.log(err.message);
+          //insert it into the database
+          db.run(
+            `INSERT INTO sessions(address,userid,net) VALUES(?,?,?)`,
+            [address, uid, process.env.NETWORK],
+            function(err) {
+              if (err) {
+                //debug
+                //return console.log(err.message);
 
-              //return error
-              res.send(JSON.stringify({ error: err.message }));
-              return;
+                //return error
+                res.send(JSON.stringify({ error: err.message }));
+                return;
+              }
+
+              //return the address
+              res.send(JSON.stringify({ address: address }));
+              //client.walletLock();
             }
-
-            //return the address
-            res.send(JSON.stringify({ address: address }));
-            //client.walletLock();
-          }
-        );
-        //client.walletLock();
-        return;
-        });
-      });
+          );
+          //client.walletLock();
+          return;
+          });
+        //});
+    //}
     }
 
 

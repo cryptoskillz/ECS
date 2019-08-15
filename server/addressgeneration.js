@@ -1,3 +1,8 @@
+/*
+Is this still required?
+Audit it
+*/
+
 //load commander
 const program = require("commander");
 const bitcoin = require("bitcoinjs-lib");

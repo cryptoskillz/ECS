@@ -23,6 +23,7 @@ var backOffice = function ()
     introduced in v0.17 as a replacement for accounts. See the release notes from v0.17 for
      a full description of the changes from the ‘account’ API to the ‘label’ API.
     */
+
     if (process.env.WALLETACCOUNT != '')
     {
       client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
