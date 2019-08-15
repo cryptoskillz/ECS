@@ -15,7 +15,14 @@ var backOffice = function ()
 {
 	this.test = function test(req,res) 
 	{
-    //check if we are using a wallet or not and if it is encrypated.
+    /*
+    check if we are using a wallet or not and if it is encrypted.
+    https://github.com/bitcoin/bitcoin/issues/12952
+
+    The ‘account’ API is removed after being deprecated in v0.17. The ‘label’ API was 
+    introduced in v0.17 as a replacement for accounts. See the release notes from v0.17 for
+     a full description of the changes from the ‘account’ API to the ‘label’ API.
+    */
     if (process.env.WALLETACCOUNT != '')
     {
       client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => {
