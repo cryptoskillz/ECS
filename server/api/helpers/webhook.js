@@ -90,38 +90,35 @@ var webhook = function ()
 		//console.log(address)
 
 		//decryop the wallet
-		client.walletPassphrase(process.env.WALLETPASSPHRASE, 10).then(() => 
+		//get the unspent transaxtions for the address we are intrested in.
+		client.listUnspent(1, 9999999, [address]).then(result => 
 		{
-			//get the unspent transaxtions for the address we are intrested in.
-			client.listUnspent(1, 9999999, [address]).then(result => 
-			{
-				//debug
-				//console.log(result);
-				//console.log(result.length)
-				//note we only check the first one as should only use each address once but we can 
-				//easily update this to run through all the results to check for an active paymebt in
-				//the array
+			//debug
+			//console.log(result);
+			//console.log(result.length)
+			//note we only check the first one as should only use each address once but we can 
+			//easily update this to run through all the results to check for an active paymebt in
+			//the array
 
-				//check there is a result
-				if (result.length > 0)
+			//check there is a result
+			if (result.length > 0)
+			{
+				//check the confirmations
+				if (result[0].confirmations >= process.env.CONFIRMATIONS) 
 				{
-					//check the confirmations
-					if (result[0].confirmations >= process.env.CONFIRMATIONS) 
-					{
-						//valid
-						res.send(JSON.stringify({ status: 1 }));
-					}
-					else
-					{
-						//not valid
-						res.send(JSON.stringify({ status: 0 }));
-					}
+					//valid
+					res.send(JSON.stringify({ status: 1 }));
 				}
 				else
 				{
-					res.send(JSON.stringify({ status: 0 }));	
+					//not valid
+					res.send(JSON.stringify({ status: 0 }));
 				}
-			});
+			}
+			else
+			{
+				res.send(JSON.stringify({ status: 0 }));	
+			}
 		});
 	}
 }
