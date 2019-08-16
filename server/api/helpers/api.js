@@ -192,15 +192,22 @@ var api = function() {
     //console.log(req.query.address);
     res.send(JSON.stringify({ status: "ok" }));
   }
+
   /*
-  *
-  *  This function generate a new address
-  *
-  *  Note if Bitcoin core is slow in returning an addresss this could have an adverse impact on the functionality
-  *      to avoid this we could cache a number of addresses ready to use in the database.
-  *
-  *   todo add passphrase back. 
-  *
+  =============================================================================================================================
+
+  This function generate a new address
+  
+  Note if Bitcoin core is slow in returning an addresss this could have an adverse impact on the functionality
+  to avoid this we could cache a number of addresses ready to use in the database.
+  
+  todo 
+
+  add passphrase back. 
+  allow nartive, Segwit or Bech32 address to be specified.
+  
+  =============================================================================================================================
+
   */
   this.generateAddress = function generateAddress(uid,res)
   {

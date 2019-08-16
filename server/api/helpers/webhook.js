@@ -83,18 +83,26 @@ var webhook = function ()
 	}	
 	
 
-	//note we could pass down the whole req here is we use more of it in the future
+	/*
+	=============================================================================================================================
+
+	This function checks for and unspent transcations in the wallet.  As we are in essence using this as a 
+	hot wallet and creating a new address for each transaction (which we only use once) we can safely make 
+	the assumpation that anything here is for the transaction.
+
+	In the future we could detect over/under payments and deal with them gracefully but right now we want the flow to 
+	be pretty simple.
+
+	=============================================================================================================================
+
+	*/
 	this.checkPayment = function checkPayment(token,address,res) 
 	{
-		//debug
-		console.log(address)
-
-		//decryop the wallet
-		//get the unspent transaxtions for the address we are intrested in.
+		//get the unspent transactions for the address we are intrested in.
 		client.listUnspent(1, 9999999, [address]).then(result => 
 		{
 			//debug
-			console.log(result);
+			//console.log(result);
 			//console.log(result.length)
 			//note we only check the first one as should only use each address once but we can 
 			//easily update this to run through all the results to check for an active paymebt in
@@ -103,7 +111,9 @@ var webhook = function ()
 			//check there is a result
 			if (result.length > 0)
 			{
-				//check the confirmations
+				//check the confirmations (set int the env var)
+				//note we have set this to one for testing etc but you should up this if you it is going to be used 
+				//in any live enviorment.
 				if (result[0].confirmations >= process.env.CONFIRMATIONS) 
 				{
 					//valid
