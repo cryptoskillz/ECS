@@ -87,14 +87,14 @@ var webhook = function ()
 	this.checkPayment = function checkPayment(token,address,res) 
 	{
 		//debug
-		//console.log(address)
+		console.log(address)
 
 		//decryop the wallet
 		//get the unspent transaxtions for the address we are intrested in.
 		client.listUnspent(1, 9999999, [address]).then(result => 
 		{
 			//debug
-			//console.log(result);
+			console.log(result);
 			//console.log(result.length)
 			//note we only check the first one as should only use each address once but we can 
 			//easily update this to run through all the results to check for an active paymebt in
