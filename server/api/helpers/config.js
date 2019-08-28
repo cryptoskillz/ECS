@@ -15,11 +15,11 @@ const Client = require("bitcoin-core");
 if (process.env.NETWORK == 1)
 {
   client = new Client({
-    host: "127.0.0.1",
+    host: process.env.RPCHOSTTEST,
     port: 18332,
     wallet: process.env.WALLET,
-    username: process.env.RPCUSERNAME,
-    password: process.env.RPCPASSWORD,
+    username: process.env.RPCUSERNAMETEST,
+    password: process.env.RPCPASSWORDTEST,
 
   });
 }
@@ -27,11 +27,11 @@ if (process.env.NETWORK == 1)
 if (process.env.NETWORK == 2)
 {
   client = new Client({
-    host: "127.0.0.1",
+    host: process.env.RPCHOSTLIVE,
     port: 8332,
     wallet: process.env.WALLET,
-    username: process.env.RPCUSERNAME,
-    password: process.env.RPCPASSWORD
+    username: process.env.RPCUSERNAMELIVE,
+    password: process.env.RPCPASSWORDLIVE
   });
 }
 
