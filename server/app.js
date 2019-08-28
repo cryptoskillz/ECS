@@ -298,32 +298,7 @@ app.get("/api/address", (req, res) => {
 
   //debug
   //generic.test();
-    //set the headers
-
-  var url =  req.get('host')
-  console.log(url);
-  if (url == "127.0.0.1:3030")
-  {
-    process.env.NETWORK == 1;
-  }
-  if (url == "157.245.13.93")
-  {
-    process.env.NETWORK == 1;
-  }
-  if (url == "165.22.109.223")
-  {
-    process.env.NETWORK == 2;
-  }
-  if (url == "ecstestnet.cryptoskillz.com")
-  {
-    process.env.NETWORK == 1;
-  }
-  if (url == "ecslive.cryptoskillz.com")
-  {
-    console.log('ddd');
-    process.env.NETWORK == 2;
-  }
-
+  //set the headers
 
   res = generic.setHeaders(res);
   //load the api helper
@@ -379,7 +354,7 @@ END OF API FUNCTIONS
 
 
 var os = require("os");
-//console.log(os)
+console.log(os)
 var hostname = os.hostname();
 console.log('hostname');
 
