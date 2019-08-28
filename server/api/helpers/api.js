@@ -49,8 +49,8 @@ var api = function() {
 
       //check if there is a product id if not set it to 0 so it deletes nothing
       //this is a bit of hack but we can fix it later
-      let data = [0];
-      console.log(result);
+      //let data = [0];
+      //console.log(result);
       //if(result == undefined)
       //{
           //the product does not exist so we do not have to do any admin stuff.
@@ -149,6 +149,31 @@ var api = function() {
 
   this.addUser = function storeUser(req,res)
   {
+    var generator = require('generate-password');
+ 
+    var password = generator.generate({
+        length: 10,
+        numbers: true
+    });
+    //debug
+    //console.log(password);
+    //console.log(req.query);
+    db.run(
+        `INSERT INTO ecs_user(username,password,isadmin) VALUES(?,?,?)`,
+        [
+          req.query.email,
+          password,
+          1
+        ],
+        function(err) {
+          if (err) {
+            return console.log(err.message);
+          }
+        }
+      );
+
+    //todo : return the user id
+    //output
     res.send(JSON.stringify({ status: "ok" }));
   }
 
