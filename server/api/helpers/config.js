@@ -10,6 +10,8 @@ const config = {
  }
 };
 
+
+
 //open a connection to the RPC client
 const Client = require("bitcoin-core");
 if (process.env.NETWORK == 1)

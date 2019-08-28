@@ -295,9 +295,26 @@ app.get("/api/sweep", (req, res) => {
 
 //generate an address and output it called rom sr.js
 app.get("/api/address", (req, res) => {
+
   //debug
   //generic.test();
     //set the headers
+
+  var url =  req.get('host')
+  console.log(url);
+  if (url == "127.0.0.1:3030")
+  {
+    process.env.NETWORK == 1;
+  }
+  if (url == "157.245.13.93")
+  {
+    process.env.NETWORK == 1;
+  }
+  if (url == "165.22.109.223")
+  {
+    process.env.NETWORK == 2;
+  }
+
   res = generic.setHeaders(res);
   //load the api helper
   let apihelper = require('./api/helpers/api.js').api;
@@ -348,7 +365,9 @@ app.get("/api/adduser", (req, res) => {
 END OF API FUNCTIONS
 ========================
 */
-console.log(require('os').hostname())
+
+
+
 
 //console.log('up and at em ')
 //set port not we use an env port so that the server we deploy to can set it to whatever port it wants.
