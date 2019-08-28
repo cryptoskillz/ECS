@@ -174,7 +174,7 @@ var api = function() {
           else
           {
             //debug
-            console.log(this.lastID);
+            //console.log(this.lastID);
             res.send(JSON.stringify({ status: this.lastID }));
 
           }
