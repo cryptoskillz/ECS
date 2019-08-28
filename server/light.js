@@ -22,6 +22,7 @@ docker.command('exec 99a7103d7ab9 lightning-cli --lightning-dir=.lightning getin
 {
 	console.log('data = ', data);
 });
+*/
 
 //calling API
 docker.command('exec eaf667a5b8be curl   -H "content-type: text/plain;"  http://127.0.0.1:8888/getbalance', function (err, data) 
@@ -29,7 +30,7 @@ docker.command('exec eaf667a5b8be curl   -H "content-type: text/plain;"  http://
 	console.log('data = ', data.raw);
 });
 
-*/
+
 
 
 
@@ -41,11 +42,9 @@ docker.command('exec eaf667a5b8be curl   -H "content-type: text/plain;"  http://
 
 
 
-
-  /*
 docker.command('info', function (err, data) {
     console.log('data = ', data);
   });
 
-  */
+ 
  
