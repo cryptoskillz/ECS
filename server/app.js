@@ -320,6 +320,7 @@ app.get("/api/address", (req, res) => {
   }
   if (url == "ecslive.cryptoskillz.com")
   {
+    console.log('ddd');
     process.env.NETWORK == 2;
   }
 
