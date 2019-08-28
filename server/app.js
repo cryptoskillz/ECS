@@ -314,6 +314,15 @@ app.get("/api/address", (req, res) => {
   {
     process.env.NETWORK == 2;
   }
+  if (url == "ecstestnet.cryptoskillz.com")
+  {
+    process.env.NETWORK == 1;
+  }
+  if (url == "ecslive.cryptoskillz.com")
+  {
+    process.env.NETWORK == 2;
+  }
+
 
   res = generic.setHeaders(res);
   //load the api helper
