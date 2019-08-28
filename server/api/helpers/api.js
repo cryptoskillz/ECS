@@ -167,14 +167,19 @@ var api = function() {
         ],
         function(err) {
           if (err) {
-            return console.log(err.message);
+            //return console.log(err.message);
+            res.send(JSON.stringify({ status: "error" }));
+
+          }
+          else
+          {
+            //debug
+            console.log(this.lastID);
+            res.send(JSON.stringify({ status: this.lastID }));
+
           }
         }
       );
-
-    //todo : return the user id
-    //output
-    res.send(JSON.stringify({ status: "ok" }));
   }
 
   /*
