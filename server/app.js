@@ -348,6 +348,7 @@ app.get("/api/adduser", (req, res) => {
 END OF API FUNCTIONS
 ========================
 */
+console.log(require('os').hostname())
 
 //console.log('up and at em ')
 //set port not we use an env port so that the server we deploy to can set it to whatever port it wants.
