@@ -306,7 +306,7 @@ app.get("/api/address", (req, res) => {
   api.generateAddress(req.query.uid,res);
 });
 
-//store user details called rom sr.js
+//store user details called from sr.js
 app.get("/api/storeuserdetails", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
@@ -327,6 +327,21 @@ app.get("/api/storeproduct", (req, res) => {
   //call the login function
   api.storeProduct(req,res);
 });
+
+
+//storeproduct  called rom sr.js
+app.get("/api/adduser", (req, res) => {
+  //set the headers
+  res = generic.setHeaders(res);
+  //load the api helper
+  let apihelper = require('./api/helpers/api.js').api;
+  let api = new apihelper(); 
+  //call the login function
+  api.addUser(req,res);
+});
+
+
+
 
 /*
 ========================

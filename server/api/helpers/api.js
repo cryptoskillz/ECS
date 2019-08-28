@@ -32,7 +32,10 @@ var api = function() {
   */
   this.storeUserDetails = function storeUserDetails(req,res)
   {
-    //console.log(req.query);
+    //debug
+    console.log("query")
+    console.log(req.query);
+
     let data = [req.query.address];
     //console.log(data)
     let sql = `SELECT * FROM order_product where address = "`+req.query.address+`"`;
@@ -43,61 +46,46 @@ var api = function() {
       if (err) {
         console.log(err)
       }
-      let data = [result.id];
-      let sql = `delete FROM order_meta WHERE productid = ?`;
-      db.run(sql, data, function(err) {
-        if (err) {
-          return console.error(err.message);
-        }
-        let data = [result.id];
-        let sql = `delete FROM order_product_meta WHERE productid = ?`;
+
+      //check if there is a product id if not set it to 0 so it deletes nothing
+      //this is a bit of hack but we can fix it later
+      let data = [0];
+      console.log(result);
+      //if(result == undefined)
+      //{
+          //the product does not exist so we do not have to do any admin stuff.
+        //  res.send(JSON.stringify({ status: "ok" }));
+      //}
+      //else
+      //{
+        let sql = `delete FROM order_meta WHERE productid = ?`;
         db.run(sql, data, function(err) {
-            if (err) {
-              return console.error(err.message);
-            }
-            for (var metaname in req.query) 
-            {
+          if (err) {
+            return console.error(err.message);
+          }
+          let data = [result.id];
+          let sql = `delete FROM order_product_meta WHERE productid = ?`;
+          db.run(sql, data, function(err) {
+              if (err) {
+                return console.error(err.message);
+              }
+              for (var metaname in req.query) 
+              {
 
-                if (req.query.hasOwnProperty(metaname)) 
-                {
-                    var metavalue = req.query[metaname]
-                    
-                    if(metaname.indexOf("sr-product-") > -1) 
-                    {
-                      //console.log('prod:'+req.query[metaname])
-                      //inser into proiduct meta
-                      if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
+                  if (req.query.hasOwnProperty(metaname)) 
+                  {
+                      var metavalue = req.query[metaname]
+                      
+                      if(metaname.indexOf("sr-product-") > -1) 
                       {
-                        metaname = metaname.replace("sr-product-", "");
-                        //insert into oder meta
-                        db.run(
-                          `INSERT INTO order_product_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
-                          [
-                            result.id,
-                            metaname,
-                            metavalue
-                          ],
-                          function(err) {
-                            if (err) {
-                              return console.log(err.message);
-                            }
-                          }
-                        );
-                      }
-
-                    }
-                    else
-                    {
-                        //note we should change this to sr-order so it is not just an if else check in the future
-                        //debug
-                        //console.log('order:'+req.query[metaname])
-                        //note the undefined should be cleaned in sr.js but does hurt to also check here
+                        //console.log('prod:'+req.query[metaname])
+                        //inser into proiduct meta
                         if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
                         {
-                          metaname = metaname.replace("sr-", "");
+                          metaname = metaname.replace("sr-product-", "");
                           //insert into oder meta
                           db.run(
-                            `INSERT INTO order_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                            `INSERT INTO order_product_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
                             [
                               result.id,
                               metaname,
@@ -110,18 +98,59 @@ var api = function() {
                             }
                           );
                         }
-                      //debug
-                      //console.log(metaname, metavalue);
-                    }
 
-                }
-            }
-            res.send(JSON.stringify({ status: "ok" }));
+                      }
+                      else
+                      {
+                          //note we should change this to sr-order so it is not just an if else check in the future
+                          //debug
+                          //console.log('order:'+req.query[metaname])
+                          //note the undefined should be cleaned in sr.js but does hurt to also check here
+                          if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
+                          {
+                            metaname = metaname.replace("sr-", "");
+                            //insert into oder meta
+                            db.run(
+                              `INSERT INTO order_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                              [
+                                result.id,
+                                metaname,
+                                metavalue
+                              ],
+                              function(err) {
+                                if (err) {
+                                  return console.log(err.message);
+                                }
+                              }
+                            );
+                          }
+                        //debug
+                        //console.log(metaname, metavalue);
+                      }
+
+                  }
+              }
+              res.send(JSON.stringify({ status: "ok" }));
+            });
           });
-        });
-    });
+
+        //}
+      });
+  
   }
 
+  /*
+
+
+  This function add a user to the user table.  This is used for SAAS hosted so we can use more than one user 
+  we ideally only wnt one user per instance but this allows us to onboard people to the Bitcoin experience easier.
+
+  */
+
+  this.addUser = function storeUser(req,res)
+  {
+    res.send(JSON.stringify({ status: "ok" }));
+  }
 
   /*
   *
