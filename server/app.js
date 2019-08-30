@@ -71,6 +71,31 @@ END OF BACKOFFICE ROUTING
 */
 
 /*
+==============================
+START OF TIMER FUNCTIONS
+=============================
+*/
+
+
+function checkforPayment() {
+  //set the headers
+  //res = generic.setHeaders(res);
+  //load the api helper
+  let apihelper = require('./api/helpers/api.js').api;
+  let api = new apihelper(); 
+  //call the login function
+  api.checksessionforpayment();
+}
+setInterval(checkforPayment, 1000);
+
+/*
+==============================
+END OF TIMER FUNCTIONS
+=============================
+*/
+
+
+/*
 ========================
 START OF WEBHOOK FUNCTION
 ========================

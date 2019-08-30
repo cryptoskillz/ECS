@@ -360,14 +360,90 @@ var api = function() {
     });
   };
 
+
+  this.checksessionforpayment = function checkSessionForPayment() {
+
+    let sqldata = [0];
+    let sql = `select * from sessions where processed = ?`;
+    db.all(sql, sqldata, (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      rows.forEach((row) => {
+        //console.log(row);
+        let address = row.address;
+        //console.log(address);
+        client.listUnspent(1, 9999999, [address]).then(listResult => {
+          //debug
+          //console.log(listResult[0])
+          if (listResult.length == 0) 
+          {
+            console.log(address+' not recieved');
+          } 
+          else 
+          {
+            if (listResult[0].confirmations >= process.env.CONFIRMATIONS) 
+            {
+              //console.log(listResult);
+              //get cold storage address for user and if the want to auto send funds (used for SAAS cersion)
+
+              let sqldata = [row.userid,1];
+              let sql = `select * from ecs_coldstorageaddresses where userid = ? and autosendfunds = ?`;
+              db.get(sql, sqldata, function(err,coldstorageaddressesresult) {
+                if (err) {
+                }
+                //console.log('coldstorageaddressesresult');
+
+                //console.log(coldstorageaddressesresult);
+                if (coldstorageaddressesresult != undefined)
+                {
+                  if (coldstorageaddressesresult.autosendfunds == 1)
+                  {
+                    //console.log('sendiong funds')
+                    amounttosend = listResult[0].amount.toFixed(8);
+                    //debug
+                    //console.log('ams'+amounttosend);
+                    //console.log(coldstorageaddressesresult.address);
+                    
+                    client.sendToAddress(coldstorageaddressesresult.address,amounttosend,'','',true).then(result => {
+                      //debug
+
+                      console.log('result');
+                      console.log(result);
+                      //todo : update the database
+
+                    });
+                    
+                  }
+                }
+              });
+            }
+            else
+            {
+              console.log('not enough confs');
+            }
+           
+          }
+       });
+      });
+    });
+ 
+  };
   /*
 	*
 	*	This function moves a payment to a cold storge address (admin)
+
+    Note we will have to update this to handle UID's
+    note.  
+
+    This function may not be required anymore as we have the timer check now.
+
 	*
 	*/
   this.sweep = function sweep(address, res) {
 
     let sqldata = [0];
+    //this has to use the userid to get the correct address from.
     let sql = `select * from ecs_coldstorageaddresses where used = ?`;
 
     //get a cold storage address
