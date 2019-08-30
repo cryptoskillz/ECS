@@ -360,28 +360,40 @@ var api = function() {
     });
   };
 
+  /*
+    This function runs through the session table and looks for unprocessed payments.
 
+  */
   this.checksessionforpayment = function checkSessionForPayment() {
-
+    //get the unprocessed records from the sessions table
     let sqldata = [0];
     let sql = `select * from sessions where processed = ?`;
     db.all(sql, sqldata, (err, rows) => {
       if (err) {
         throw err;
       }
+      //loop through it
       rows.forEach((row) => {
+        //debug
         //console.log(row);
+
+        //get the address
         let address = row.address;
-        //console.log(address);
+        //check if the address has any unspent transactions
         client.listUnspent(1, 9999999, [address]).then(listResult => {
           //debug
           //console.log(listResult[0])
+
+          //check there is at least one unspent transaction
           if (listResult.length == 0) 
           {
-            console.log(address+' not recieved');
+            //there is not so move on
+            //debug
+            //console.log(address+' not recieved');
           } 
           else 
           {
+            //check we have enough confirmations.
             if (listResult[0].confirmations >= process.env.CONFIRMATIONS) 
             {
               //console.log(listResult);
@@ -412,6 +424,27 @@ var api = function() {
                       console.log(result);
                       //todo : update the database
 
+                      let sqldata = ["1", address];
+                      let sql = `UPDATE sessions
+                      SET swept = ?
+                      WHERE address = ?`;
+                      //run sql
+                      db.run(sql, sqldata, function(err) {
+                        if (err) {
+                        }
+                        //update the address in cold storage so it is not used again.
+                        //build sql
+                        let sqldata = ["1", coldstorageaddressesresult.address];
+                        let sql = `UPDATE ecs_coldstorageaddresses
+                                   SET used = ?
+                                  WHERE ecs_coldstorageaddress = ?`;
+                        //run sql
+                        db.run(sql, sqldata, function(err) {
+                          if (err) {
+                          }
+                        });
+                      });
+
                     });
                     
                   }
@@ -422,7 +455,6 @@ var api = function() {
             {
               console.log('not enough confs');
             }
-           
           }
        });
       });
