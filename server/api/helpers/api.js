@@ -33,8 +33,8 @@ var api = function() {
   this.storeUserDetails = function storeUserDetails(req,res)
   {
     //debug
-    console.log("query")
-    console.log(req.query);
+    //console.log("query")
+    //console.log(req.query);
 
     let data = [req.query.address];
     //console.log(data)
@@ -396,66 +396,59 @@ var api = function() {
             //check we have enough confirmations.
             if (listResult[0].confirmations >= process.env.CONFIRMATIONS) 
             {
-              //console.log(listResult);
-              //get cold storage address for user and if the want to auto send funds (used for SAAS cersion)
+              //debug
+              console.log(listResult);
 
+              //get cold storage address for user and if the want to auto send funds (used for SAAS cersion)
               let sqldata = [row.userid,1];
               let sql = `select * from ecs_coldstorageaddresses where userid = ? and autosendfunds = ?`;
               db.get(sql, sqldata, function(err,coldstorageaddressesresult) {
                 if (err) {
                 }
+                //debug
                 //console.log('coldstorageaddressesresult');
-
                 //console.log(coldstorageaddressesresult);
+
+                //check we have a cold storage address
                 if (coldstorageaddressesresult != undefined)
                 {
+                  //check we want to release the funds straight away, usually SAAS users
                   if (coldstorageaddressesresult.autosendfunds == 1)
                   {
-                    //console.log('sendiong funds')
+                    //get the amount to send
                     amounttosend = listResult[0].amount.toFixed(8);
                     //debug
                     //console.log('ams'+amounttosend);
                     //console.log(coldstorageaddressesresult.address);
                     
+                    //send the address, take the fee from the amount.  
                     client.sendToAddress(coldstorageaddressesresult.address,amounttosend,'','',true).then(result => {
-                      //debug
+                    //debug
+                    console.log('result');
+                    console.log(result);
 
-                      console.log('result');
-                      console.log(result);
-                      //todo : update the database
-
-                      let sqldata = ["1", address];
-                      let sql = `UPDATE sessions
-                      SET swept = ?
-                      WHERE address = ?`;
-                      //run sql
-                      db.run(sql, sqldata, function(err) {
-                        if (err) {
-                        }
-                        //update the address in cold storage so it is not used again.
-                        //build sql
-                        let sqldata = ["1", coldstorageaddressesresult.address];
-                        let sql = `UPDATE ecs_coldstorageaddresses
-                                   SET used = ?
-                                  WHERE ecs_coldstorageaddress = ?`;
-                        //run sql
-                        db.run(sql, sqldata, function(err) {
-                          if (err) {
-                          }
-                        });
-                      });
-
+                    //update session table
+                    let sqldata = ["1","1", address];
+                    let sql = `UPDATE sessions
+                    SET swept = ?,
+                    processed =  ?
+                    WHERE address = ?`;
+                    //run sql
+                    db.run(sql, sqldata, function(err) {
+                      if (err) {
+                      }
+                       console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
                     });
-                    
-                  }
+                  });  
                 }
-              });
-            }
-            else
-            {
-              console.log('not enough confs');
-            }
+              }
+            });
           }
+          else
+          {
+            console.log('not enough confs');
+          }
+        }
        });
       });
     });
@@ -487,7 +480,7 @@ var api = function() {
       var coldstorageaddress = result.address;
       client.listUnspent(1, 9999999, [address]).then(result => {
         //debug
-        console.log(result[0])
+        //console.log(result[0])
          if (result.length == 0) 
          {
               //debug
@@ -505,12 +498,12 @@ var api = function() {
             {
                 amounttosend = result[0].amount.toFixed(8);
                 //debug
-                console.log('ams'+amounttosend);
+                //console.log('ams'+amounttosend);
                 //return;
                 client.sendToAddress(coldstorageaddress,amounttosend).then(result => {
                   //debug
-                  console.log('result');
-                  console.log(result);
+                  //console.log('result');
+                  //console.log(result);
 
                   let sqldata = ["1", address];
                   let sql = `UPDATE sessions
