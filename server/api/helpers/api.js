@@ -397,11 +397,21 @@ var api = function() {
             if (listResult[0].confirmations >= process.env.CONFIRMATIONS) 
             {
               //debug
-              console.log(listResult);
+              //console.log(listResult);
 
               //get cold storage address for user and if the want to auto send funds (used for SAAS cersion)
               let sqldata = [row.userid,1];
-              let sql = `select * from ecs_coldstorageaddresses where userid = ? and autosendfunds = ?`;
+              //build the query 
+              let sql =  `select 
+                          ecs_user.id,
+                          ecs_user.username,
+                          ecs_coldstorageaddresses.userid,
+                          ecs_coldstorageaddresses.autosendfunds 
+                          from ecs_user 
+                          LEFT JOIN ecs_coldstorageaddresses
+                          ON ecs_user.id = ecs_coldstorageaddresses.userid
+                          where ecs_coldstorageaddresses.userid = ? 
+                          and ecs_coldstorageaddresses.autosendfunds = ?`;
               db.get(sql, sqldata, function(err,coldstorageaddressesresult) {
                 if (err) {
                 }
@@ -424,8 +434,8 @@ var api = function() {
                     //send the address, take the fee from the amount.  
                     client.sendToAddress(coldstorageaddressesresult.address,amounttosend,'','',true).then(result => {
                     //debug
-                    console.log('result');
-                    console.log(result);
+                    //console.log('result');
+                    //console.log(result);
 
                     //update session table
                     let sqldata = ["1","1", address];
@@ -438,10 +448,12 @@ var api = function() {
                       if (err) {
                       }
 
-                      //send 
+                      //build an array for the email 
                       let mailMerge = [{ ORDERDETAILS: "a order"},{b: "b"}];
-                      //console.log(mailMerge);
-                      generic.sendMail(3,"cryptoskillz@protonmail.com",mailMerge);
+                      //send the sales order to the person in the ecs_user account
+                      generic.sendMail(3,coldstorageaddressesresult.email,mailMerge);.
+                      //send confirmation email 
+                      //todo : May make this optional as a flag as well.
                       console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
                     });
                   });  

@@ -20,8 +20,8 @@ let mailMerge = {
 };
 
 //console.log(mailMerge);
- generic.sendMail(3,"cryptoskillz@protonmail.com",mailMerge);
- return;                 
+ //generic.sendMail(3,"cryptoskillz@protonmail.com",mailMerge);
+ //return;                 
 
 //debug
 //generic.sendMail(1,'wah@gah.com');
