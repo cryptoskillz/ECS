@@ -406,7 +406,9 @@ var api = function() {
                           ecs_user.id,
                           ecs_user.username,
                           ecs_coldstorageaddresses.userid,
-                          ecs_coldstorageaddresses.autosendfunds 
+                          ecs_coldstorageaddresses.autosendfunds,
+                          ecs_coldstorageaddresses.address
+                         
                           from ecs_user 
                           LEFT JOIN ecs_coldstorageaddresses
                           ON ecs_user.id = ecs_coldstorageaddresses.userid
