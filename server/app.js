@@ -11,6 +11,8 @@ require( 'pkginfo' )( module, 'version','name','description' );
 var generichelper = require('./api/helpers/generic.js').Generic;
 var generic = new generichelper();
 
+
+/*
 const sqlite3 = require("sqlite3").verbose();
 let db = new sqlite3.Database("./db/db.db", err => {
   if (err) {
@@ -46,6 +48,7 @@ db.get(sql, sqldata, function(err,result) {
 
 
 return;
+*/
 
 //init it
 const app = express();
