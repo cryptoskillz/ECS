@@ -21,7 +21,7 @@ var Generic = function ()
 	*	This function sends an email. 
 	*
 	*/
-	this.sendMail = function sendMail(id,email) {
+	this.sendMail = function sendMail(id,toemail,dataArray) {
 
 		//debug
 		//console.log(process.env.emailusername)
@@ -56,17 +56,37 @@ var Generic = function ()
 				//debug
 				//console.log(rows[0].fromname);
 
+				let body = rows[0].body;
+				if (dataArray.length > 0)
+				{
+
+					for (var key in dataArray) {
+						let obj = dataArray[key];
+						//console.log(obj);
+
+						//console.log(obj[0]);
+
+						//console.log(dataArray[0])
+					    if (obj.hasOwnProperty(key)) {
+					        console.log(key + " -> " + dataArray[key]);
+					    }
+					}
+					console.log(dataArray[0].ORDERDETAILS)
+					body = body.replace("[ORDERDETAILS]",dataArray[0].ORDERDETAILS);
+				}
+
 				// setup email data with unicode symbols
 				 mailOptions = {
 				    from: '"'+rows[0].fromname+'"<'+rows[0].fromemail+'>', // sender address
-				    to: email+','+email, // list of receivers
+				    to: toemail+','+toemail, // list of receivers
 				    subject: rows[0].subject, // Subject line
-				    text: rows[0].body, // plain text body
-				    html: rows[0].body // html body
+				    text: body, // plain text body
+				    html: body // html body
 				};
 
 				//debug
 				console.log(mailOptions);
+				return;
 
 
 				 // send mail with defined transport object

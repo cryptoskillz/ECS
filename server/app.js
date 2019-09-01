@@ -10,6 +10,14 @@ require( 'pkginfo' )( module, 'version','name','description' );
 //load the generic functions
 var generichelper = require('./api/helpers/generic.js').Generic;
 var generic = new generichelper();
+
+
+
+let mailMerge = [{ ORDERDETAILS: "a order"},{b: "b"}];
+//console.log(mailMerge);
+generic.sendMail(3,"cryptoskillz",mailMerge);
+return;
+
 //debug
 //generic.sendMail(1,'wah@gah.com');
 

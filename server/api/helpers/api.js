@@ -437,7 +437,12 @@ var api = function() {
                     db.run(sql, sqldata, function(err) {
                       if (err) {
                       }
-                       console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
+
+                      //send 
+                      let mailMerge = [{ ORDERDETAILS: "a order",b: "b" }];
+                      console.log(mailMerge.ORDERDETAILS);
+                      generic.sendMail(3,mailMerge);
+                      console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
                     });
                   });  
                 }
