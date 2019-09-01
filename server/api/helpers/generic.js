@@ -71,9 +71,8 @@ var Generic = function ()
 				};
 
 				//debug 
-				console.log(mailOptions);
-
-				return;
+				//console.log(mailOptions);
+				//return;
 
 				// send mail with defined transport object
 			    transporter.sendMail(mailOptions, (error, info) => {
