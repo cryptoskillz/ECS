@@ -451,7 +451,7 @@ var api = function() {
                       //build an array for the email 
                       let mailMerge = [{ ORDERDETAILS: "a order"},{b: "b"}];
                       //send the sales order to the person in the ecs_user account
-                      generic.sendMail(3,coldstorageaddressesresult.email,mailMerge);.
+                      generic.sendMail(3,coldstorageaddressesresult.email,mailMerge);
                       //send confirmation email 
                       //todo : May make this optional as a flag as well.
                       console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
