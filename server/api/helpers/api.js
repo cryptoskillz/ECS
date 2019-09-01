@@ -408,7 +408,6 @@ var api = function() {
                           ecs_coldstorageaddresses.userid,
                           ecs_coldstorageaddresses.autosendfunds,
                           ecs_coldstorageaddresses.address
-                         
                           from ecs_user 
                           LEFT JOIN ecs_coldstorageaddresses
                           ON ecs_user.id = ecs_coldstorageaddresses.userid
@@ -450,8 +449,30 @@ var api = function() {
                       if (err) {
                       }
 
-                      //build an array for the email 
-                      let mailMerge = [{ ORDERDETAILS: "a order"},{b: "b"}];
+                      //get the address details
+                      let sqldata = [address]; 
+                      let sql = `select *
+                                from order_product  
+                                where address =?`
+                      db.get(sql, sqldata, function(err,result) {
+                        if (err) {
+                        }
+                        let sqldata = [result.id]; 
+                        let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
+                        db.get(sql, sqldata, (err, result2) => {
+                          if (err) {
+                            console.error('sql error ' + err.message);
+                            return;
+                          }
+                          let total = result.price*result.quantity;
+                          let mailMerge = {
+                            ORDEREMAIL: result2.metavalue,
+                            ORDERDETAILs:result.price+" BTC "+result.name+" quantity "+result.quantity,
+                            ORDERTOTAL:total,
+                            COLDSTORAGE:address
+                          };
+                        });
+                      });    
                       //send the sales order to the person in the ecs_user account
                       generic.sendMail(3,coldstorageaddressesresult.email,mailMerge);
                       //send confirmation email 
