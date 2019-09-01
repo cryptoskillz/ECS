@@ -60,7 +60,7 @@ var Generic = function ()
 				  var val = dataArray[key];
 				  body = body.replace("["+key+"]",val);
 				});
-				
+
 				//setup email data with unicode symbols
 				mailOptions = {
 				    from: '"'+rows[0].fromname+'"<'+rows[0].fromemail+'>', // sender address
@@ -69,6 +69,12 @@ var Generic = function ()
 				    text: body, // plain text body
 				    html: body // html body
 				};
+
+				//debug 
+				console.log(mailOptions);
+
+				return;
+
 				// send mail with defined transport object
 			    transporter.sendMail(mailOptions, (error, info) => {
 			        if (error) {

@@ -16,11 +16,13 @@ var generic = new generichelper();
  //let mailMerge = [{ ORDERDETAILS: "a order"},{b: "b"}];
 
 let mailMerge = {
-    ORDERDETAILS: "a order"
+    ORDERDETAILS: "a order",
+    ORDEREMAIL:"test@test.com",
+    ORDERTOTAL:"0.01"
 };
 
 //console.log(mailMerge);
-//generic.sendMail(3,"cryptoskillz@protonmail.com",mailMerge);
+generic.sendMail(3,"cryptoskillz@protonmail.com",mailMerge);
 //return;                 
 
 //debug
