@@ -13,10 +13,15 @@ var generic = new generichelper();
 
 
 
-let mailMerge = [{ ORDERDETAILS: "a order"},{b: "b"}];
+ //let mailMerge = [{ ORDERDETAILS: "a order"},{b: "b"}];
+
+let mailMerge = {
+    ORDERDETAILS: "a order"
+};
+
 //console.log(mailMerge);
-generic.sendMail(3,"cryptoskillz",mailMerge);
-return;
+ generic.sendMail(3,"cryptoskillz@protonmail.com",mailMerge);
+ return;                 
 
 //debug
 //generic.sendMail(1,'wah@gah.com');

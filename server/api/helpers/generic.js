@@ -53,58 +53,33 @@ var Generic = function ()
 
 			if (rows.length > 0)
 			{
-				//debug
-				//console.log(rows[0].fromname);
-
+				//get the body
 				let body = rows[0].body;
-				if (dataArray.length > 0)
-				{
-
-					for (var key in dataArray) {
-						let obj = dataArray[key];
-						//console.log(obj);
-
-						//console.log(obj[0]);
-
-						//console.log(dataArray[0])
-					    if (obj.hasOwnProperty(key)) {
-					        console.log(key + " -> " + dataArray[key]);
-					    }
-					}
-					console.log(dataArray[0].ORDERDETAILS)
-					body = body.replace("[ORDERDETAILS]",dataArray[0].ORDERDETAILS);
-				}
-
-				// setup email data with unicode symbols
-				 mailOptions = {
+				//loop through the mail merge array and reeplace the function.
+				Object.keys(dataArray).forEach(function(key) {
+				  var val = dataArray[key];
+				  body = body.replace("["+key+"]",val);
+				});
+				
+				//setup email data with unicode symbols
+				mailOptions = {
 				    from: '"'+rows[0].fromname+'"<'+rows[0].fromemail+'>', // sender address
 				    to: toemail+','+toemail, // list of receivers
 				    subject: rows[0].subject, // Subject line
 				    text: body, // plain text body
 				    html: body // html body
 				};
-
-				//debug
-				console.log(mailOptions);
-				return;
-
-
-				 // send mail with defined transport object
+				// send mail with defined transport object
 			    transporter.sendMail(mailOptions, (error, info) => {
 			        if (error) {
 			        	console.error('Failed to send email. ' + error);
 			            return console.log(error);
 			        }
-
 			        ///debug
 			        console.log('Message sent: %s', info.messageId);
 			        // Preview only available when sending through an Ethereal account
 			        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-
 			        return
-
-			        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-			        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 			    });
 			 }
 			 else
@@ -112,8 +87,6 @@ var Generic = function ()
 			 	console.log('email id not found')
 			 	return
 			 }
-
-
 		});
        
     };

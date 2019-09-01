@@ -439,9 +439,9 @@ var api = function() {
                       }
 
                       //send 
-                      let mailMerge = [{ ORDERDETAILS: "a order",b: "b" }];
-                      console.log(mailMerge.ORDERDETAILS);
-                      generic.sendMail(3,mailMerge);
+                      let mailMerge = [{ ORDERDETAILS: "a order"},{b: "b"}];
+                      //console.log(mailMerge);
+                      generic.sendMail(3,"cryptoskillz@protonmail.com",mailMerge);
                       console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
                     });
                   });  
