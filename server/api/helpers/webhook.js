@@ -104,8 +104,8 @@ var webhook = function ()
 		client.listUnspent(1, 9999999, [address]).then(result => 
 		{
 			//debug
-			//console.log(result);
-			//console.log(result.length)
+			console.log(result);
+			console.log(result.length)
 			//note we only check the first one as should only use each address once but we can 
 			//easily update this to run through all the results to check for an active paymebt in
 			//the array

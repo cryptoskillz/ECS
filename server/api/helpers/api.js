@@ -467,13 +467,13 @@ var api = function() {
                           let total = result.price*result.quantity;
                           let mailMerge = {
                             ORDEREMAIL: result2.metavalue,
-                            ORDERDETAILs:result.price+" BTC "+result.name+" quantity "+result.quantity,
+                            ORDERDETAILS:result.price+" BTC "+result.name+" quantity "+result.quantity,
                             ORDERTOTAL:total,
                             COLDSTORAGE:address
                           };
 
                            //send the sales order to the person in the ecs_user account
-                          generic.sendMail(3,coldstorageaddressesresult.address,mailMerge);
+                          generic.sendMail(3,coldstorageaddressesresult.username,mailMerge);
                           //send confirmation email 
                           //todo : May make this optional as a flag as well.
                           console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
