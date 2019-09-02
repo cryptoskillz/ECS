@@ -471,13 +471,16 @@ var api = function() {
                             ORDERTOTAL:total,
                             COLDSTORAGE:address
                           };
+
+                           //send the sales order to the person in the ecs_user account
+                          generic.sendMail(3,coldstorageaddressesresult.address,mailMerge);
+                          //send confirmation email 
+                          //todo : May make this optional as a flag as well.
+                          console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
+
                         });
                       });    
-                      //send the sales order to the person in the ecs_user account
-                      generic.sendMail(3,coldstorageaddressesresult.email,mailMerge);
-                      //send confirmation email 
-                      //todo : May make this optional as a flag as well.
-                      console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
+                     
                     });
                   });  
                 }
