@@ -33,8 +33,8 @@ var api = function() {
   this.storeUserDetails = function storeUserDetails(req,res)
   {
     //debug
-    console.log("query")
-    console.log(req.query);
+    //console.log("query")
+    //console.log(req.query);
 
     let data = [req.query.address];
     //console.log(data)
@@ -173,10 +173,26 @@ var api = function() {
           }
           else
           {
-            //debug
-            //console.log(this.lastID);
-            res.send(JSON.stringify({ status: this.lastID }));
+             db.run(
+              `INSERT INTO ecs_coldstorageaddresses(userid,address) VALUES(?,?)`,
+              [
+                 this.lastID,
+                req.query.btc
+              ],
+              function(err) {
+                if (err) {
+                  //return console.log(err.message);
+                  res.send(JSON.stringify({ status: "error" }));
 
+                }
+                else
+                {
+                  //debug
+                  //console.log(this.lastID);
+                  res.send(JSON.stringify({ status: this.lastID }));
+                }
+              }
+            ); 
           }
         }
       );
@@ -345,13 +361,157 @@ var api = function() {
   };
 
   /*
+    This function runs through the session table and looks for unprocessed payments.
+
+  */
+  this.checksessionforpayment = function checkSessionForPayment() {
+    //get the unprocessed records from the sessions table
+    let sqldata = [0];
+    let sql = `select * from sessions where processed = ?`;
+    db.all(sql, sqldata, (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      //loop through it
+      rows.forEach((row) => {
+        //debug
+        //console.log(row);
+
+        //get the address
+        let address = row.address;
+        //check if the address has any unspent transactions
+        client.listUnspent(1, 9999999, [address]).then(listResult => {
+          //debug
+          //console.log(listResult[0])
+
+          //check there is at least one unspent transaction
+          if (listResult.length == 0) 
+          {
+            //there is not so move on
+            //debug
+            //console.log(address+' not recieved');
+          } 
+          else 
+          {
+            //check we have enough confirmations.
+            if (listResult[0].confirmations >= process.env.CONFIRMATIONS) 
+            {
+              //debug
+              //console.log(listResult);
+
+              //get cold storage address for user and if the want to auto send funds (used for SAAS cersion)
+              let sqldata = [row.userid,1];
+              //build the query 
+              let sql =  `select 
+                          ecs_user.id,
+                          ecs_user.username,
+                          ecs_coldstorageaddresses.userid,
+                          ecs_coldstorageaddresses.autosendfunds,
+                          ecs_coldstorageaddresses.address
+                          from ecs_user 
+                          LEFT JOIN ecs_coldstorageaddresses
+                          ON ecs_user.id = ecs_coldstorageaddresses.userid
+                          where ecs_coldstorageaddresses.userid = ? 
+                          and ecs_coldstorageaddresses.autosendfunds = ?`;
+              db.get(sql, sqldata, function(err,coldstorageaddressesresult) {
+                if (err) {
+                }
+                //debug
+                //console.log('coldstorageaddressesresult');
+                //console.log(coldstorageaddressesresult);
+
+                //check we have a cold storage address
+                if (coldstorageaddressesresult != undefined)
+                {
+                  //check we want to release the funds straight away, usually SAAS users
+                  if (coldstorageaddressesresult.autosendfunds == 1)
+                  {
+                    //get the amount to send
+                    amounttosend = listResult[0].amount.toFixed(8);
+                    //debug
+                    //console.log('ams'+amounttosend);
+                    //console.log(coldstorageaddressesresult.address);
+                    
+                    //send the address, take the fee from the amount.  
+                    client.sendToAddress(coldstorageaddressesresult.address,amounttosend,'','',true).then(result => {
+                    //debug
+                    //console.log('result');
+                    //console.log(result);
+
+                    //update session table
+                    let sqldata = ["1","1", address];
+                    let sql = `UPDATE sessions
+                    SET swept = ?,
+                    processed =  ?
+                    WHERE address = ?`;
+                    //run sql
+                    db.run(sql, sqldata, function(err) {
+                      if (err) {
+                      }
+
+                      //get the address details
+                      let sqldata = [address]; 
+                      let sql = `select *
+                                from order_product  
+                                where address =?`
+                      db.get(sql, sqldata, function(err,result) {
+                        if (err) {
+                        }
+                        let sqldata = [result.id]; 
+                        let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
+                        db.get(sql, sqldata, (err, result2) => {
+                          if (err) {
+                            console.error('sql error ' + err.message);
+                            return;
+                          }
+                          let total = result.price*result.quantity;
+                          let mailMerge = {
+                            ORDEREMAIL: result2.metavalue,
+                            ORDERDETAILS:result.price+" BTC "+result.name+" quantity "+result.quantity,
+                            ORDERTOTAL:total,
+                            COLDSTORAGE:address
+                          };
+
+                           //send the sales order to the person in the ecs_user account
+                          generic.sendMail(3,coldstorageaddressesresult.username,mailMerge);
+                          //send confirmation email 
+                          //todo : May make this optional as a flag as well.
+                          console.log(amounttosend+' sent from '+address+' to '+coldstorageaddressesresult.address);
+
+                        });
+                      });    
+                     
+                    });
+                  });  
+                }
+              }
+            });
+          }
+          else
+          {
+            console.log('not enough confs');
+          }
+        }
+       });
+      });
+    });
+ 
+  };
+  /*
 	*
 	*	This function moves a payment to a cold storge address (admin)
+
+    Note we will have to update this to handle UID's
+    note.  
+
+    This function may not be required anymore as we have the timer check now.
+
 	*
 	*/
   this.sweep = function sweep(address, res) {
 
     let sqldata = [0];
+    //this has to use the userid to get the correct address from.
     let sql = `select * from ecs_coldstorageaddresses where used = ?`;
 
     //get a cold storage address
@@ -363,7 +523,7 @@ var api = function() {
       var coldstorageaddress = result.address;
       client.listUnspent(1, 9999999, [address]).then(result => {
         //debug
-        console.log(result[0])
+        //console.log(result[0])
          if (result.length == 0) 
          {
               //debug
@@ -381,12 +541,12 @@ var api = function() {
             {
                 amounttosend = result[0].amount.toFixed(8);
                 //debug
-                console.log('ams'+amounttosend);
+                //console.log('ams'+amounttosend);
                 //return;
                 client.sendToAddress(coldstorageaddress,amounttosend).then(result => {
                   //debug
-                  console.log('result');
-                  console.log(result);
+                  //console.log('result');
+                  //console.log(result);
 
                   let sqldata = ["1", address];
                   let sql = `UPDATE sessions

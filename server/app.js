@@ -10,8 +10,45 @@ require( 'pkginfo' )( module, 'version','name','description' );
 //load the generic functions
 var generichelper = require('./api/helpers/generic.js').Generic;
 var generic = new generichelper();
-//debug
-//generic.sendMail(1,'wah@gah.com');
+
+
+/*
+const sqlite3 = require("sqlite3").verbose();
+let db = new sqlite3.Database("./db/db.db", err => {
+  if (err) {
+    console.error(err.message);
+  }
+});
+
+let sqldata = ['2N5Wh7AdqASEyhyh9TNWESKu5bLHaqs6LLs']; 
+let sql = `select *
+          from order_product  
+          where address =?`
+db.get(sql, sqldata, function(err,result) {
+  if (err) {
+  }
+  let sqldata = [result.id]; 
+  let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
+  db.get(sql, sqldata, (err, result2) => {
+    if (err) {
+      console.error('sql error ' + err.message);
+      return;
+    }
+    let total = result.price*result.quantity;
+    let mailMerge = {
+      ORDEREMAIL: result2.metavalue,
+      ORDERDETAILS:result.price+" BTC "+result.name+" quantity "+result.quantity,
+      ORDERTOTAL:total,
+      COLDSTORAGE:"2N5Wh7AdqASEyhyh9TNWESKu5bLHaqs6LLs"
+    };
+    generic.sendMail(3,"cryptoskillz@protonmail.com",mailMerge);
+
+  });
+});    
+
+
+return;
+*/
 
 //init it
 const app = express();
@@ -53,7 +90,6 @@ START OF BACKOFFICE ROUTING
 
 
 
-
 app.get("/backoffice/test", (req, res) => {
   //load the back office helper
   let backofficehelper = require('./api/helpers/backoffice.js').backOffice;
@@ -69,6 +105,32 @@ app.get("/backoffice/test", (req, res) => {
 END OF BACKOFFICE ROUTING
 =============================
 */
+
+/*
+==============================
+START OF TIMER FUNCTIONS
+=============================
+*/
+
+
+function checkforPayment() {
+  //set the headers
+  //res = generic.setHeaders(res);
+  //load the api helper
+  let apihelper = require('./api/helpers/api.js').api;
+  let api = new apihelper(); 
+  //call the login function
+  //console.log('tick')
+  api.checksessionforpayment();
+}
+setInterval(checkforPayment, 1000);
+
+/*
+==============================
+END OF TIMER FUNCTIONS
+=============================
+*/
+
 
 /*
 ========================

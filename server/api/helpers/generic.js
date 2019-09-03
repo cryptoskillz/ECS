@@ -21,7 +21,7 @@ var Generic = function ()
 	*	This function sends an email. 
 	*
 	*/
-	this.sendMail = function sendMail(id,email) {
+	this.sendMail = function sendMail(id,toemail,dataArray) {
 
 		//debug
 		//console.log(process.env.emailusername)
@@ -53,38 +53,38 @@ var Generic = function ()
 
 			if (rows.length > 0)
 			{
-				//debug
-				//console.log(rows[0].fromname);
+				//get the body
+				let body = rows[0].body;
+				//loop through the mail merge array and reeplace the function.
+				Object.keys(dataArray).forEach(function(key) {
+				  var val = dataArray[key];
+				  body = body.replace("["+key+"]",val);
+				});
 
-				// setup email data with unicode symbols
-				 mailOptions = {
+				//setup email data with unicode symbols
+				mailOptions = {
 				    from: '"'+rows[0].fromname+'"<'+rows[0].fromemail+'>', // sender address
-				    to: email+','+email, // list of receivers
+				    to: toemail+','+toemail, // list of receivers
 				    subject: rows[0].subject, // Subject line
-				    text: rows[0].body, // plain text body
-				    html: rows[0].body // html body
+				    text: body, // plain text body
+				    html: body // html body
 				};
 
-				//debug
-				console.log(mailOptions);
+				//debug 
+				//console.log(mailOptions);
+				//return;
 
-
-				 // send mail with defined transport object
+				// send mail with defined transport object
 			    transporter.sendMail(mailOptions, (error, info) => {
 			        if (error) {
 			        	console.error('Failed to send email. ' + error);
 			            return console.log(error);
 			        }
-
 			        ///debug
 			        console.log('Message sent: %s', info.messageId);
 			        // Preview only available when sending through an Ethereal account
 			        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-
 			        return
-
-			        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-			        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 			    });
 			 }
 			 else
@@ -92,8 +92,6 @@ var Generic = function ()
 			 	console.log('email id not found')
 			 	return
 			 }
-
-
 		});
        
     };
