@@ -71,7 +71,7 @@ var Generic = function ()
 				};
 
 				//debug 
-				console.log(mailOptions);
+				//console.log(mailOptions);
 				//return;
 
 				// send mail with defined transport object
