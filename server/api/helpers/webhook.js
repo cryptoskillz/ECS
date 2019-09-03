@@ -93,7 +93,10 @@ var webhook = function ()
 	In the future we could detect over/under payments and deal with them gracefully but right now we want the flow to 
 	be pretty simple.
 
-	TODO : When the timer function is live just change this to a simple checl
+	TODO : When the timer function is live just change this to a simple check
+
+	note: 	if the funds are sent via autoesend funds then there will be no unspent so this will show as 0. 
+			we have to extend it to check the processed table first and if it is `1 then return otherwise we can do this check`
 
 	=============================================================================================================================
 
