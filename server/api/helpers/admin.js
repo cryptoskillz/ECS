@@ -18,6 +18,51 @@ var admin = function ()
 		console.log('yay')
 	}
 
+	this.getUsers = function getUsers(res)
+	{
+		let jsonStr = '{"results":[]}';
+		let obj = JSON.parse(jsonStr);
+		//build sql
+		let sql = `select 
+		ecs_user.id,
+		ecs_user.username,
+		ecs_coldstorageaddresses.userid,
+		ecs_coldstorageaddresses.autosendfunds,
+		ecs_coldstorageaddresses.address
+		from ecs_user 
+		LEFT JOIN ecs_coldstorageaddresses
+		ON ecs_user.id = ecs_coldstorageaddresses.userid`;
+		db.all(sql, [], function(err,rows) {
+		    if (err) {
+		    }
+		    //debug
+		    //console.log(rows);
+
+		     rows.forEach(row => {
+
+		    	//debug
+		      	//console.log(row);
+		      	//myObj.push(row);
+		      	//obj.push('dsss');
+
+		      	//add to results object
+		      	obj["results"].push(row);
+
+		    });
+
+
+
+		    jsonStr = JSON.stringify(obj);
+		    //debug
+		    //console.log('done');
+		    //console.log(jsonStr);
+
+		    //return the orders
+		    res.send(jsonStr);
+
+		});
+	}
+
 	this.login = function login(uname,pass,res)
 	{
 		//get username and password passed up

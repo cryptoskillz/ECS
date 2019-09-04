@@ -177,6 +177,53 @@ function checkSweptDone()
 	}
 }
 
+function usersDone()
+{
+	//parse the result
+	var result = $.parseJSON(ajaxdata);
+	//console.log(result.results);
+	//console.log(ajaxdata);
+	var t = $('#paymentstable').DataTable();
+	//empty the table
+	t
+    .clear()
+    .draw();
+    //loop through the results returned from the server
+	jQuery.each( result.results, function( index, res )
+	{
+		//console.log(res);
+		//net 1 = live 2 = test
+
+		//vars 
+		var autosendfunds = 'Yes';
+		var swept = 'Yes';
+		//set the block explorer url
+		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
+		blockexplorerurl = blockexplorerurl+res.address+'/';
+		//actions column
+		var actions = '<a href="'+blockexplorerurl+'" target="_blank"><i class="fas fa-globe" title="View on blockchain explorer"></i> </a>'
+		//check if the payment was processed
+		if (res.autosendfunds == 0)
+		{	
+			//set processed to no
+			autosendfunds = 'No';
+			//add to the action
+			actions = actions + '<a href="javascript:checkProcessed(\''+res.address+'\')"><i class="fas fa-money-bill" title="Check for payment"></i> </a>'
+
+		}
+		
+		
+		
+		//add the row to the table
+		t.row.add( [
+			res.id,
+			res.username,
+			autosendfunds,
+			'<a href="'+blockexplorerurl+'" target="_blank" title="View on blockchain explorer">'+res.address+'</a>',
+		] ).draw( false );
+	});
+}
+
 
 //process the payments done 
 function paymentsDone()
@@ -353,6 +400,13 @@ $(document).ready(function()
 
     	//check what page we are on
 		//check if it is the payment page
+		if (url.substr(url.lastIndexOf('/') + 1) == 'users.html')
+		{
+			//alert(token);
+			//make a server call
+			var geturl = serverurl+'admin/getusers?token='+token;
+			ajaxGET(geturl,"usersDone()");
+		}
 		if (url.substr(url.lastIndexOf('/') + 1) == 'payments.html')
 		{
 			//alert(token);

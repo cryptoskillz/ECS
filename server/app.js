@@ -227,6 +227,20 @@ START OF ADMIN FUNCTION
 */
 
 //update the settings
+app.get("/admin/getusers", (req, res) => {
+  //set the headers
+  res = generic.setHeaders(res);
+
+  //check if it is a zero and if so return error
+  //todo : check for duplicate address and validate the btc adddress
+  //load the admin helper
+  let adminhelper = require('./api/helpers/admin.js').admin;
+  let admin = new adminhelper();
+  //add the cold storage address
+  admin.getUsers(res);
+});
+
+//update the settings
 app.get("/admin/updatesettings", (req, res) => {
   //set the headers
   res = generic.setHeaders(res);
