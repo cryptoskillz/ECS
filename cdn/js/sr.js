@@ -526,6 +526,7 @@ var SR = SR || (function()
 		    	hideClass(document.getElementById('sr-paid'));
 		    	hideClass(document.getElementById('sr-billing'));
 		        hideClass(document.getElementById('sr-shipping'));
+		        hideClass(document.getElementById('sr-cart-header'));
 		        //hide the customer details
 				hideClass(document.getElementById('sr-customerdetailswrapper'));
 				//hide back button
