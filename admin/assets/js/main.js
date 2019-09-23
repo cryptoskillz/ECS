@@ -1,9 +1,4 @@
-
-//server call to make the AJAX calls to
-//set url to production
-//var serverurl = "https://ecslive.cryptoskillz.com/";
-//testnet 
-var serverurl = "https://ecstestnet.cryptoskillz.com/";
+var serverurl = "";
 //check if we are local
 //note : set this whatever your local instance is 127.0.0.1 for example
 if(window.location.href.indexOf("127.0.0.1") > -1) 
@@ -12,6 +7,28 @@ if(window.location.href.indexOf("127.0.0.1") > -1)
 
 	//alert(serverurl)
 }
+
+if(window.location.href.indexOf("cryptoskillz") > -1) 
+{
+	serverurl = "https://ecstestnet.cryptoskillz.com/";
+
+	//alert(serverurl)
+}
+
+/*
+disabled for now as we have not launched live net yet
+todo : move this to a switch statement when we add live. 
+if(window.location.href.indexOf("ecslive") > -1) 
+{
+	serverurl = "https://ecslive.cryptoskillz.com/";
+
+	//alert(serverurl)
+}
+
+*/
+//debug
+//ghost this when we push.
+serverurl = "https://ecstestnet.cryptoskillz.com/";
 
 //hold the return from the server
 var ajaxdata = '';
