@@ -10,6 +10,7 @@ const config = {
  }
 };
 
+
 //open a connection to the RPC client
 const Client = require("bitcoin-core");
 //we are working with isolated test and main nets so we removed the if here and get the vars from the .env file.
