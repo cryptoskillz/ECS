@@ -379,6 +379,8 @@ var api = function() {
 
         //get the address
         let address = row.address;
+
+        //TODO : check the address matches the correct network namely mainnet or testnet
         //check if the address has any unspent transactions
         client.listUnspent(1, 9999999, [address]).then(listResult => {
           //debug
