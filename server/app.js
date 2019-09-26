@@ -123,7 +123,15 @@ function checkforPayment() {
   //console.log('tick')
   api.checksessionforpayment();
 }
-setInterval(checkforPayment, 1000);
+/*
+check if we want to do auto payment, we use this to handle the payments in the SASS mode.  
+
+It is disabled at the moment in time as it is causing time out error and some DB errors between test and mainnet. 
+
+
+*/
+if (process.env.AUTOPAYMENT == 1)
+  setInterval(checkforPayment, process.env.AUTOPAYMENTTICK);
 
 /*
 ==============================

@@ -19,6 +19,11 @@ var SR = SR || (function()
 	var address = '';
 	//hold the preview image
 	var preview = '';
+	//hold the cart type
+	//0 = normal cart
+	//1 = anon cart (to implement)
+	//2 = donation cart type
+	var cartytype = 0;
 
 	//hold the email
 	var email = '';
@@ -516,6 +521,26 @@ var SR = SR || (function()
 		     	//show paid screeb
 		    	showClass(document.getElementById('sr-paid'));
 		     	break;
+		     case 8: //donaton mode
+		    	stopPaymentCheck();
+		    	hideClass(document.getElementById('sr-paid'));
+		    	hideClass(document.getElementById('sr-billing'));
+		        hideClass(document.getElementById('sr-shipping'));
+		        hideClass(document.getElementById('sr-cart-header'));
+		        //hide the customer details
+				hideClass(document.getElementById('sr-customerdetailswrapper'));
+				//hide back button
+				hideClass(document.getElementById('sr-back-button'));
+				//hide the product details
+		    	hideClass(document.getElementById('sr-cartlistitems'));
+		    	//hide the check out button
+				hideClass(document.getElementById('sr-checkout'));
+		        //open it
+				addClass(document.querySelector('.sr-cart-container'),'cart-open');
+		        //show btc stuff		    	
+				showClass(document.getElementById('sr-bitcoinaddresswrapper'));
+
+
 
 
 		     	
@@ -635,6 +660,7 @@ var SR = SR || (function()
 		//add to cart click element
 		document.querySelector('.sr-add-to-cart').addEventListener('click', function () 
 		{
+
 			//note we ought to move this string creator into its own function now as it is bound to be used
 			//by others
 
@@ -661,73 +687,99 @@ var SR = SR || (function()
 			price =elproduct.getAttribute('data-price');
 			name =elproduct.getAttribute('data-name');
 			preview = elproduct.getAttribute('data-preview');
-			//will update when we use multipile products
-			var productid = 1;
-			//todo
-			var previewpic = '';
-			//increment count (quantity)
-			if (itemcount <= quantity)
+			//check if cart type has been set and if so override default.
+			if (elproduct.getAttribute('cart-type') != null)
 			{
-				itemcount = itemcount+1;
-				carttotal(price)
-				
-		  		//show it
-		  		showClass(document.querySelector('.sr-cart-container'))	
-			  	
-			  	//add item to cart
-			  	var productlist = document.getElementById('sr-cartlistitems');
-				var itemlist  = document.createElement('li');
-				itemlist.className = 'sr-product ';
+				cartytype = elproduct.getAttribute('cart-type');
+			}
 
-				//build produt
-				var prodcuthtml = '';
-				//display default image or the one supplied	
-				if (preview == "")
+			/*
+			check the cart type.
+			note we can (and shall) refactor this as we this is not required for cart type and if we add more in the future we ]
+			want this to funciton slicker.
+			*/
+			if (cartytype == 0)
+			{
+				//will update when we use multipile products
+				var productid = 1;
+				//todo
+				var previewpic = '';
+				//increment count (quantity)
+				if (itemcount <= quantity)
 				{
-					var prodcuthtml = prodcuthtml +'<div class="sr-product-image"><a href="#0"><img src="'+cdnurl+'img/sr-product-preview.png" alt="placeholder"></a></div>';
-				}
-				else
-				{
-					var prodcuthtml = prodcuthtml +'<div class="sr-product-image"><a href="#0"><img src="'+preview+'" alt="placeholder"></a></div>';
-				}
-				//product name
-				prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
-				//product price
-				prodcuthtml = prodcuthtml + '<div class="sr-price">'+price+' BTC</div>';
-				//actions div
-				prodcuthtml = prodcuthtml + '<div class="sr-actions">';
+					itemcount = itemcount+1;
+					carttotal(price)
+					
+			  		//show it
+			  		showClass(document.querySelector('.sr-cart-container'))	
+				  	
+				  	//add item to cart
+				  	var productlist = document.getElementById('sr-cartlistitems');
+					var itemlist  = document.createElement('li');
+					itemlist.className = 'sr-product ';
 
-				//delete option
-				prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="sr-delete-item">Delete</a>';
-				prodcuthtml = prodcuthtml + '<div class="sr-quantity">';
-				//quantity label
-				//quantity select
-				prodcuthtml = prodcuthtml + '<span class="select"><select id="sr-productquantity" name="sr-productquantity" onchange="SR.changequantity()">';
-				var i = 0;
-				for (i = 1; i < quantity; i++) 
-				{ 
-					if (i == itemcount)
-						prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
-
+					//build produt
+					var prodcuthtml = '';
+					//display default image or the one supplied	
+					if (preview == "")
+					{
+						var prodcuthtml = prodcuthtml +'<div class="sr-product-image"><a href="#0"><img src="'+cdnurl+'img/sr-product-preview.png" alt="placeholder"></a></div>';
+					}
 					else
-						prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
-				}
-				prodcuthtml = prodcuthtml +'</select></span>';
-				//end of quantiy div
-				var prodcuthtml = prodcuthtml + '</div>';
-				//end of actions div
-				var prodcuthtml = prodcuthtml + '</div>';
-				//end of products details div
-				var prodcuthtml = prodcuthtml + '</div>';
-				//end of product div
-				//add to the list		
-				itemlist.innerHTML = prodcuthtml;
-				// append  to the end of theParent
-				productlist.innerHTML = prodcuthtml;
-				//note we have to fix this when we add multipile products. 
-				//productlist.appendChild(itemlist);
-	  		}
+					{
+						var prodcuthtml = prodcuthtml +'<div class="sr-product-image"><a href="#0"><img src="'+preview+'" alt="placeholder"></a></div>';
+					}
+					//product name
+					prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">'+name+'</a></h3>';
+					//product price
+					prodcuthtml = prodcuthtml + '<div class="sr-price">'+price+' BTC</div>';
+					//actions div
+					prodcuthtml = prodcuthtml + '<div class="sr-actions">';
+
+					//delete option
+					prodcuthtml = prodcuthtml + '<a href="javascript:SR.deleteitem()" class="sr-delete-item">Delete</a>';
+					prodcuthtml = prodcuthtml + '<div class="sr-quantity">';
+					//quantity label
+					//quantity select
+					prodcuthtml = prodcuthtml + '<span class="select"><select id="sr-productquantity" name="sr-productquantity" onchange="SR.changequantity()">';
+					var i = 0;
+					for (i = 1; i < quantity; i++) 
+					{ 
+						if (i == itemcount)
+							prodcuthtml = prodcuthtml +'<option value="'+i+'" selected>'+i+'</option>';
+
+						else
+							prodcuthtml = prodcuthtml +'<option value="'+i+'">'+i+'</option>';
+					}
+					prodcuthtml = prodcuthtml +'</select></span>';
+					//end of quantiy div
+					var prodcuthtml = prodcuthtml + '</div>';
+					//end of actions div
+					var prodcuthtml = prodcuthtml + '</div>';
+					//end of products details div
+					var prodcuthtml = prodcuthtml + '</div>';
+					//end of product div
+					//add to the list		
+					itemlist.innerHTML = prodcuthtml;
+					// append  to the end of theParent
+					productlist.innerHTML = prodcuthtml;
+					//note we have to fix this when we add multipile products. 
+					//productlist.appendChild(itemlist);
+		  		}
+		  	}
+		  	else
+		  	{
+		  		//increment the itemcount as this is a one time donation then let us just set it to 1 for now. 
+		  		//we could make this an incemental thing later.
+		  		itemcount = 1;
+		  		//open the container;	
+		  		showClass(document.querySelector('.sr-cart-container'));
+		  		//render the cart state
+		  		cartstate(8);
+
+		  	}
 		});
+
 		/*
 			cart clicked element
 
@@ -737,6 +789,7 @@ var SR = SR || (function()
 	  		//debug
 	  		//itemcount = 1;
 
+
 	  		//check if cart shoud be shown
 	  		if (itemcount == 0)
 	  		{
@@ -745,18 +798,25 @@ var SR = SR || (function()
 	  		}
 	  		else
 	  		{
-	  			//see if the cart is open and toggle it
-	  			var res = hasClass(document.querySelector('.sr-cart-container'),'cart-open');
-	  			if (res == 1)
+  				if (cartytype == 2)
 	  			{
-	  				//stop payment check
-	  				stopPaymentCheck()
-	  				//close it
-	  				removeClass(document.querySelector('.sr-cart-container'),'cart-open');
+	  				hideClass(document.getElementById('sr-cart-container'));
 	  			}
 	  			else
 	  			{
-	  				cartstate(1);
+		  			//see if the cart is open and toggle it
+		  			var res = hasClass(document.querySelector('.sr-cart-container'),'cart-open');
+		  			if (res == 1)
+		  			{
+		  				//stop payment check
+		  				stopPaymentCheck()
+		  				//close it
+		  				removeClass(document.querySelector('.sr-cart-container'),'cart-open');
+		  			}
+		  			else
+		  			{
+		  				cartstate(1);
+		  			}
 	  			}
 	  		}
 		});

@@ -10,30 +10,19 @@ const config = {
  }
 };
 
+
 //open a connection to the RPC client
 const Client = require("bitcoin-core");
-if (process.env.NETWORK == 1)
-{
-  client = new Client({
-    host: process.env.RPCHOSTTEST,
-    port: 18332,
-    wallet: process.env.WALLET,
-    username: process.env.RPCUSERNAMETEST,
-    password: process.env.RPCPASSWORDTEST,
+//we are working with isolated test and main nets so we removed the if here and get the vars from the .env file.
+client = new Client({
+  host: process.env.RPCHOST,
+  port: process.env.RPCPORT,
+  wallet: process.env.WALLET,
+  username: process.env.RPCUSERNAME,
+  password: process.env.RPCPASSWORD,
 
-  });
-}
+});
 
-if (process.env.NETWORK == 2)
-{
-  client = new Client({
-    host: process.env.RPCHOSTLIVE,
-    port: 8332,
-    wallet: process.env.WALLET,
-    username: process.env.RPCUSERNAMELIVE,
-    password: process.env.RPCPASSWORDLIVE
-  });
-}
 
 
 module.exports = config;
