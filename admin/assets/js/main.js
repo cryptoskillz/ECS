@@ -10,7 +10,7 @@ if(window.location.href.indexOf("127.0.0.1") > -1)
 
 if(window.location.href.indexOf("cryptoskillz") > -1) 
 {
-	serverurl = "https://ecslive.cryptoskillz.com";
+	serverurl = "https://ecslive.cryptoskillz.com/";
 
 	//alert(serverurl)
 }
