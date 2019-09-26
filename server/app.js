@@ -55,6 +55,17 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.get("/", (req, res) => {
+  let output = module.exports.name+": " + module.exports.version;
+  if (process.env.NETWORK == 2)
+    output = output+' connected to BTC mainnet '
+  if (process.env.NETWORK == 1)
+        output = output+' connected to BTC testnet'
+  
+  res.send(JSON.stringify({ status: output }));
+});
+
+
 /*
 ==============================
 START OF STRIKE ROUTING

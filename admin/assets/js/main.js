@@ -10,7 +10,7 @@ if(window.location.href.indexOf("127.0.0.1") > -1)
 
 if(window.location.href.indexOf("cryptoskillz") > -1) 
 {
-	serverurl = "https://ecstestnet.cryptoskillz.com/";
+	serverurl = "https://ecslive.cryptoskillz.com";
 
 	//alert(serverurl)
 }
@@ -28,7 +28,7 @@ if(window.location.href.indexOf("ecslive") > -1)
 */
 //debug
 //ghost this when we push.
-serverurl = "https://ecstestnet.cryptoskillz.com/";
+//serverurl = "https://ecstestnet.cryptoskillz.com/";
 
 //hold the return from the server
 var ajaxdata = '';
