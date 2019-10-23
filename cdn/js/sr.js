@@ -50,6 +50,10 @@ var SR = SR || (function()
 	var shippingaddress = 0;
 	//note: we could detect the IP to set this automitcally. 
 	var startcountry = "US"
+	//hold if it is serverless or not 
+	var serverless = 0;
+	var serverlessbtcaddress = '1234567890'; // replace this with a proper one for testing or let the debugger pass it in.
+
 
 	/*
 	*	List of countries
@@ -264,9 +268,12 @@ var SR = SR || (function()
 		//update counter
 	  	changeClassText(document.querySelector('.sr-count'),itemcount);	
 	  	//store product
-		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
-		//call the store produt endpoint
-		fetchurl(url,'storeproduct')
+	  	if (serverless == 0)
+		{
+			var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
+			//call the store produt endpoint
+			fetchurl(url,'storeproduct')
+		}
 	}
 
 	//this function calls endpoints on the server
@@ -322,8 +329,33 @@ var SR = SR || (function()
 				//add the click elements listeners
 				clickElements()
 				//get an address
-				var url = serverurl+"api/address?uid="+uid;
-				fetchurl(url,'getaddress')
+				if (serverless == 0)
+				{
+					var url = serverurl+"api/address?uid="+uid;
+					fetchurl(url,'getaddress')
+				}
+				else
+				{
+					address = serverlessbtcaddress;
+				    //set the address in the checkout
+				    var elbtcaddress = document.getElementById('sr-bitcoinaddress');
+				    //set the href
+				    elbtcaddress.setAttribute('href', "bitcoin:"+address);
+				    //set the address
+		    		elbtcaddress.innerText =address;
+		    		//do pay from wallet also
+		    		var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
+				    //set the href
+				    elbtcaddress.setAttribute('href', "bitcoin:"+address);
+		    		//do pay from wallet alo
+
+		    		//debug
+				    //console.log(elbtcaddress)
+
+				    //generate the qr code
+				    var elbtcqr = document.getElementById('sr-bitcoinqrcode');
+					elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
+				}
 		    }
 		    if (method == "storeuserdetails")
 		    {
@@ -493,7 +525,9 @@ var SR = SR || (function()
 				showClass(document.getElementById('sr-back-button'));
 				hideClass(document.getElementById('sr-customerdetailswrapper'));
 				//call the check payment
-				checkpaymentres = setInterval(checkPayment, 3000)
+				//note in serverless mode we will have to make it move to the payment successful page. 
+				if (serverless == 0)
+					checkpaymentres = setInterval(checkPayment, 3000)
 		        break;
 		    case 5:
 		    	//check address
@@ -614,10 +648,17 @@ var SR = SR || (function()
 			    }
 			}
 
-			var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+address;
-			//console.log(url)
-			//call the store produt endpoint
-			fetchurl(url,'storeuserdetails')		
+			if (serverless == 0)
+			{
+				var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+address;
+				//console.log(url)
+				//call the store produt endpoint
+				fetchurl(url,'storeuserdetails')
+			}
+			else
+			{
+				cartstate(4)
+			}		
 			
 							
 			
@@ -892,10 +933,15 @@ var SR = SR || (function()
 			{
 				startcountry = _args[8]
 			}
+			//run in serverless mode (mainly a quick way to debug)
+			if (_args[9] != "")
+			{
+				serverless = _args[9]
+			}
 			//load css
-        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
+        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+theme+'.css" rel="stylesheet">'	
 			//fetch the template so we can use themes 
-			fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
+			fetchurl(cdnurl+theme+'.html','carttemplate');
         }
         ,
         //this function changes the quantity of the item in the cart
@@ -908,6 +954,7 @@ var SR = SR || (function()
 			itemcount = parseInt(itemcountq.value);
 			carttotal();	
         }
+
         ,
         //this function deletes an item in the cart
         //note : it is in the name space like this as the cart items are created dynamically so the dom does not always know about it's existence 

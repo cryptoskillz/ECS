@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+ <link rel="stylesheet" href="cart.css" id="theme-stylesheet">
+
+    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+  </head>
+  <body>
+
+<a href="#0" 
+      id="sr-add-to-cart" 
+      class="sr-add-to-cart add-to-cart btn btn-primary" 
+      data-price="0.01" 
+      data-name="Entity T" 
+      data-preview="">Add To Cart</a>
+
+<!--- COPY AND PASTE BELOW HERE -->
+<div class="sr-cart-container" id="sr-cart-container" style="display:none">
+   <a href="#0" class="sr-cart-trigger">
+      <span class="sr-count"> 
+         0
+      </span> 
+   </a>
+   <div class="sr-cart">
+      <div class="sr-wrapper">
+         <sr-header>
+            <h2 id="sr-cart-header">Cart</h2>
+            <span><a class="sr-back"  id="sr-back-button" href="#0">Back</a></span>
+         </sr-header>
+         <div class="sr-body">
+            <ul id='sr-cartlistitems'>
+            </ul>
+            <div id="sr-customerdetailswrapper" class="sr-customerdetails">
+               <label>Email</label>  
+               <input type="text" class="sr-textbox sr-input" name="sr-email" id="sr-email">
+              <div id="sr-addresswrapper" class="sr-addresswrapper">
+                  <div id="sr-billingaddressswrapper" class="sr-billingaddressswrapper">
+                    <span>Billing Address</span>
+                    <div>
+                      <label>Address</label>  
+                      <input type="text" class="sr-textbox sr-input" name="sr-billingaddress1" id="sr-billingaddress1">
+                    </div>
+                    <div>
+                      <label>City</label>  
+                      <input type="text" class="sr-textbox sr-input" name="sr-billingcity" id="sr-billingcity">
+                    </div>
+                    <div>
+                      <label>State</label>  
+                      <input type="text" class="sr-textbox sr-input" name="sr-billingstate" id="sr-billingstate">
+                    </div>
+                    <div>
+                      <label>Zip</label>  
+                      <input type="text" class="sr-textbox sr-input" name="sr-billingzip" id="sr-billingzip">
+                    </div>
+                    <div>
+                      <label>Country</label>  
+                      <select name="sr-billingcountry" id="sr-billingcountry" class="sr-cart-country sr-input">
+                      
+                      </select>
+                    </div>
+                    <div id="sr-billingandshippingequal">
+                      <input type="checkbox" id="sr-billingandshippingcheck" name="sr-billingandshippingcheck" class="sr-input"  checked> Billing & Shippng the same<br>
+                    </div>
+
+                  </div>
+                  <div id="sr-shippingaddresswrapper" class="sr-shippingaddresswrapper">
+                      <span>Shipping Address</span>
+                      <div>
+                      <label>Address</label>  
+                      <input type="text" class="sr-textbox sr-input" name="sr-shippingaddress1" id="sr-shippingaddress1">
+                    </div>
+                    <div>
+                      <label>City</label>  
+                      <input type="text" class="sr-textbox sr-input" name="sr-shippingcity" id="sr-shippingcity">
+                    </div>
+                    <div>
+                      <label>State</label>  
+                      <input type="text" class="sr-textbox sr-input" name="sr-shippingstate" id="sr-shippingstate">
+                    </div>
+                    <div>
+                      <label>Zip</label>  
+                      <input type="text" class="sr-textbox sr-input" name="sr-shippingzip" id="sr-shippingzip">
+                    </div>
+                    <div>
+                      <label>Country</label>  
+                      <select name="sr-shippingcountry" id="sr-shippingcountry" class="sr-cart-country sr-input">
+                      </select>
+                    </div>
+                  </div>
+                
+                </div>
+                <a href="#0" id="sr-pay" class="sr-button">Pay</a>
+                <a href="#0" id="sr-billing" class="sr-button">Billing</a>
+                <a href="#0" id="sr-shipping" class="sr-button">Shipping</a>
+
+            </div>
+
+            <div id="sr-bitcoinaddresswrapper">
+               <div>
+                    <a id="sr-bitcoinaddress" class="sr-bitcoinaddress" href=""></a>
+                </div>
+                <div class="sr-bitcoinoptions" >
+                  <a href="#" class="sr-bitcoinaddresscopy" id="sr-bitcoinaddresscopy">
+                       <i class="fa fa-copy"></i>
+                       Copy
+                   </a>
+                   <a href="" id="sr-bitcoinaddresswallet">
+                       <i class="fa fa-btc"></i>
+                       Pay from wallet
+                   </a>
+                </div>
+               <img id="sr-bitcoinqrcode" src="" />
+            </div>
+
+            <div id="sr-paid" class="sr-paid ">
+               Thank you for paying.  Your order is being processed.
+            </div>
+         </div>
+            <sr-footer><a href="#0" id="sr-checkout" class="sr-checkout"><em>Checkout - <span id="sr-checkouttotal">0</span> BTC</em></a></sr-footer>
+      </div>
+   </div> 
+</div> 
+<!--- COPY AND PASTE ABOVE HERE -->
+ <script type="text/javascript" src="http://127.0.0.1:8080/cdn/js/sr.js"></script>
+
+    <script type="text/javascript">
+       /*
+          0 = server url
+          1 = animated
+          2 = quantity count
+          3 = cdn url
+          4 = uid
+          5 = theme
+          6 = billing address 
+          7 = shipping address
+          8 = start country
+          9 = serverless
+       */
+
+       //all production (testnet) 
+       // SR.init(["https://ecs.cryptoskillz.com/", false,15,"https://cryptoskillz.com/srcrypto/prod/cdn/","3","",1,1,"GB"]);
+       //all local
+       SR.init(["http://127.0.0.1:3030/", false,15,"http://127.0.0.1:8080/demos/carts/default/","3","",1,1,"GB",1]);
+
+       // local dev production cdn 
+       //SR.init(["http://127.0.0.1:3000/", false,15,"https://cryptoskillz.com/srcrypto/prod/","3","",1,1,"GB"]);
+
+
+    </script>
+  </body>
+</html>
+
