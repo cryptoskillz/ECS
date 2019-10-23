@@ -52,7 +52,7 @@ var SR = SR || (function()
 	var startcountry = "US"
 	//hold if it is serverless or not 
 	var serverless = 0;
-	var serverlessbtcaddress = '1234567890'; // replace this with a proper one for testing or let the debugger pass it in.
+	var serverlessbtcaddress = ''; // replace this with a proper one for testing or let the debugger pass it in.
 
 
 	/*
@@ -937,6 +937,11 @@ var SR = SR || (function()
 			if (_args[9] != "")
 			{
 				serverless = _args[9]
+			}
+			//we require a btc address for serverless mode
+			if (_args[10] != "")
+			{
+				serverlessbtcaddress = _args[10]
 			}
 			//load css
         	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+theme+'.css" rel="stylesheet">'	
