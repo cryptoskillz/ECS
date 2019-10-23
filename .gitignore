@@ -1,2 +1,2 @@
 *.env
-*/server/db/db.db
+/server/db/db.db
