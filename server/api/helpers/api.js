@@ -189,7 +189,7 @@ var api = function() {
                 {
                   //debug
                   //console.log(this.lastID);
-                  res.send(JSON.stringify({ status: this.lastID }));
+                  res.send(JSON.stringify({ status: userid }));
                 }
               }
             ); 
@@ -367,7 +367,7 @@ var api = function() {
   this.checksessionforpayment = function checkSessionForPayment() {
   //get the unprocessed records from the sessions table
   let sqldata = [0];
-  let sql = `select * from sessions where processed = ?`;
+  let sql = `select * from sessions where processed = ? limit 1`;
   db.all(sql, sqldata, (err, rows) => {
     if (err) {
       throw err;
@@ -384,9 +384,15 @@ var api = function() {
       //note : Why is it doing a netwok search ofor live to stop processing. 
       if (process.env.NETWORK == 2) {
         //todo : check it does not start with a 2
-        processAddress = 0;
-        console.log('not checking for a payment for '+address)
+        
+        if (address.substring(0, 1) == '2')
+        {
+          processAddress = 0;
+          console.log('not checking for a payment for '+address)
+        }  
       }
+      //console.log(processAddress);
+      //return;
 
       //TODO : check the address matches the correct network namely mainnet or testnet
       //check if the address has any unspent transactions
@@ -462,8 +468,10 @@ var api = function() {
                         db.run(sql, sqldata, function(err) {
                           if (err) {
                           }
-
+                          //todo : fix this for donation mode.
                           //get the address details
+
+                          //todo : check payment type if it is 2 this is donation mode so it not in order product
                           let sqldata = [address];
                           let sql = `select *
                                   from order_product  
