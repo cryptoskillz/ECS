@@ -381,8 +381,9 @@ var api = function() {
       let address = row.address;
       let processAddress = 1;
 
+      //note : Why is it doing a netwok search ofor live to stop processing. 
       if (process.env.NETWORK == 2) {
-        //check it does not start with a 2
+        //todo : check it does not start with a 2
         processAddress = 0;
         console.log('not checking for a payment for '+address)
       }
