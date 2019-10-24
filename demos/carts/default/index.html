@@ -7,39 +7,29 @@
   </head>
   <body>
   <div>
-    <a href="#0" id="sr-add-to-cart" class="sr-add-to-cart" data-price="0.01" data-name="Entity T" data-preview="">Add To Cart</a>
+  	<span>
+        Below is a list of the different cart configurations. 
+        <br>Click the add to cart link below
+        <br><br>
+    </span>
+    <a href="cart-billing-shipping.html" id="" class="">
+    	1) Cart with Billing and Shipping address
+    </a>
+    <br>
+     <a href="cart-billing.html" id="" class="">
+    	2) Cart with Billing address only
+    </a>
+    <br>
+    <a href="cart-no-billing-shipping.html" id="" class="">
+    	3) Cart without Billing and Shipping address
+    </a>
+    <br>
+    <a href="cart-donation.html" id="" class="">
+    	4) Cart in donation mode
+    </a>
+   
   </div>
  </body>
 
-
-
- <script type="text/javascript" src="http://127.0.0.1:8080/cdn/js/sr.js"></script>
-
-    <script type="text/javascript">
-       /*
-          0 = server url
-          1 = animated
-          2 = quantity count
-          3 = cdn url
-          4 = uid
-          5 = theme
-          6 = billing address 
-          7 = shipping address
-          8 = start country
-          9 = serverless
-          10 = serverless btc address
-       */
-
-       //all production (testnet) 
-       // SR.init(["https://ecs.cryptoskillz.com/", false,15,"https://cryptoskillz.com/srcrypto/prod/cdn/","3","",1,1,"GB"]);
-       //all local
-       SR.init(["http://127.0.0.1:3030/", false,15,"http://127.0.0.1:8080/demos/carts/default/","3","",1,1,"GB",1,"1234456"]);
-
-       // local dev production cdn 
-       //SR.init(["http://127.0.0.1:3000/", false,15,"https://cryptoskillz.com/srcrypto/prod/","3","",1,1,"GB"]);
-
-
-    </script>
-
+  </body>
 </html>
-
