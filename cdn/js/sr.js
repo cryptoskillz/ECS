@@ -23,7 +23,7 @@ var SR = SR || (function()
 	//0 = normal cart
 	//1 = anon cart (to implement)
 	//2 = donation cart type
-	var cartytype = 0;
+	var carttype = 0;
 
 	//hold the email
 	var email = '';
@@ -331,7 +331,13 @@ var SR = SR || (function()
 				//get an address
 				if (serverless == 0)
 				{
-					var url = serverurl+"api/address?uid="+uid;
+					var elproduct = document.getElementById('sr-add-to-cart');
+					if (elproduct.getAttribute('cart-type') != null)
+					{
+						carttype = elproduct.getAttribute('cart-type');
+						//alert(carttype)
+					}
+					var url = serverurl+"api/address?uid="+uid+"&carttype="+carttype;
 					fetchurl(url,'getaddress')
 				}
 				else
@@ -731,7 +737,7 @@ var SR = SR || (function()
 			//check if cart type has been set and if so override default.
 			if (elproduct.getAttribute('cart-type') != null)
 			{
-				cartytype = elproduct.getAttribute('cart-type');
+				carttype = elproduct.getAttribute('cart-type');
 			}
 
 			/*
@@ -739,7 +745,7 @@ var SR = SR || (function()
 			note we can (and shall) refactor this as we this is not required for cart type and if we add more in the future we ]
 			want this to funciton slicker.
 			*/
-			if (cartytype == 0)
+			if (carttype == 0)
 			{
 				//will update when we use multipile products
 				var productid = 1;
@@ -839,7 +845,7 @@ var SR = SR || (function()
 	  		}
 	  		else
 	  		{
-  				if (cartytype == 2)
+  				if (carttype == 2)
 	  			{
 	  				hideClass(document.getElementById('sr-cart-container'));
 	  			}

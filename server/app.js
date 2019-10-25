@@ -366,7 +366,7 @@ app.get("/api/address", (req, res) => {
   let apihelper = require('./api/helpers/api.js').api;
   let api = new apihelper(); 
   //call the login function
-  api.generateAddress(req.query.uid,res);
+  api.generateAddress(req.query.uid,req.query.carttype,res);
 });
 
 //store user details called from sr.js

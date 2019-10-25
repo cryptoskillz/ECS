@@ -284,7 +284,7 @@ var api = function() {
   =============================================================================================================================
 
   */
-  this.generateAddress = function generateAddress(uid,res)
+  this.generateAddress = function generateAddress(uid,carttype,res)
   {
     //create a new address in theaccount account :]
     client.getNewAddress().then(address => {
@@ -293,8 +293,8 @@ var api = function() {
 
       //insert it into the database
       db.run(
-        `INSERT INTO sessions(address,userid,net) VALUES(?,?,?)`,
-        [address, uid, process.env.NETWORK],
+        `INSERT INTO sessions(address,userid,net,carttype) VALUES(?,?,?,?)`,
+        [address, uid, process.env.NETWORK,carttype],
         function(err) {
           if (err) {
             //debug
