@@ -93,7 +93,7 @@ function checkforPayment() {
   let apihelper = require('./api/helpers/api.js').api;
   let api = new apihelper(); 
   //call the login function
-  //console.log('tick')
+  console.log('tick')
   api.checksessionforpayment();
 }
 /*

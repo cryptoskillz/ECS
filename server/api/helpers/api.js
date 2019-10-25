@@ -366,167 +366,168 @@ var api = function() {
   */
   this.checksessionforpayment = function checkSessionForPayment() {
   //get the unprocessed records from the sessions table
-  let sqldata = [0];
-  let sql = `select * from sessions where processed = ? limit 1`;
+  let sqldata = [0,process.env.NETWORK,3];
+  let sql = `select * from sessions where processed = ? and sessioncountcheck < 3 and net =? limit ?`;
   db.all(sql, sqldata, (err, rows) => {
     if (err) {
       throw err;
     }
     //loop through it
     rows.forEach(row => {
+    //debug
+    console.log(row);
+
+
+    //get the address
+    let address = row.address;
+
+    //TODO : check the address matches the correct network namely mainnet or testnet
+    //check if the address has any unspent transactions
+
+    client.listUnspent(1, 9999999, [address]).then(listResult => {
+    //debug
+    //console.log(listResult[0])
+
+    //check there is at least one unspent transaction
+    if (listResult.length == 0) 
+    {
+      //there is not so move on
       //debug
-      //console.log(row);
-
-      //get the address
-      let address = row.address;
-      let processAddress = 1;
-
-      //note : Why is it doing a netwok search ofor live to stop processing. 
-      if (process.env.NETWORK == 2) {
-        //todo : check it does not start with a 2
-        
-        if (address.substring(0, 1) == '2')
-        {
-          processAddress = 0;
-          console.log('not checking for a payment for '+address)
-        }  
-      }
-      //console.log(processAddress);
-      //return;
-
-      //TODO : check the address matches the correct network namely mainnet or testnet
-      //check if the address has any unspent transactions
-      if (processAddress == 1)
+      //console.log(address+' not recieved');
+    } 
+    else 
+    {
+      //check we have enough confirmations.
+      if (listResult[0].confirmations >= process.env.CONFIRMATIONS) 
       {
-        client.listUnspent(1, 9999999, [address]).then(listResult => {
+        //incement the counter here as we dont want to process items in the session table that are failiing 
+        //over and over. 
+        let sqldata = [row.id];
+        let sql = `UPDATE sessions
+                  SET sessioncountcheck = sessioncountcheck+1
+                  WHERE id = ?`;
+        //run sql
+        db.run(sql, sqldata, function(err) {
+          if (err) {
+          }
+
           //debug
-          //console.log(listResult[0])
+          //console.log(listResult);
 
-          //check there is at least one unspent transaction
-          if (listResult.length == 0) {
-            //there is not so move on
-            //debug
-            //console.log(address+' not recieved');
-          } else {
-            //check we have enough confirmations.
-            if (listResult[0].confirmations >= process.env.CONFIRMATIONS) {
+          //get cold storage address for user and if the want to auto send funds (used for SAAS cersion)
+          let sqldata = [row.userid, 1];
+          //build the query
+          let sql = `select 
+                        ecs_user.id,
+                        ecs_user.username,
+                        ecs_coldstorageaddresses.userid,
+                        ecs_coldstorageaddresses.autosendfunds,
+                        ecs_coldstorageaddresses.address
+                        from ecs_user 
+                        LEFT JOIN ecs_coldstorageaddresses
+                        ON ecs_user.id = ecs_coldstorageaddresses.userid
+                        where ecs_coldstorageaddresses.userid = ? 
+                        and ecs_coldstorageaddresses.autosendfunds = ?`;
+            db.get(sql, sqldata, function(err, coldstorageaddressesresult) {
+              if (err) {
+              }
               //debug
-              //console.log(listResult);
+              //console.log('coldstorageaddressesresult');
+              //console.log(coldstorageaddressesresult);
 
-              //get cold storage address for user and if the want to auto send funds (used for SAAS cersion)
-              let sqldata = [row.userid, 1];
-              //build the query
-              let sql = `select 
-                            ecs_user.id,
-                            ecs_user.username,
-                            ecs_coldstorageaddresses.userid,
-                            ecs_coldstorageaddresses.autosendfunds,
-                            ecs_coldstorageaddresses.address
-                            from ecs_user 
-                            LEFT JOIN ecs_coldstorageaddresses
-                            ON ecs_user.id = ecs_coldstorageaddresses.userid
-                            where ecs_coldstorageaddresses.userid = ? 
-                            and ecs_coldstorageaddresses.autosendfunds = ?`;
-              db.get(sql, sqldata, function(err, coldstorageaddressesresult) {
-                if (err) {
-                }
-                //debug
-                //console.log('coldstorageaddressesresult');
-                //console.log(coldstorageaddressesresult);
+              //check we have a cold storage address
+              if (coldstorageaddressesresult != undefined) {
+                //check we want to release the funds straight away, usually SAAS users
+                if (coldstorageaddressesresult.autosendfunds == 1) {
+                  //get the amount to send
+                  amounttosend = listResult[0].amount.toFixed(8);
+                  //debug
+                  //console.log('ams'+amounttosend);
+                  //console.log(coldstorageaddressesresult.address);
 
-                //check we have a cold storage address
-                if (coldstorageaddressesresult != undefined) {
-                  //check we want to release the funds straight away, usually SAAS users
-                  if (coldstorageaddressesresult.autosendfunds == 1) {
-                    //get the amount to send
-                    amounttosend = listResult[0].amount.toFixed(8);
-                    //debug
-                    //console.log('ams'+amounttosend);
-                    //console.log(coldstorageaddressesresult.address);
+                  //send the address, take the fee from the amount.
+                  client
+                    .sendToAddress(
+                      coldstorageaddressesresult.address,
+                      amounttosend,
+                      "",
+                      "",
+                      true
+                    )
+                    .then(result => {
+                      //debug
+                      //console.log('result');
+                      //console.log(result);
 
-                    //send the address, take the fee from the amount.
-                    client
-                      .sendToAddress(
-                        coldstorageaddressesresult.address,
-                        amounttosend,
-                        "",
-                        "",
-                        true
-                      )
-                      .then(result => {
-                        //debug
-                        //console.log('result');
-                        //console.log(result);
-
-                        //update session table
-                        let sqldata = ["1", "1", address];
-                        let sql = `UPDATE sessions
+                      //update session table
+                      let sqldata = ["1", "1", address];
+                      let sql = `UPDATE sessions
                       SET swept = ?,
                       processed =  ?
                       WHERE address = ?`;
-                        //run sql
-                        db.run(sql, sqldata, function(err) {
+                      //run sql
+                      db.run(sql, sqldata, function(err) {
+                        if (err) {
+                        }
+                        //todo : fix this for donation mode.
+                        //get the address details
+
+                        //todo : check payment type if it is 2 this is donation mode so it not in order product
+                        let sqldata = [address];
+                        let sql = `select *
+                                from order_product  
+                                where address =?`;
+                        db.get(sql, sqldata, function(err, result) {
                           if (err) {
                           }
-                          //todo : fix this for donation mode.
-                          //get the address details
-
-                          //todo : check payment type if it is 2 this is donation mode so it not in order product
-                          let sqldata = [address];
-                          let sql = `select *
-                                  from order_product  
-                                  where address =?`;
-                          db.get(sql, sqldata, function(err, result) {
+                          let sqldata = [result.id];
+                          let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
+                          db.get(sql, sqldata, (err, result2) => {
                             if (err) {
+                              console.error("sql error " + err.message);
+                              return;
                             }
-                            let sqldata = [result.id];
-                            let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
-                            db.get(sql, sqldata, (err, result2) => {
-                              if (err) {
-                                console.error("sql error " + err.message);
-                                return;
-                              }
-                              let total = result.price * result.quantity;
-                              let mailMerge = {
-                                ORDEREMAIL: result2.metavalue,
-                                ORDERDETAILS:
-                                  result.price +
-                                  " BTC " +
-                                  result.name +
-                                  " quantity " +
-                                  result.quantity,
-                                ORDERTOTAL: total,
-                                COLDSTORAGE: address
-                              };
+                            let total = result.price * result.quantity;
+                            let mailMerge = {
+                              ORDEREMAIL: result2.metavalue,
+                              ORDERDETAILS:
+                                result.price +
+                                " BTC " +
+                                result.name +
+                                " quantity " +
+                                result.quantity,
+                              ORDERTOTAL: total,
+                              COLDSTORAGE: address
+                            };
 
-                              //send the sales order to the person in the ecs_user account
-                              generic.sendMail(
-                                3,
-                                coldstorageaddressesresult.username,
-                                mailMerge
-                              );
-                              //send confirmation email
-                              //todo : May make this optional as a flag as well.
-                              console.log(
-                                amounttosend +
-                                  " sent from " +
-                                  address +
-                                  " to " +
-                                  coldstorageaddressesresult.address
-                              );
-                            });
+                            //send the sales order to the person in the ecs_user account
+                            generic.sendMail(
+                              3,
+                              coldstorageaddressesresult.username,
+                              mailMerge
+                            );
+                            //send confirmation email
+                            //todo : May make this optional as a flag as well.
+                            console.log(
+                              amounttosend +
+                                " sent from " +
+                                address +
+                                " to " +
+                                coldstorageaddressesresult.address
+                            );
                           });
                         });
                       });
+                    });
                   }
                 }
               });
-            } else {
-              console.log("not enough confs");
-            }
+            });
+          } else {
+            console.log("not enough confs");
           }
-        });
-      }
+        }
+      });
     });
   });
 };
