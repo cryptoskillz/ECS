@@ -323,8 +323,8 @@ var api = function() {
   */
   this.checksessionforpayment = function checkSessionForPayment() {
     //get the unprocessed records from the sessions table
-    let sqldata = [0, process.env.NETWORK, 3];
-    let sql = `select * from sessions where processed = ? and sessioncountcheck < 3 and net =? limit ?`;
+    let sqldata = [0, process.env.NETWORK, 1];
+    let sql = `select * from sessions where processed = ?  and net =? ORDER BY sessioncountcheck limit ? ` ;
     db.all(sql, sqldata, (err, rows) => {
       if (err) {
         throw err;
