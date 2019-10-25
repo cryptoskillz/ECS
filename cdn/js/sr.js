@@ -331,6 +331,7 @@ var SR = SR || (function()
 				//get an address
 				if (serverless == 0)
 				{
+					//todo : this is code is called in 2 place so we can refactor it into the init
 					var elproduct = document.getElementById('sr-add-to-cart');
 					if (elproduct.getAttribute('cart-type') != null)
 					{
