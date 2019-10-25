@@ -377,13 +377,9 @@ var api = function() {
     //debug
     console.log(row);
 
-
     //get the address
     let address = row.address;
-
-    //TODO : check the address matches the correct network namely mainnet or testnet
     //check if the address has any unspent transactions
-
     client.listUnspent(1, 9999999, [address]).then(listResult => {
     //debug
     //console.log(listResult[0])
@@ -430,6 +426,7 @@ var api = function() {
                         and ecs_coldstorageaddresses.autosendfunds = ?`;
             db.get(sql, sqldata, function(err, coldstorageaddressesresult) {
               if (err) {
+                //no cold storage address.
               }
               //debug
               //console.log('coldstorageaddressesresult');
@@ -469,54 +466,73 @@ var api = function() {
                       db.run(sql, sqldata, function(err) {
                         if (err) {
                         }
-                        //todo : fix this for donation mode.
-                        //get the address details
-
-                        //todo : check payment type if it is 2 this is donation mode so it not in order product
-                        let sqldata = [address];
-                        let sql = `select *
-                                from order_product  
-                                where address =?`;
-                        db.get(sql, sqldata, function(err, result) {
-                          if (err) {
-                          }
-                          let sqldata = [result.id];
-                          let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
-                          db.get(sql, sqldata, (err, result2) => {
+                        //check payment type if it is 2 this is donation mode so it not in order product
+                        if (row.carttype == 0)
+                        {
+                          let sqldata = [address];
+                          let sql = `select *
+                                  from order_product  
+                                  where address =?`;
+                          db.get(sql, sqldata, function(err, result) {
                             if (err) {
-                              console.error("sql error " + err.message);
-                              return;
                             }
-                            let total = result.price * result.quantity;
-                            let mailMerge = {
-                              ORDEREMAIL: result2.metavalue,
-                              ORDERDETAILS:
-                                result.price +
-                                " BTC " +
-                                result.name +
-                                " quantity " +
-                                result.quantity,
-                              ORDERTOTAL: total,
-                              COLDSTORAGE: address
-                            };
+                            let sqldata = [result.id];
+                            let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
+                            db.get(sql, sqldata, (err, result2) => {
+                              if (err) {
+                                console.error("sql error " + err.message);
+                                return;
+                              }
+                              let total = result.price * result.quantity;
+                              let mailMerge = {
+                                ORDEREMAIL: result2.metavalue,
+                                ORDERDETAILS:
+                                  result.price +
+                                  " BTC " +
+                                  result.name +
+                                  " quantity " +
+                                  result.quantity,
+                                ORDERTOTAL: total,
+                                COLDSTORAGE: coldstorageaddressesresult.address
+                              };
 
-                            //send the sales order to the person in the ecs_user account
-                            generic.sendMail(
-                              3,
-                              coldstorageaddressesresult.username,
-                              mailMerge
-                            );
-                            //send confirmation email
-                            //todo : May make this optional as a flag as well.
-                            console.log(
-                              amounttosend +
-                                " sent from " +
-                                address +
-                                " to " +
-                                coldstorageaddressesresult.address
-                            );
+                              //todo: send the sales order to the person in the ecs_user account
+                              //      
+                              //send to admin
+                              generic.sendMail(
+                                3,
+                                coldstorageaddressesresult.username,
+                                mailMerge
+                              );
+                              console.log(
+                                amounttosend +
+                                  " sent from " +
+                                  address +
+                                  " to " +
+                                  coldstorageaddressesresult.address
+                              );
+                            });
                           });
-                        });
+                         } 
+                         else
+                        {
+                          //send dpnation email
+                          let total = result.price * result.quantity;
+                          let mailMerge = {
+                            ORDEREMAIL: "",
+                            ORDERDETAILS:"donation"
+                            ORDERTOTAL: amounttosend,
+                            COLDSTORAGE: coldstorageaddressesresult.address
+                          };
+
+                          //send to admin
+                          generic.sendMail(
+                            3,
+                            coldstorageaddressesresult.username,
+                            mailMerge
+                          );
+                          console.log(mailMerge);
+                        }
                       });
                     });
                   }
