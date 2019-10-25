@@ -6,7 +6,7 @@
 
 
 */
-const config = require('./config');
+const config = require("./config");
 //open a database connection
 //load SQLlite (use any database you want or none)
 const sqlite3 = require("sqlite3").verbose();
@@ -17,127 +17,100 @@ let db = new sqlite3.Database("./db/db.db", err => {
 });
 
 //load the generic functions
-//note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that. 
-var generichelper = require('./generic.js').Generic;
+//note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that.
+var generichelper = require("./generic.js").Generic;
 var generic = new generichelper();
 
 var api = function() {
-
-   /*
+  /*
   *
   * This function stores the user details 
 
     note : Check why it is storing adddress in this table (not required)
   *
   */
-  this.storeUserDetails = function storeUserDetails(req,res)
-  {
+  this.storeUserDetails = function storeUserDetails(req, res) {
     //debug
     //console.log("query")
     //console.log(req.query);
 
     let data = [req.query.address];
     //console.log(data)
-    let sql = `SELECT * FROM order_product where address = "`+req.query.address+`"`;
+    let sql =
+      `SELECT * FROM order_product where address = "` + req.query.address + `"`;
     //debug
 
     db.get(sql, [], (err, result) => {
       //console.log(result)
       if (err) {
-        console.log(err)
+        console.log(err);
       }
 
-      //check if there is a product id if not set it to 0 so it deletes nothing
-      //this is a bit of hack but we can fix it later
-      //let data = [0];
-      //console.log(result);
-      //if(result == undefined)
-      //{
-          //the product does not exist so we do not have to do any admin stuff.
-        //  res.send(JSON.stringify({ status: "ok" }));
-      //}
-      //else
-      //{
-        let sql = `delete FROM order_meta WHERE productid = ?`;
+      let sql = `delete FROM order_meta WHERE productid = ?`;
+      db.run(sql, data, function(err) {
+        if (err) {
+          return console.error(err.message);
+        }
+        let data = [result.id];
+        let sql = `delete FROM order_product_meta WHERE productid = ?`;
         db.run(sql, data, function(err) {
           if (err) {
             return console.error(err.message);
           }
-          let data = [result.id];
-          let sql = `delete FROM order_product_meta WHERE productid = ?`;
-          db.run(sql, data, function(err) {
-              if (err) {
-                return console.error(err.message);
-              }
-              for (var metaname in req.query) 
-              {
+          for (var metaname in req.query) {
+            if (req.query.hasOwnProperty(metaname)) {
+              var metavalue = req.query[metaname];
 
-                  if (req.query.hasOwnProperty(metaname)) 
-                  {
-                      var metavalue = req.query[metaname]
-                      
-                      if(metaname.indexOf("sr-product-") > -1) 
-                      {
-                        //console.log('prod:'+req.query[metaname])
-                        //inser into proiduct meta
-                        if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
-                        {
-                          metaname = metaname.replace("sr-product-", "");
-                          //insert into oder meta
-                          db.run(
-                            `INSERT INTO order_product_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
-                            [
-                              result.id,
-                              metaname,
-                              metavalue
-                            ],
-                            function(err) {
-                              if (err) {
-                                return console.log(err.message);
-                              }
-                            }
-                          );
-                        }
-
+              if (metaname.indexOf("sr-product-") > -1) {
+                //console.log('prod:'+req.query[metaname])
+                //inser into proiduct meta
+                if (
+                  req.query[metaname] != "" &&
+                  req.query[metaname] != "undefined"
+                ) {
+                  metaname = metaname.replace("sr-product-", "");
+                  //insert into oder meta
+                  db.run(
+                    `INSERT INTO order_product_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                    [result.id, metaname, metavalue],
+                    function(err) {
+                      if (err) {
+                        return console.log(err.message);
                       }
-                      else
-                      {
-                          //note we should change this to sr-order so it is not just an if else check in the future
-                          //debug
-                          //console.log('order:'+req.query[metaname])
-                          //note the undefined should be cleaned in sr.js but does hurt to also check here
-                          if ((req.query[metaname] != '') && (req.query[metaname] != "undefined"))
-                          {
-                            metaname = metaname.replace("sr-", "");
-                            //insert into oder meta
-                            db.run(
-                              `INSERT INTO order_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
-                              [
-                                result.id,
-                                metaname,
-                                metavalue
-                              ],
-                              function(err) {
-                                if (err) {
-                                  return console.log(err.message);
-                                }
-                              }
-                            );
-                          }
-                        //debug
-                        //console.log(metaname, metavalue);
+                    }
+                  );
+                }
+              } else {
+                //note we should change this to sr-order so it is not just an if else check in the future
+                //debug
+                //console.log('order:'+req.query[metaname])
+                //note the undefined should be cleaned in sr.js but does hurt to also check here
+                if (
+                  req.query[metaname] != "" &&
+                  req.query[metaname] != "undefined"
+                ) {
+                  metaname = metaname.replace("sr-", "");
+                  //insert into oder meta
+                  db.run(
+                    `INSERT INTO order_meta(productid,metaname,metavalue) VALUES(?,?,?)`,
+                    [result.id, metaname, metavalue],
+                    function(err) {
+                      if (err) {
+                        return console.log(err.message);
                       }
-
-                  }
+                    }
+                  );
+                }
+                //debug
+                //console.log(metaname, metavalue);
               }
-              res.send(JSON.stringify({ status: "ok" }));
-            });
-          });
-
-        //}
+            }
+          }
+          res.send(JSON.stringify({ status: "ok" }));
+        });
       });
-  
-  }
+    });
+  };
 
   /*
 
@@ -147,56 +120,42 @@ var api = function() {
 
   */
 
-  this.addUser = function storeUser(req,res)
-  {
-    var generator = require('generate-password');
- 
+  this.addUser = function storeUser(req, res) {
+    var generator = require("generate-password");
+
     var password = generator.generate({
-        length: 10,
-        numbers: true
+      length: 10,
+      numbers: true
     });
     //debug
     //console.log(password);
     //console.log(req.query);
     db.run(
-        `INSERT INTO ecs_user(username,password,isadmin) VALUES(?,?,?)`,
-        [
-          req.query.email,
-          password,
-          1
-        ],
-        function(err) {
-          if (err) {
-            //return console.log(err.message);
-            res.send(JSON.stringify({ status: "error" }));
-
-          }
-          else
-          {
-             db.run(
-              `INSERT INTO ecs_coldstorageaddresses(userid,address) VALUES(?,?)`,
-              [
-                 this.lastID,
-                req.query.btc
-              ],
-              function(err) {
-                if (err) {
-                  //return console.log(err.message);
-                  res.send(JSON.stringify({ status: "error" }));
-
-                }
-                else
-                {
-                  //debug
-                  //console.log(this.lastID);
-                  res.send(JSON.stringify({ status: userid }));
-                }
+      `INSERT INTO ecs_user(username,password,isadmin) VALUES(?,?,?)`,
+      [req.query.email, password, 1],
+      function(err) {
+        if (err) {
+          //return console.log(err.message);
+          res.send(JSON.stringify({ status: "error" }));
+        } else {
+          db.run(
+            `INSERT INTO ecs_coldstorageaddresses(userid,address) VALUES(?,?)`,
+            [this.lastID, req.query.btc],
+            function(err) {
+              if (err) {
+                //return console.log(err.message);
+                res.send(JSON.stringify({ status: "error" }));
+              } else {
+                //debug
+                //console.log(this.lastID);
+                res.send(JSON.stringify({ status: userid }));
               }
-            ); 
-          }
+            }
+          );
         }
-      );
-  }
+      }
+    );
+  };
 
   /*
   *
@@ -207,8 +166,7 @@ var api = function() {
            from having a check to see if bitcoin core is running correctly.
   *
   */
-  this.storeProduct = function storeProduct(req,res)
-  {
+  this.storeProduct = function storeProduct(req, res) {
     //check if it is in the product table
     if (req.query.quantity == 0) {
       //delete the record
@@ -222,7 +180,9 @@ var api = function() {
     } else {
       //see if we have it already
       let sql =
-        `SELECT * FROM order_product where address = "` + req.query.address + `"`;
+        `SELECT * FROM order_product where address = "` +
+        req.query.address +
+        `"`;
       //debug
       //console.log(sql);
 
@@ -266,7 +226,7 @@ var api = function() {
     //console.log(req.query.quantity);
     //console.log(req.query.address);
     res.send(JSON.stringify({ status: "ok" }));
-  }
+  };
 
   /*
   =============================================================================================================================
@@ -284,8 +244,7 @@ var api = function() {
   =============================================================================================================================
 
   */
-  this.generateAddress = function generateAddress(uid,carttype,res)
-  {
+  this.generateAddress = function generateAddress(uid, carttype, res) {
     //create a new address in theaccount account :]
     client.getNewAddress().then(address => {
       //debug
@@ -294,7 +253,7 @@ var api = function() {
       //insert it into the database
       db.run(
         `INSERT INTO sessions(address,userid,net,carttype) VALUES(?,?,?,?)`,
-        [address, uid, process.env.NETWORK,carttype],
+        [address, uid, process.env.NETWORK, carttype],
         function(err) {
           if (err) {
             //debug
@@ -310,20 +269,18 @@ var api = function() {
       );
       return;
     });
-  }
-
+  };
 
   /*
-	*
-	*	This function check if payment has been sent to the address
+  *
+  * This function check if payment has been sent to the address
   *
   * todo: check client is running
           fix small amounts been written to the data base incorrectly (ie 0.00002000 as 2.0e-05) most likely we will have 
           parse it as a string before we write to the database
-	*
-	*/
+  *
+  */
   this.monitor = function monitor(address, res) {
-
     //call the recieved by address RPC call
     //console.log(address)
     client.getReceivedByAddress(address).then(result => {
@@ -338,9 +295,9 @@ var api = function() {
         let data = ["1", result, address];
         //build the query
         let sql = `UPDATE sessions
-				          SET processed = ?,
-				            amount = ?
-				          WHERE address = ?`;
+                  SET processed = ?,
+                    amount = ?
+                  WHERE address = ?`;
         //run the query
         db.run(sql, data, function(err) {
           if (err) {
@@ -351,7 +308,7 @@ var api = function() {
           //todo: send the email confirmations.
           //send email to customer.
           //console.log('send email in monitor')
-          generic.sendMail(2,'cryptoskillz@protonmail.com');
+          generic.sendMail(2, "cryptoskillz@protonmail.com");
         });
       } else {
         //return error
@@ -365,55 +322,61 @@ var api = function() {
 
   */
   this.checksessionforpayment = function checkSessionForPayment() {
-  //get the unprocessed records from the sessions table
-  let sqldata = [0,process.env.NETWORK,3];
-  let sql = `select * from sessions where processed = ? and sessioncountcheck < 3 and net =? limit ?`;
-  db.all(sql, sqldata, (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    //loop through it
-    rows.forEach(row => {
-    //debug
-    console.log(row);
+    //get the unprocessed records from the sessions table
+    let sqldata = [0, process.env.NETWORK, 3];
+    let sql = `select * from sessions where processed = ? and sessioncountcheck < 3 and net =? limit ?`;
+    db.all(sql, sqldata, (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      //loop through it
+      rows.forEach(row => {
+        //debug
+        console.log(row);
 
-    //get the address
-    let address = row.address;
-    //check if the address has any unspent transactions
-    client.listUnspent(1, 9999999, [address]).then(listResult => {
-    //debug
-    //console.log(listResult[0])
+        //get the address
+        let address = row.address;
+        //check if the address has any unspent transactions
+        client.listUnspent(1, 9999999, [address]).then(listResult => {
+          //debug
+          console.log(listResult[0])
 
-    //check there is at least one unspent transaction
-    if (listResult.length == 0) 
-    {
-      //there is not so move on
-      //debug
-      //console.log(address+' not recieved');
-    } 
-    else 
-    {
-      //check we have enough confirmations.
-      if (listResult[0].confirmations >= process.env.CONFIRMATIONS) 
-      {
-        //incement the counter here as we dont want to process items in the session table that are failiing 
-        //over and over. 
-        let sqldata = [row.id];
-        let sql = `UPDATE sessions
+          //check there is at least one unspent transaction
+          if (listResult.length == 0) {
+            //there is not so move on
+            //debug
+            console.log(address+' not recieved');
+            let sqldata = [row.id];
+              let sql = `UPDATE sessions
                   SET sessioncountcheck = sessioncountcheck+1
                   WHERE id = ?`;
-        //run sql
-        db.run(sql, sqldata, function(err) {
-          if (err) {
-          }
+              //run sql
+              db.run(sql, sqldata, function(err) {
+                if (err) {
+                }
+              });
 
-          //debug
-          //console.log(listResult);
+          } else {
+            //check we have enough confirmations.
+            if (listResult[0].confirmations >= process.env.CONFIRMATIONS) {
+              //incement the counter here as we dont want to process items in the session table that are failiing
+              //over and over.
+              let sqldata = [row.id];
+              let sql = `UPDATE sessions
+                  SET sessioncountcheck = sessioncountcheck+1
+                  WHERE id = ?`;
+              //run sql
+              db.run(sql, sqldata, function(err) {
+                if (err) {
+                }
 
-          //get cold storage address for user and if the want to auto send funds (used for SAAS cersion)
-          let sqldata = [row.userid, 1];
-          //build the query
-          let sql = `select 
+                //debug
+                //console.log(listResult);
+
+                //get cold storage address for user and if the want to auto send funds (used for SAAS cersion)
+                let sqldata = [row.userid, 1];
+                //build the query
+                let sql = `select 
                         ecs_user.id,
                         ecs_user.username,
                         ecs_coldstorageaddresses.userid,
@@ -424,142 +387,139 @@ var api = function() {
                         ON ecs_user.id = ecs_coldstorageaddresses.userid
                         where ecs_coldstorageaddresses.userid = ? 
                         and ecs_coldstorageaddresses.autosendfunds = ?`;
-            db.get(sql, sqldata, function(err, coldstorageaddressesresult) {
-              if (err) {
-                //no cold storage address.
-              }
-              //debug
-              //console.log('coldstorageaddressesresult');
-              //console.log(coldstorageaddressesresult);
-
-              //check we have a cold storage address
-              if (coldstorageaddressesresult != undefined) {
-                //check we want to release the funds straight away, usually SAAS users
-                if (coldstorageaddressesresult.autosendfunds == 1) {
-                  //get the amount to send
-                  amounttosend = listResult[0].amount.toFixed(8);
+                db.get(sql, sqldata, function(err, coldstorageaddressesresult) {
+                  if (err) {
+                    //no cold storage address.
+                  }
                   //debug
-                  //console.log('ams'+amounttosend);
-                  //console.log(coldstorageaddressesresult.address);
+                  //console.log('coldstorageaddressesresult');
+                  //console.log(coldstorageaddressesresult);
 
-                  //send the address, take the fee from the amount.
-                  client
-                    .sendToAddress(
-                      coldstorageaddressesresult.address,
-                      amounttosend,
-                      "",
-                      "",
-                      true
-                    )
-                    .then(result => {
+                  //check we have a cold storage address
+                  if (coldstorageaddressesresult != undefined) {
+                    //check we want to release the funds straight away, usually SAAS users
+                    if (coldstorageaddressesresult.autosendfunds == 1) {
+                      //get the amount to send
+                      amounttosend = listResult[0].amount.toFixed(8);
                       //debug
-                      //console.log('result');
-                      //console.log(result);
+                      //console.log('ams'+amounttosend);
+                      //console.log(coldstorageaddressesresult.address);
 
-                      //update session table
-                      let sqldata = ["1", "1", address];
-                      let sql = `UPDATE sessions
+                      //send the address, take the fee from the amount.
+                      client
+                        .sendToAddress(
+                          coldstorageaddressesresult.address,
+                          amounttosend,
+                          "",
+                          "",
+                          true
+                        )
+                        .then(result => {
+                          //debug
+                          //console.log('result');
+                          //console.log(result);
+
+                          //update session table
+                          let sqldata = ["1", "1", address];
+                          let sql = `UPDATE sessions
                       SET swept = ?,
                       processed =  ?
                       WHERE address = ?`;
-                      //run sql
-                      db.run(sql, sqldata, function(err) {
-                        if (err) {
-                        }
-                        //check payment type if it is 2 this is donation mode so it not in order product
-                        if (row.carttype == 0)
-                        {
-                          let sqldata = [address];
-                          let sql = `select *
-                                  from order_product  
-                                  where address =?`;
-                          db.get(sql, sqldata, function(err, result) {
+                          //run sql
+                          db.run(sql, sqldata, function(err) {
                             if (err) {
                             }
-                            let sqldata = [result.id];
-                            let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
-                            db.get(sql, sqldata, (err, result2) => {
-                              if (err) {
-                                console.error("sql error " + err.message);
-                                return;
-                              }
+                            //check payment type if it is 2 this is donation mode so it not in order product
+                            if (row.carttype == 0) {
+                              let sqldata = [address];
+                              let sql = `select *
+                                  from order_product  
+                                  where address =?`;
+                              db.get(sql, sqldata, function(err, result) {
+                                if (err) {
+                                }
+                                let sqldata = [result.id];
+                                let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
+                                db.get(sql, sqldata, (err, result2) => {
+                                  if (err) {
+                                    console.error("sql error " + err.message);
+                                    return;
+                                  }
+                                  let total = result.price * result.quantity;
+                                  let mailMerge = {
+                                    ORDEREMAIL: result2.metavalue,
+                                    ORDERDETAILS:
+                                      result.price +
+                                      " BTC " +
+                                      result.name +
+                                      " quantity " +
+                                      result.quantity,
+                                    ORDERTOTAL: total,
+                                    COLDSTORAGE:
+                                      coldstorageaddressesresult.address
+                                  };
+
+                                  //todo: send the sales order to the person in the ecs_user account
+                                  //
+                                  //send to admin
+                                  generic.sendMail(
+                                    3,
+                                    coldstorageaddressesresult.username,
+                                    mailMerge
+                                  );
+                                  console.log(
+                                    amounttosend +
+                                      " sent from " +
+                                      address +
+                                      " to " +
+                                      coldstorageaddressesresult.address
+                                  );
+                                });
+                              });
+                            } else {
+                              //send donation email
                               let total = result.price * result.quantity;
                               let mailMerge = {
-                                ORDEREMAIL: result2.metavalue,
-                                ORDERDETAILS:
-                                  result.price +
-                                  " BTC " +
-                                  result.name +
-                                  " quantity " +
-                                  result.quantity,
-                                ORDERTOTAL: total,
+                                ORDEREMAIL: "",
+                                ORDERDETAILS: "donation",
+                                ORDERTOTAL: amounttosend,
                                 COLDSTORAGE: coldstorageaddressesresult.address
                               };
 
-                              //todo: send the sales order to the person in the ecs_user account
-                              //      
                               //send to admin
                               generic.sendMail(
                                 3,
                                 coldstorageaddressesresult.username,
                                 mailMerge
                               );
-                              console.log(
-                                amounttosend +
-                                  " sent from " +
-                                  address +
-                                  " to " +
-                                  coldstorageaddressesresult.address
-                              );
-                            });
+                              console.log(mailMerge);
+                            }
                           });
-                         } 
-                         else
-                        {
-                          //send dpnation email
-                          let total = result.price * result.quantity;
-                          let mailMerge = {
-                            ORDEREMAIL: "",
-                            ORDERDETAILS:"donation"
-                            ORDERTOTAL: amounttosend,
-                            COLDSTORAGE: coldstorageaddressesresult.address
-                          };
-
-                          //send to admin
-                          generic.sendMail(
-                            3,
-                            coldstorageaddressesresult.username,
-                            mailMerge
-                          );
-                          console.log(mailMerge);
-                        }
-                      });
-                    });
+                        });
+                    }
                   }
-                }
+                });
               });
-            });
-          } else {
-            console.log("not enough confs");
+            } else {
+              console.log("not enough confs");
+            }
           }
-        }
+        });
       });
     });
-  });
-};
+  };
   /*
-	*
-	*	This function moves a payment to a cold storge address (admin)
+  *
+  * This function moves a payment to a cold storge address (admin)
 
     Note we will have to update this to handle UID's
     note.  
 
     This function may not be required anymore as we have the timer check now.
 
-	*
-	*/
+  *
+  */
   this.sweep = function sweep(address, res) {
-
     let sqldata = [0];
     //this has to use the userid to get the correct address from.
     let sql = `select * from ecs_coldstorageaddresses where used = ?`;
@@ -574,69 +534,65 @@ var api = function() {
       client.listUnspent(1, 9999999, [address]).then(result => {
         //debug
         //console.log(result[0])
-         if (result.length == 0) 
-         {
-              //debug
-              //console.log(result);
-              res.send(
-                JSON.stringify({
-                  result: "nothing to sweep no unspent transactions"
-                })
-              );
-              return;
-          } 
-          else 
-          {
-            if (result[0].confirmations >= process.env.CONFIRMATIONS) 
-            {
-                amounttosend = result[0].amount.toFixed(8);
+        if (result.length == 0) {
+          //debug
+          //console.log(result);
+          res.send(
+            JSON.stringify({
+              result: "nothing to sweep no unspent transactions"
+            })
+          );
+          return;
+        } else {
+          if (result[0].confirmations >= process.env.CONFIRMATIONS) {
+            amounttosend = result[0].amount.toFixed(8);
+            //debug
+            //console.log('ams'+amounttosend);
+            //return;
+            client
+              .sendToAddress(coldstorageaddress, amounttosend)
+              .then(result => {
                 //debug
-                //console.log('ams'+amounttosend);
-                //return;
-                client.sendToAddress(coldstorageaddress,amounttosend).then(result => {
-                  //debug
-                  //console.log('result');
-                  //console.log(result);
+                //console.log('result');
+                //console.log(result);
 
-                  let sqldata = ["1", address];
-                  let sql = `UPDATE sessions
+                let sqldata = ["1", address];
+                let sql = `UPDATE sessions
                   SET swept = ?
                   WHERE address = ?`;
+                //run sql
+                db.run(sql, sqldata, function(err) {
+                  if (err) {
+                  }
+                  //update the address in cold storage so it is not used again.
+                  //build sql
+                  let sqldata = ["1", coldstorageaddress];
+                  let sql = `UPDATE ecs_coldstorageaddresses
+                               SET used = ?
+                              WHERE ecs_coldstorageaddress = ?`;
                   //run sql
                   db.run(sql, sqldata, function(err) {
                     if (err) {
                     }
-                    //update the address in cold storage so it is not used again.
-                    //build sql
-                    let sqldata = ["1", coldstorageaddress];
-                    let sql = `UPDATE ecs_coldstorageaddresses
-                               SET used = ?
-                              WHERE ecs_coldstorageaddress = ?`;
-                    //run sql
-                    db.run(sql, sqldata, function(err) {
-                      if (err) {
-                      }
-                      //return status
-                      res.send(JSON.stringify({ status: "swept" }));
-                      return;
-                    });
+                    //return status
+                    res.send(JSON.stringify({ status: "swept" }));
+                    return;
                   });
                 });
-              }
-              else
-              {
-                //return status
-                res.send(
-                  JSON.stringify({
-                    status:
-                      "not enough confirmations :" + result[0].confirmations
-                  })
-                );
-                return;
-              }
-            }
-          });
-       });
-    };
+              });
+          } else {
+            //return status
+            res.send(
+              JSON.stringify({
+                status: "not enough confirmations :" + result[0].confirmations
+              })
+            );
+            return;
+          }
+        }
+      });
+    });
   };
-  exports.api = api;
+};
+exports.api = api;
+
