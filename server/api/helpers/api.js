@@ -324,7 +324,9 @@ var api = function() {
   this.checksessionforpayment = function checkSessionForPayment() {
     //get the unprocessed records from the sessions table
     let sqldata = [0, process.env.NETWORK, 1];
-    let sql = `select * from sessions where processed = ?  and net =? ORDER BY sessioncountcheck limit ? ` ;
+
+    //set the max check to 1000 we can assume if we are not see unconfrimed transactions it requires some kind of mnaual review
+    let sql = `select * from sessions where processed = ?  and net =? and sessioncountcheck < 1000 ORDER BY sessioncountcheck limit ? ` ;
     db.all(sql, sqldata, (err, rows) => {
       if (err) {
         throw err;
@@ -332,20 +334,24 @@ var api = function() {
       //loop through it
       rows.forEach(row => {
         //debug
-        console.log(row);
+        //console.log(row);
 
         //get the address
         let address = row.address;
+
+        //client.GetUnconfirmedBalance().then(res => {
+         // console.log(res);
+        //});
         //check if the address has any unspent transactions
         client.listUnspent(1, 9999999, [address]).then(listResult => {
           //debug
-          console.log(listResult[0])
+          console.log(listResult)
 
           //check there is at least one unspent transaction
           if (listResult.length == 0) {
             //there is not so move on
             //debug
-            console.log(address+' not recieved');
+            console.log(row.id+' : '+address+' no unspent transactions');
             let sqldata = [row.id];
               let sql = `UPDATE sessions
                   SET sessioncountcheck = sessioncountcheck+1
@@ -357,6 +363,8 @@ var api = function() {
               });
 
           } else {
+            //debug
+            console.log(listResult[0])
             //check we have enough confirmations.
             if (listResult[0].confirmations >= process.env.CONFIRMATIONS) {
               //incement the counter here as we dont want to process items in the session table that are failiing
