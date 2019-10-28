@@ -21,9 +21,11 @@ var SR = SR || (function()
 	var preview = '';
 	//hold the cart type
 	//0 = normal cart
-	//1 = anon cart (to implement)
+	//1 = anon cart (todo)
 	//2 = donation cart type
 	var carttype = 0;
+	//hold the total for the cart
+	var producttotal = 0;
 	//hold the email
 	var email = '';
 	//hold the user id 
@@ -249,7 +251,7 @@ var SR = SR || (function()
 	function carttotal()
 	{
 		//multipily the price by the number of items in the cart
-		var producttotal = price * itemcount;
+		producttotal = price * itemcount;
 		//set it to 8 decimal places as it's Bitcoin
 		producttotal = parseFloat(producttotal).toFixed(8);
 		changeClassText(document.getElementById('sr-checkouttotal'),producttotal);
@@ -354,7 +356,7 @@ var SR = SR || (function()
 		    }
 		    if (method == "storeuserdetails")
 		    {
-		    	cartstate(4);
+		    	cartstate(3);
 		    }
 
 		    //process the check
@@ -367,7 +369,7 @@ var SR = SR || (function()
 
 		    	//check if we have enough confirmartions
 		    	if (data.status == 1)
-		    		cartstate(7)
+		    		cartstate(4)
 		    }
 
 		  } 
@@ -414,7 +416,11 @@ var SR = SR || (function()
 		switch (state) {
 		    case 1:
 		    	stopPaymentCheck()
+		    	//hide the pay button
+		    	hideClass(document.getElementById('sr-pay'));
+		    	//hide the paid view
 		    	hideClass(document.getElementById('sr-paid'));
+		    	//hide the shipping view
 		        hideClass(document.getElementById('sr-shipping'));
 		    	//hide the address
 		        hideClass(document.getElementById('sr-addresswrapper'));
@@ -432,6 +438,8 @@ var SR = SR || (function()
 				showClass(document.getElementById('sr-cartlistitems'));
 		        break;
 		    case 2:
+		    	//show the pay button
+		    	showClass(document.getElementById('sr-pay'));
 		    	//check address
 		    	checkAddressState();
 		    	//hide btc stuff
@@ -444,18 +452,11 @@ var SR = SR || (function()
 		    	//hide btc stuff
 				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 		        break;
-		    case 3:
-		    	//check address
-		    	checkAddressState();
-		    	//show the check out button
-				showClass(document.getElementById('sr-checkout'));
-				//show the product details
-		       	showClass(document.getElementById('sr-cartlistitems'));
-				//hide the customer details			  	
-			    hideClass(document.getElementById('sr-customerdetailswrapper'));
-			   	hideClass(document.getElementById('sr-back-button'));
-		        break;
-		    case 4:
+		    case 3: //btc address cart mode 0
+		    	//set the amount to pay in the btc address screen
+				changeClassText(document.getElementById('sr-btctotal'), producttotal+' BTC');
+		    	//hide the pay button
+		    	hideClass(document.getElementById('sr-pay'));
 				//hide the product details
 		    	hideClass(document.getElementById('sr-cartlistitems'));
 		    	//show btc stuff		    	
@@ -468,22 +469,7 @@ var SR = SR || (function()
 				if (serverless == 0)
 					checkpaymentres = setInterval(checkPayment, 3000)
 		        break;
-		    case 5:
-		    	//check address
-		    	checkAddressState();
-		    	//hide the product details
-		    	hideClass(document.getElementById('sr-cartlistitems'));
-				//show the customer details
-				showClass(document.getElementById('sr-back-button'));
-				showClass(document.getElementById('sr-customerdetailswrapper'));
-		    	//show btc stuff
-				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
-		        break; 
-		     case 6:
-		     	showClass(document.getElementById('sr-shippingaddresswrapper'));
-		     	showClass(document.getElementById('sr-pay'));
-		     	hideClass(document.getElementById('sr-shipping'));
-		     case 7:
+		     case 4:
 		     	//stop payment timer
 		     	stopPaymentCheck()
 		     	//hide back button
@@ -493,7 +479,8 @@ var SR = SR || (function()
 		     	//show paid screeb
 		    	showClass(document.getElementById('sr-paid'));
 		     	break;
-		     case 8: //donaton mode
+		     case 5: //donaton mode (cart mode 2)
+		     	alert('d mode')
 		    	stopPaymentCheck();
 		    	hideClass(document.getElementById('sr-paid'));
 		        hideClass(document.getElementById('sr-shipping'));
@@ -509,12 +496,7 @@ var SR = SR || (function()
 		        //open it
 				addClass(document.querySelector('.sr-cart-container'),'cart-open');
 		        //show btc stuff		    	
-				showClass(document.getElementById('sr-bitcoinaddresswrapper'));
-
-
-
-
-		     	
+				showClass(document.getElementById('sr-bitcoinaddresswrapper')); 	
 		}
 	}
 
@@ -581,7 +563,7 @@ var SR = SR || (function()
 			}
 			else
 			{
-				cartstate(4)
+				cartstate(3)
 			}		
 			
 							
@@ -727,7 +709,7 @@ var SR = SR || (function()
 		  		//open the container;	
 		  		showClass(document.querySelector('.sr-cart-container'));
 		  		//render the cart state
-		  		cartstate(8);
+		  		cartstate(5);
 
 		  	}
 		});
