@@ -138,9 +138,12 @@ var api = function() {
           //return console.log(err.message);
           res.send(JSON.stringify({ status: "error" }));
         } else {
+          //get the userid
+          var userid = this.lastID;
+
           db.run(
             `INSERT INTO ecs_coldstorageaddresses(userid,address) VALUES(?,?)`,
-            [this.lastID, req.query.btc],
+            [userid, req.query.btc],
             function(err) {
               if (err) {
                 //return console.log(err.message);

@@ -8,7 +8,7 @@
   <body>
   <div>
     <span>
-        This demo shows the ECS cart in donation mode. 
+        This demo shows the ECS cart in donation mode. It will use the server to generate the address
         <br>Click the add to cart link below
         <br><br>
         Back to <a href="index.html">Index</a>
@@ -29,22 +29,13 @@
           2 = quantity count
           3 = cdn url
           4 = uid
-          5 = theme
-          6 = billing address 
-          7 = shipping address
-          8 = start country
-          9 = serverless
-          10 = serverless btc address
+          5 = shipping address
+          6 = start country
+          7 = serverless
+          8 = serverless btc address
        */
 
-       //all production (testnet) 
-       // SR.init(["https://ecs.cryptoskillz.com/", false,15,"https://cryptoskillz.com/srcrypto/prod/cdn/","3","",1,1,"GB"]);
-       //all local
-       SR.init(["", false,15,"http://127.0.0.1:8080/demos/carts/default/","3","",1,1,"GB",1,"1234456"]);
-
-       // local dev production cdn 
-       //SR.init(["http://127.0.0.1:3000/", false,15,"https://cryptoskillz.com/srcrypto/prod/","3","",1,1,"GB"]);
-
+       SR.init(["http://127.0.0.1:3030/",false,15,"http://127.0.0.1:8080/demos/carts/default/","3",1,"GB",0,""]);
 
     </script>
 

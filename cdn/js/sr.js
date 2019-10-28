@@ -30,10 +30,10 @@ var SR = SR || (function()
 	//hold the user id 
 	//note : Right now we only allow one user but we will expand this later to make it more of a SAAS product.
 	var uid = '';
-	//hold the server url can be overridden in init
-	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
-	//hold the cdn url can be overridden in init
-	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
+	//hold the server url from init
+	var serverurl = "";
+	//hold the cdn url from init
+	var cdnurl = "";
 
 		//var to hold the arguments passed in from init
 	var _args = {}; // private
@@ -43,10 +43,7 @@ var SR = SR || (function()
 	//hold the animating flag
 	var animating = false;
 
-	var theme = 'cart';
-
-	//billing and shipping addres booleans
-	var billingaddress = 0;
+	//shipping addres boolean
 	var shippingaddress = 0;
 	//note: we could detect the IP to set this automitcally. 
 	var startcountry = "US"
@@ -395,71 +392,16 @@ var SR = SR || (function()
 		request.send();
 	}
 
-	//this function sets the correct addres state. billing / shipping etc
+	//this function sets the correct addres state, shipping etc
 	function checkAddressState()
 	{
-		checkAddressClickState();
-		//chek if shipping and billing has been enabled
-		if ((shippingaddress == 1) && ( billingaddress == 1))
-    	{
-
-    		//show the both
-    		showClass(document.getElementById('sr-addresswrapper'));
-    		showClass(document.getElementById('sr-billingaddressswrapper'));
-    		//hide shipping
-    		hideClass(document.getElementById('sr-shippingaddresswrapper'));
-    		//populate countries dropdown
-    		populateDropdown(['sr-billingcountry','sr-shippingcountry'],countries,startcountry);
-
-    	}
-    	else
-    	{
-    		//check if shipping is enabled
-    		if (shippingaddress == 1)
-    		{
-    			populateDropdown(['sr-shippingcountry'],countries,startcountry);
-    			//hide billing and show shipping
-    			showClass(document.getElementById('sr-addresswrapper'));
-    			showClass(document.getElementById('sr-shippingaddresswrapper'));
-    			hideClass(document.getElementById('sr-sbillingaddressswrapper'));
-
-
-    		}
-    		//check if billing is enabled
-    		if (billingaddress == 1)
-    		{
-    			populateDropdown(['sr-billingcountry'],countries,startcountry);
-    			//hide shipping and show billing
-    			showClass(document.getElementById('addresswrapper'));
-    			hideClass(document.getElementById('shippingaddresswrapper'));
-    			showClass(document.getElementById('billingaddressswrapper'));
-
-    		}
-    	}
-	}
-
-
-	function checkAddressClickState()
-	{
-		var checkbox =  document.getElementById('sr-billingandshippingcheck');
-
-		if (checkbox.checked) 
+		//check if shipping is enabled
+		if (shippingaddress == 1)
 		{
-
-		    //Checkbox has been checked
-	        showClass(document.getElementById('sr-pay'));
-		    hideClass(document.getElementById('sr-billing'));
-	        hideClass(document.getElementById('sr-shipping'));
-
-
-		} 
-		else 
-		{
-		    //Checkbox has been unchecked
-		    hideClass(document.getElementById('sr-pay'));
-		    hideClass(document.getElementById('sr-billing'));
-	        showClass(document.getElementById('sr-shipping'));
-
+			populateDropdown(['sr-shippingcountry'],countries,startcountry);
+			//show shipping
+			showClass(document.getElementById('sr-addresswrapper'));
+			showClass(document.getElementById('sr-shippingaddresswrapper'));
 		}
 	}
 
@@ -482,7 +424,6 @@ var SR = SR || (function()
 		    case 1:
 		    	stopPaymentCheck()
 		    	hideClass(document.getElementById('sr-paid'));
-		    	hideClass(document.getElementById('sr-billing'));
 		        hideClass(document.getElementById('sr-shipping'));
 		    	//hide the address
 		        hideClass(document.getElementById('sr-addresswrapper'));
@@ -548,7 +489,6 @@ var SR = SR || (function()
 				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 		        break; 
 		     case 6:
-		     	hideClass(document.getElementById('sr-billingaddressswrapper'));
 		     	showClass(document.getElementById('sr-shippingaddresswrapper'));
 		     	showClass(document.getElementById('sr-pay'));
 		     	hideClass(document.getElementById('sr-shipping'));
@@ -565,7 +505,6 @@ var SR = SR || (function()
 		     case 8: //donaton mode
 		    	stopPaymentCheck();
 		    	hideClass(document.getElementById('sr-paid'));
-		    	hideClass(document.getElementById('sr-billing'));
 		        hideClass(document.getElementById('sr-shipping'));
 		        hideClass(document.getElementById('sr-cart-header'));
 		        //hide the customer details
@@ -611,19 +550,6 @@ var SR = SR || (function()
 		//payment click
 		document.getElementById('sr-pay').addEventListener('click', function () 
 		{
-			var checkbox =  document.getElementById('sr-billingandshippingcheck');
-			//check if it the shipping / billing the same has been clicked
-			if (checkbox.checked) 
-			{
-				//note we could do this at the server end and cut down on the size of the call but I prefer
-				//to keep the server failry agnostic and keep the logic here in this usecase.
-				document.getElementById("sr-shippingaddress1").value = document.getElementById("sr-billingaddress1").value;
-				document.getElementById("sr-shippingcity").value = document.getElementById("sr-billingcity").value;
-				document.getElementById("sr-shippingstate").value = document.getElementById("sr-billingstate").value;
-				document.getElementById("sr-shippingzip").value = document.getElementById("sr-billingzip").value;
-				document.getElementById("sr-shippingcountry").value = document.getElementById("sr-billingcountry").value;
-
-			}
 			var cartstring = "";
 			var elements = document.getElementsByClassName("sr-input");
 			for (var i = 0, len = elements.length; i < len; i++) {
@@ -685,19 +611,6 @@ var SR = SR || (function()
   			document.body.removeChild(el);      
 		});
 		
-		//shipping and billing checbox
-		document.getElementById('sr-billingandshippingcheck').addEventListener('click', function () 
-		{
-			checkAddressClickState()
-			
-		});
-		
-		//shipping button clicked
-		document.getElementById('sr-shipping').addEventListener('click', function () 
-		{
-			cartstate(6)			
-			
-		});
 
 		//add to cart click element
 		document.querySelector('.sr-checkout').addEventListener('click', function () 
@@ -881,15 +794,15 @@ var SR = SR || (function()
 
         	Server vars you can pass set to "" to ignore
 
-			0 = server url
-			1 = animated
-			2 = quantity count
-			3 = cdn url
-			4 = uid
-    	    5 = theme
-			6 = billing address 
-			7 = shipping address
-			8 = start country
+	         0 = server url
+	         1 = animated
+	         2 = quantity count
+	         3 = cdn url
+	         4 = uid
+	         5 = shipping address
+	         6 = start country
+	         7 = serverless
+	         8 = serverless btc address
 
         	*/
 			_args = Args;
@@ -920,40 +833,30 @@ var SR = SR || (function()
 			{
 				uid = _args[4]
 			}
-			//theme
+			//shipping address
 			if (_args[5] != "")
 			{
-				theme = _args[5]
-			}
-			//billing address
-			if (_args[6] != "")
-			{
-				billingaddress = _args[6]
-			}
-			//shipping address
-			if (_args[7] != "")
-			{
-				shippingaddress = _args[7]
+				shippingaddress = _args[5]
 			}
 			//start country
-			if (_args[8] != "")
+			if (_args[6] != "")
 			{
-				startcountry = _args[8]
+				startcountry = _args[6]
 			}
 			//run in serverless mode (mainly a quick way to debug)
-			if (_args[9] != "")
+			if (_args[7] != "")
 			{
-				serverless = _args[9]
+				serverless = _args[7]
 			}
 			//we require a btc address for serverless mode
-			if (_args[10] != "")
+			if (_args[8] != "")
 			{
-				serverlessbtcaddress = _args[10]
+				serverlessbtcaddress = _args[8]
 			}
 			//load css
-        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+theme+'.css" rel="stylesheet">'	
+        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'cart.css" rel="stylesheet">'	
 			//fetch the template so we can use themes 
-			fetchurl(cdnurl+theme+'.html','carttemplate');
+			fetchurl(cdnurl+'cart.html','carttemplate');
         }
         ,
         //this function changes the quantity of the item in the cart
