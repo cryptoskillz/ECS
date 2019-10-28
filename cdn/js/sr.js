@@ -480,10 +480,19 @@ var SR = SR || (function()
 		    	showClass(document.getElementById('sr-paid'));
 		     	break;
 		     case 5: //donaton mode (cart mode 2)
-		     	alert('d mode')
+		     	//get the total no product so this is just the amount in the sr button
+		     	carttotal();
+		     	//sto the payment checker
 		    	stopPaymentCheck();
+		    	//hide the pay button
+		    	hideClass(document.getElementById('sr-pay'));
+		    	//set the amount to pay in the btc address screen
+				changeClassText(document.getElementById('sr-btctotal'), producttotal+' BTC');
+				//hide the paid view
 		    	hideClass(document.getElementById('sr-paid'));
+		    	//hide the shiping view
 		        hideClass(document.getElementById('sr-shipping'));
+		        //hide the cart header
 		        hideClass(document.getElementById('sr-cart-header'));
 		        //hide the customer details
 				hideClass(document.getElementById('sr-customerdetailswrapper'));
