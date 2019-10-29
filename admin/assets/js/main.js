@@ -34,6 +34,7 @@ if(window.location.href.indexOf("ecslive") > -1)
 var ajaxdata = '';
 //hold the session token 
 var token = '';
+var isadmin = 0;
 
 //set a cookie
 function setCookie(cname, cvalue) {
@@ -260,11 +261,14 @@ function paymentsDone()
 	jQuery.each( result.results, function( index, res )
 	{
 		//console.log(res);
+		//return;
 		//net 1 = live 2 = test
 
 		//vars 
 		var processed = 'Yes';
 		var swept = 'Yes';
+		var paymenttype = 'On Chain';
+		var carttype = 'Shipping';
 		//set the block explorer url
 		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
 		blockexplorerurl = blockexplorerurl+res.address+'/';
@@ -288,6 +292,20 @@ function paymentsDone()
 			actions = actions + '<a href="javascript:checkSwept(\''+res.address+'\')"><i class="fas fa-broom" title="Move money to cold storage"></i> </a>'
 		}
 
+		//add a delete actions
+		actions = actions + '<a href="javascript:deletePayment(\''+res.address+'\')"><i class="fas fa-trash" title="Delete"></i> </a>'
+
+
+		if (res.paymenttype == 2)
+		{
+			paymenttype = "Lightning";
+		}
+
+		if (res.carttype == 2) 
+		{
+			carttype = 'Donation';
+		}
+
 		
 		
 		//add the row to the table
@@ -297,35 +315,15 @@ function paymentsDone()
 			processed,
 			swept,
 			'<i class="fab fa-bitcoin"></i>'+res.amount,
+			paymenttype,
+			carttype,
 			actions
 		] ).draw( false );
 	});
 	
 }
 
-//process the server return call from login
-function loginDone()
-{
-	//parse the results
-	var result = $.parseJSON(ajaxdata);
-	//debug	
-	//console.log(result.token)
 
-	//check for token
-	if (result.token != 0)
-	{
-		//get the cookie
-		setCookie('srcookie',result.token);
-		//redirect to index page
-		window.location.href = "index.html";
-	}
-	else
-	{
-		//issue with login
-		alert('invalid login details');
-	}
-
-}
 
 //generic ajax call function
 function ajaxGET(url,parentcallback)
@@ -363,6 +361,30 @@ function deleteAddress(address)
   	ajaxGET(geturl,"deleteSettingAaddress()");
 }
 
+//this function deletes a session payment
+function deletePayment(address)
+{
+	var geturl = serverurl+'admin/deletePayment?address='+address+'&token='+token;
+  	ajaxGET(geturl,"deletePaymentDone()");
+}
+
+//this function redraws the table when a session entry has been deleted.
+function deletePaymentDone()
+{
+	//parse the results
+	var result = $.parseJSON(ajaxdata);
+	//debug
+	//console.log(result);
+	if (result.result == "1")
+	{
+		//todo : replace this refresh with a row delete.
+		window.location.reload();
+	}
+	else
+		alert('error deleting record');
+
+}
+
 //update settings click
 $('#updatesettings').click(function() 
 {
@@ -376,6 +398,28 @@ $('#updatesettings').click(function()
   	ajaxGET(geturl,"updatesettigsDone()");
 });
 
+
+/*
+	================================================
+	START OF LOGIN FUNCTION
+	================================================
+*/
+
+//logout
+
+
+
+$('#logoutmenu').click(function() 
+{
+	//reset user
+	token = 0;
+	isadmin = 0;
+	setCookie('srcookie',"");
+	window.location.href = "login.html";
+
+
+});
+
 //login click
 $('#login').click(function() 
 {
@@ -387,13 +431,52 @@ $('#login').click(function()
   	ajaxGET(geturl,"loginDone()");
 });
 
+//process the server return call from login
+function loginDone()
+{
+	//parse the results
+	var result = $.parseJSON(ajaxdata);
+	//debug	
+	//check for token
+	if (result.token != 0)
+	{
+		//get the cookie
+		setCookie('srcookie',result.token+':'+result.isadmin);
+		//redirect to index page
+		window.location.href = "index.html";
+	}
+	else
+	{
+		//issue with login
+		alert('invalid login details');
+	}
+
+}
+
+/*
+	================================================
+	END OF LOGIN FUNCTION
+	================================================
+*/
+
+
+
+
 
 $(document).ready(function() 
 {
 	//get the cookie
-    token = getCookie('srcookie');
+    var cookie = getCookie('srcookie');
+    cookie = cookie.split(":");
+    token = cookie[0];
+    isadmin = cookie[1];
+    //isadmin = 0;
+    if (isadmin == 0)
+    	$('#usertab').hide();
     //debug
     //console.log(token);
+    //console.log(isadmin);
+
     //setCookie('srcookie','12345');
     //force login
     //setCookie('srcookie','');
@@ -419,6 +502,10 @@ $(document).ready(function()
 		//check if it is the payment page
 		if (url.substr(url.lastIndexOf('/') + 1) == 'users.html')
 		{
+			//take them back to admin as they should not be here.
+			if (isadmin == 0)
+				window.location.href = "index.html";
+
 			//alert(token);
 			//make a server call
 			var geturl = serverurl+'admin/getusers?token='+token;

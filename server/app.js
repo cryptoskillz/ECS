@@ -301,7 +301,19 @@ app.get("/admin/payments", (req, res) => {
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
   //call the get orders function
-  admin.getOrders(req.query.token,res);
+  admin.getPayments(req.query.token,res);
+
+});
+
+//return a list of payments
+app.get("/admin/deletepayment", (req, res) => {
+  //set the headers
+  res = generic.setHeaders(res);
+  //load the admin helper
+  let adminhelper = require('./api/helpers/admin.js').admin;
+  let admin = new adminhelper(); 
+  //call the get orders function
+  admin.deletePayment(req.query.address,res);
 
 });
 
