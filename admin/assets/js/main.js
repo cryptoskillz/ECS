@@ -269,6 +269,7 @@ function paymentsDone()
 		var swept = 'Yes';
 		var paymenttype = 'On Chain';
 		var carttype = 'Shipping';
+		var showorder = '';
 		//set the block explorer url
 		var blockexplorerurl = "https://live.blockcypher.com/btc-testnet/address/";
 		blockexplorerurl = blockexplorerurl+res.address+'/';
@@ -301,16 +302,19 @@ function paymentsDone()
 			paymenttype = "Lightning";
 		}
 
+		//set the show order to a href so we can see the order details
+		shwoorder = '<a href="order.html?address='+res.address+'" title="View Order details">'+res.id+'</a>';
 		if (res.carttype == 2) 
 		{
 			carttype = 'Donation';
+			//set it to the ID as we have no order details so we do not want it to click through
+			showorder = res.id;
+
 		}
 
-		
-		
 		//add the row to the table
 		t.row.add( [
-			'<a href="order.html?address='+res.address+'" title="View Order details">'+res.id+'</a>',
+			showorder,
 			'<a href="'+blockexplorerurl+'" target="_blank" title="View on blockchain explorer">'+res.address+'</a>',
 			processed,
 			swept,

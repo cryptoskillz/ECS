@@ -214,6 +214,7 @@ var admin = function ()
 
 		    //return the order
 		});
+		res.send(JSON.stringify({ results: 0 }));
 	}
 
 	/*
