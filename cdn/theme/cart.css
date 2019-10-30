@@ -159,7 +159,7 @@ Main Components
           transform: translateX(-50%) translateY(-50%);
   height: 100%;
   width: 100%;
-  background: url(../img/sr-icons-cart-close.svg) no-repeat 0 0;
+  background: url(img/sr-icons-cart-close.svg) no-repeat 0 0;
   -webkit-transition: opacity .2s, -webkit-transform .2s;
   transition: opacity .2s, -webkit-transform .2s;
   transition: opacity .2s, transform .2s;
@@ -382,7 +382,7 @@ Main Components
   content: '';
   height: 24px;
   width: 24px;
-  background: url(../img/sr-icon-arrow-next.svg) no-repeat center center;
+  background: url(img/sr-icon-arrow-next.svg) no-repeat center center;
   opacity: 0;
   -webkit-transition: opacity .2s;
   transition: opacity .2s;

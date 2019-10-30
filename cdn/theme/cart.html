@@ -1,51 +1,38 @@
+
+<!-- 
+ remove the display none if you want to see the cart with zero on it.  
+ //todo : fix it so it it works if you do this at present it has to has to start in hidden mode and it displays
+-->
+<!-- main cart container-->
 <div class="sr-cart-container" id="sr-cart-container" style="display:none">
+  <!-- the cart trigger -->
    <a href="#0" class="sr-cart-trigger">
+      <!-- the cart counter -->
       <span class="sr-count"> 
          0
       </span> 
    </a>
+   <!-- the cart element -->
    <div class="sr-cart">
+      <!-- the cart wrapper (is this required) -->
       <div class="sr-wrapper">
+         <!-- the cart header -->
          <sr-header>
             <h2 id="sr-cart-header">Cart</h2>
             <span><a class="sr-back"  id="sr-back-button" href="#0">Back</a></span>
          </sr-header>
+         <!-- the cart body -->
          <div class="sr-body">
+            <!-- this element hold the cart items that user adds -->
             <ul id='sr-cartlistitems'>
             </ul>
+            <!-- this element holds the cuatomer details -->
             <div id="sr-customerdetailswrapper" class="sr-customerdetails">
-               <label>Email</label>  
-               <input type="text" class="sr-textbox sr-input" name="sr-email" id="sr-email">
+              <label>Email</label>  
+              <input type="text" class="sr-textbox sr-input" name="sr-email" id="sr-email">
+              <!-- this element holds the customers addres (if activated) -->
               <div id="sr-addresswrapper" class="sr-addresswrapper">
-                  <div id="sr-billingaddressswrapper" class="sr-billingaddressswrapper">
-                    <span>Billing Address</span>
-                    <div>
-                      <label>Address</label>  
-                      <input type="text" class="sr-textbox sr-input" name="sr-billingaddress1" id="sr-billingaddress1">
-                    </div>
-                    <div>
-                      <label>City</label>  
-                      <input type="text" class="sr-textbox sr-input" name="sr-billingcity" id="sr-billingcity">
-                    </div>
-                    <div>
-                      <label>State</label>  
-                      <input type="text" class="sr-textbox sr-input" name="sr-billingstate" id="sr-billingstate">
-                    </div>
-                    <div>
-                      <label>Zip</label>  
-                      <input type="text" class="sr-textbox sr-input" name="sr-billingzip" id="sr-billingzip">
-                    </div>
-                    <div>
-                      <label>Country</label>  
-                      <select name="sr-billingcountry" id="sr-billingcountry" class="sr-cart-country sr-input">
-                      
-                      </select>
-                    </div>
-                    <div id="sr-billingandshippingequal">
-                      <input type="checkbox" id="sr-billingandshippingcheck" name="sr-billingandshippingcheck" class="sr-input"  checked> Billing & Shippng the same<br>
-                    </div>
-
-                  </div>
+                  <!-- this element holds the customer address -->
                   <div id="sr-shippingaddresswrapper" class="sr-shippingaddresswrapper">
                       <span>Shipping Address</span>
                       <div>
@@ -70,14 +57,11 @@
                       </select>
                     </div>
                   </div>
-                
-                </div>
-                <a href="#0" id="sr-pay" class="sr-button">Pay</a>
-                <a href="#0" id="sr-billing" class="sr-button">Billing</a>
-                <a href="#0" id="sr-shipping" class="sr-button">Shipping</a>
-
+              </div>
+              <!-- hold the buttons -->
+              
             </div>
-
+            <!-- this element holds the payment details -->
             <div id="sr-bitcoinaddresswrapper">
                <div>
                     <a id="sr-bitcoinaddress" class="sr-bitcoinaddress" href=""></a>
@@ -92,14 +76,23 @@
                        Pay from wallet
                    </a>
                 </div>
+                <div id="sr-btctotal">
+                  
+               </div>
                <img id="sr-bitcoinqrcode" src="" />
-            </div>
 
+            </div>
+            <!-- this element holds the paid confirmation screen -->
             <div id="sr-paid" class="sr-paid ">
                Thank you for paying.  Your order is being processed.
             </div>
-         </div>
-            <sr-footer><a href="#0" id="sr-checkout" class="sr-checkout"><em>Checkout - <span id="sr-checkouttotal">0</span> BTC</em></a></sr-footer>
+          </div>
+          <!-- this element holds the footer-->
+          <sr-footer>
+            <a href="#0" id="sr-checkout" class="sr-checkout"><em>Checkout - <span id="sr-checkouttotal">0</span> BTC</em></a>
+            <a href="#0" id="sr-pay" class="sr-checkout"><em>Click to Pay</em></a>
+
+          </sr-footer>
       </div>
    </div> 
-</div> 
+</div>  
