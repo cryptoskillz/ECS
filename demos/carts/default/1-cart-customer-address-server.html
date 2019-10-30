@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+  </head>
+  <body>
+  <div>
+    <span>
+        This demo shows the ECS cart with the a billing address connecting the ECS server.  It will collect the customers email and shipping address and store them in the servers database.
+        <br>Click the add to cart link below
+        <br><br>
+          Back to <a href="index.html">Index</a>
+        <br><br>
+    </span>
+    <a href="#0" id="sr-add-to-cart" class="sr-add-to-cart" data-price="0.01" data-name="Entity T" data-preview="">Add To Cart</a>
+  </div>
+ </body>
+
+
+
+ <script type="text/javascript" src="http://127.0.0.1:8080/cdn/js/sr.js"></script>
+
+    <script type="text/javascript">
+       /*
+          0 = server url
+          1 = quantity count
+          2 = cdn url
+          3 = uid
+          4 = shipping address
+          5 = start country
+          6 = serverless
+          7 = serverless btc address
+       */
+       SR.init(["http://127.0.0.1:3030/",15,"http://127.0.0.1:8080/demos/carts/default/","3",1,"GB",0,""]);
+    </script>
+</html>

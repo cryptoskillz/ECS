@@ -98,7 +98,8 @@ var admin = function ()
 				      return console.error(err.message);
 				    }
 			    	//oupt guid to api request
-			    	res.send(JSON.stringify({ token: sessiontoken }));
+			    	console.log('in')
+			    	res.send(JSON.stringify({ token: sessiontoken,isadmin:rows[0].isadmin }));
 			  	});
 			} 
 			else 
@@ -108,6 +109,22 @@ var admin = function ()
 		});
 	}
 
+	this.deletePayment = function deletePayment(address,res)
+	{
+		//store the data for the query 
+		let data = [address];
+		//build the sql query
+		let sql = `delete FROM sessions WHERE address = ?`;
+		//run the sql
+		console.log(sql);
+		db.run(sql, data, function(err) {
+			if (err) 
+			{
+			  res.send(JSON.stringify({ result: "0" }));
+			}   
+			res.send(JSON.stringify({ result: "1" }));
+		});
+	}
 	/*
 	*	This function retunrs alll the orders from the orders table. 
 	*
@@ -115,7 +132,7 @@ var admin = function ()
 	*		  in either the server or the amdin side.
 	*
 	*/
-	this.getOrders = function getOrders(token,res)
+	this.getPayments = function getPayments(token,res)
 	{
 		//create a reults object
 		let jsonStr = '{"results":[]}';
@@ -123,7 +140,7 @@ var admin = function ()
 		//store the data for the query 
 		let data = [token];
 		//build the query
-	  	let sql =`select sessions.id,sessions.address,sessions.processed,sessions.swept,sessions.net,sessions.amount
+	  	let sql =`select sessions.id,sessions.address,sessions.processed,sessions.swept,sessions.net,sessions.amount,sessions.paymenttype,sessions.carttype
 	    		  from ecs_user
 	    		  INNER JOIN sessions ON ecs_user.id = sessions.userid
 		          WHERE ecs_user.sessiontoken = ?`;
@@ -196,8 +213,8 @@ var admin = function ()
 			//console.log(jsonStr);
 
 		    //return the order
-			res.send(jsonStr);
 		});
+		res.send(JSON.stringify({ results: 0 }));
 	}
 
 	/*

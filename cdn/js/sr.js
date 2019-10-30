@@ -21,41 +21,35 @@ var SR = SR || (function()
 	var preview = '';
 	//hold the cart type
 	//0 = normal cart
-	//1 = anon cart (to implement)
+	//1 = anon cart (todo)
 	//2 = donation cart type
-	var cartytype = 0;
-
+	var carttype = 0;
+	//hold the total for the cart
+	var producttotal = 0;
 	//hold the email
 	var email = '';
 	//hold the user id 
 	//note : Right now we only allow one user but we will expand this later to make it more of a SAAS product.
 	var uid = '';
-	//hold the server url can be overridden in init
-	var serverurl = "http://srcryptoapi.eu-west-1.elasticbeanstalk.com/";
-	//hold the cdn url can be overridden in init
-	var cdnurl = 'http://s3.eu-west-1.amazonaws.com/srcrypto/';
-
-		//var to hold the arguments passed in from init
+	//hold the server url from init
+	var serverurl = "";
+	//hold the cdn url from init
+	var cdnurl = "";
+	//var to hold the arguments passed in from init
 	var _args = {}; // private
-    
+ 	//max quantity
     var quantity = 9;
-
-	//hold the animating flag
-	var animating = false;
-
-	var theme = 'cart';
-
-	//billing and shipping addres booleans
-	var billingaddress = 0;
+	//shipping addres boolean
 	var shippingaddress = 0;
 	//note: we could detect the IP to set this automitcally. 
 	var startcountry = "US"
-
+	//hold if it is serverless or not 
+	var serverless = 0;
+	var serverlessbtcaddress = ''; // replace this with a proper one for testing or let the debugger pass it in.
 	/*
 	*	List of countries
-	*  source : https://datahub.io/core/country-list#resource-country-list_zip
+	*  	source : https://datahub.io/core/country-list#resource-country-list_zip
 	*/
-
 	var  countries = [{"Code": "AF", "Name": "Afghanistan"},{"Code": "AX", "Name": "\u00c5land Islands"},{"Code": "AL", "Name": "Albania"},{"Code": "DZ", "Name": "Algeria"},{"Code": "AS", "Name": "American Samoa"},{"Code": "AD", "Name": "Andorra"},{"Code": "AO", "Name": "Angola"},{"Code": "AI", "Name": "Anguilla"},{"Code": "AQ", "Name": "Antarctica"},{"Code": "AG", "Name": "Antigua and Barbuda"},{"Code": "AR", "Name": "Argentina"},{"Code": "AM", "Name": "Armenia"},{"Code": "AW", "Name": "Aruba"},{"Code": "AU", "Name": "Australia"},{"Code": "AT", "Name": "Austria"},{"Code": "AZ", "Name": "Azerbaijan"},{"Code": "BS", "Name": "Bahamas"},{"Code": "BH", "Name": "Bahrain"},{"Code": "BD", "Name": "Bangladesh"},{"Code": "BB", "Name": "Barbados"},{"Code": "BY", "Name": "Belarus"},{"Code": "BE", "Name": "Belgium"},{"Code": "BZ", "Name": "Belize"},{"Code": "BJ", "Name": "Benin"},{"Code": "BM", "Name": "Bermuda"},{"Code": "BT", "Name": "Bhutan"},{"Code": "BO", "Name": "Bolivia, Plurinational State of"},{"Code": "BQ", "Name": "Bonaire, Sint Eustatius and Saba"},{"Code": "BA", "Name": "Bosnia and Herzegovina"},{"Code": "BW", "Name": "Botswana"},{"Code": "BV", "Name": "Bouvet Island"},{"Code": "BR", "Name": "Brazil"},{"Code": "IO", "Name": "British Indian Ocean Territory"},{"Code": "BN", "Name": "Brunei Darussalam"},{"Code": "BG", "Name": "Bulgaria"},{"Code": "BF", "Name": "Burkina Faso"},{"Code": "BI", "Name": "Burundi"},{"Code": "KH", "Name": "Cambodia"},{"Code": "CM", "Name": "Cameroon"},{"Code": "CA", "Name": "Canada"},{"Code": "CV", "Name": "Cape Verde"},{"Code": "KY", "Name": "Cayman Islands"},{"Code": "CF", "Name": "Central African Republic"},{"Code": "TD", "Name": "Chad"},{"Code": "CL", "Name": "Chile"},{"Code": "CN", "Name": "China"},{"Code": "CX", "Name": "Christmas Island"},{"Code": "CC", "Name": "Cocos (Keeling) Islands"},{"Code": "CO", "Name": "Colombia"},{"Code": "KM", "Name": "Comoros"},{"Code": "CG", "Name": "Congo"},{"Code": "CD", "Name": "Congo, the Democratic Republic of the"},{"Code": "CK", "Name": "Cook Islands"},{"Code": "CR", "Name": "Costa Rica"},{"Code": "CI", "Name": "C\u00f4te d'Ivoire"},{"Code": "HR", "Name": "Croatia"},{"Code": "CU", "Name": "Cuba"},{"Code": "CW", "Name": "Cura\u00e7ao"},{"Code": "CY", "Name": "Cyprus"},{"Code": "CZ", "Name": "Czech Republic"},{"Code": "DK", "Name": "Denmark"},{"Code": "DJ", "Name": "Djibouti"},{"Code": "DM", "Name": "Dominica"},{"Code": "DO", "Name": "Dominican Republic"},{"Code": "EC", "Name": "Ecuador"},{"Code": "EG", "Name": "Egypt"},{"Code": "SV", "Name": "El Salvador"},{"Code": "GQ", "Name": "Equatorial Guinea"},{"Code": "ER", "Name": "Eritrea"},{"Code": "EE", "Name": "Estonia"},{"Code": "ET", "Name": "Ethiopia"},{"Code": "FK", "Name": "Falkland Islands (Malvinas)"},{"Code": "FO", "Name": "Faroe Islands"},{"Code": "FJ", "Name": "Fiji"},{"Code": "FI", "Name": "Finland"},{"Code": "FR", "Name": "France"},{"Code": "GF", "Name": "French Guiana"},{"Code": "PF", "Name": "French Polynesia"},{"Code": "TF", "Name": "French Southern Territories"},{"Code": "GA", "Name": "Gabon"},{"Code": "GM", "Name": "Gambia"},{"Code": "GE", "Name": "Georgia"},{"Code": "DE", "Name": "Germany"},{"Code": "GH", "Name": "Ghana"},{"Code": "GI", "Name": "Gibraltar"},{"Code": "GR", "Name": "Greece"},{"Code": "GL", "Name": "Greenland"},{"Code": "GD", "Name": "Grenada"},{"Code": "GP", "Name": "Guadeloupe"},{"Code": "GU", "Name": "Guam"},{"Code": "GT", "Name": "Guatemala"},{"Code": "GG", "Name": "Guernsey"},{"Code": "GN", "Name": "Guinea"},{"Code": "GW", "Name": "Guinea-Bissau"},{"Code": "GY", "Name": "Guyana"},{"Code": "HT", "Name": "Haiti"},{"Code": "HM", "Name": "Heard Island and McDonald Islands"},{"Code": "VA", "Name": "Holy See (Vatican City State)"},{"Code": "HN", "Name": "Honduras"},{"Code": "HK", "Name": "Hong Kong"},{"Code": "HU", "Name": "Hungary"},{"Code": "IS", "Name": "Iceland"},{"Code": "IN", "Name": "India"},{"Code": "ID", "Name": "Indonesia"},{"Code": "IR", "Name": "Iran, Islamic Republic of"},{"Code": "IQ", "Name": "Iraq"},{"Code": "IE", "Name": "Ireland"},{"Code": "IM", "Name": "Isle of Man"},{"Code": "IL", "Name": "Israel"},{"Code": "IT", "Name": "Italy"},{"Code": "JM", "Name": "Jamaica"},{"Code": "JP", "Name": "Japan"},{"Code": "JE", "Name": "Jersey"},{"Code": "JO", "Name": "Jordan"},{"Code": "KZ", "Name": "Kazakhstan"},{"Code": "KE", "Name": "Kenya"},{"Code": "KI", "Name": "Kiribati"},{"Code": "KP", "Name": "Korea, Democratic People's Republic of"},{"Code": "KR", "Name": "Korea, Republic of"},{"Code": "KW", "Name": "Kuwait"},{"Code": "KG", "Name": "Kyrgyzstan"},{"Code": "LA", "Name": "Lao People's Democratic Republic"},{"Code": "LV", "Name": "Latvia"},{"Code": "LB", "Name": "Lebanon"},{"Code": "LS", "Name": "Lesotho"},{"Code": "LR", "Name": "Liberia"},{"Code": "LY", "Name": "Libya"},{"Code": "LI", "Name": "Liechtenstein"},{"Code": "LT", "Name": "Lithuania"},{"Code": "LU", "Name": "Luxembourg"},{"Code": "MO", "Name": "Macao"},{"Code": "MK", "Name": "Macedonia, the Former Yugoslav Republic of"},{"Code": "MG", "Name": "Madagascar"},{"Code": "MW", "Name": "Malawi"},{"Code": "MY", "Name": "Malaysia"},{"Code": "MV", "Name": "Maldives"},{"Code": "ML", "Name": "Mali"},{"Code": "MT", "Name": "Malta"},{"Code": "MH", "Name": "Marshall Islands"},{"Code": "MQ", "Name": "Martinique"},{"Code": "MR", "Name": "Mauritania"},{"Code": "MU", "Name": "Mauritius"},{"Code": "YT", "Name": "Mayotte"},{"Code": "MX", "Name": "Mexico"},{"Code": "FM", "Name": "Micronesia, Federated States of"},{"Code": "MD", "Name": "Moldova, Republic of"},{"Code": "MC", "Name": "Monaco"},{"Code": "MN", "Name": "Mongolia"},{"Code": "ME", "Name": "Montenegro"},{"Code": "MS", "Name": "Montserrat"},{"Code": "MA", "Name": "Morocco"},{"Code": "MZ", "Name": "Mozambique"},{"Code": "MM", "Name": "Myanmar"},{"Code": "NA", "Name": "Namibia"},{"Code": "NR", "Name": "Nauru"},{"Code": "NP", "Name": "Nepal"},{"Code": "NL", "Name": "Netherlands"},{"Code": "NC", "Name": "New Caledonia"},{"Code": "NZ", "Name": "New Zealand"},{"Code": "NI", "Name": "Nicaragua"},{"Code": "NE", "Name": "Niger"},{"Code": "NG", "Name": "Nigeria"},{"Code": "NU", "Name": "Niue"},{"Code": "NF", "Name": "Norfolk Island"},{"Code": "MP", "Name": "Northern Mariana Islands"},{"Code": "NO", "Name": "Norway"},{"Code": "OM", "Name": "Oman"},{"Code": "PK", "Name": "Pakistan"},{"Code": "PW", "Name": "Palau"},{"Code": "PS", "Name": "Palestine, State of"},{"Code": "PA", "Name": "Panama"},{"Code": "PG", "Name": "Papua New Guinea"},{"Code": "PY", "Name": "Paraguay"},{"Code": "PE", "Name": "Peru"},{"Code": "PH", "Name": "Philippines"},{"Code": "PN", "Name": "Pitcairn"},{"Code": "PL", "Name": "Poland"},{"Code": "PT", "Name": "Portugal"},{"Code": "PR", "Name": "Puerto Rico"},{"Code": "QA", "Name": "Qatar"},{"Code": "RE", "Name": "R\u00e9union"},{"Code": "RO", "Name": "Romania"},{"Code": "RU", "Name": "Russian Federation"},{"Code": "RW", "Name": "Rwanda"},{"Code": "BL", "Name": "Saint Barth\u00e9lemy"},{"Code": "SH", "Name": "Saint Helena, Ascension and Tristan da Cunha"},{"Code": "KN", "Name": "Saint Kitts and Nevis"},{"Code": "LC", "Name": "Saint Lucia"},{"Code": "MF", "Name": "Saint Martin (French part)"},{"Code": "PM", "Name": "Saint Pierre and Miquelon"},{"Code": "VC", "Name": "Saint Vincent and the Grenadines"},{"Code": "WS", "Name": "Samoa"},{"Code": "SM", "Name": "San Marino"},{"Code": "ST", "Name": "Sao Tome and Principe"},{"Code": "SA", "Name": "Saudi Arabia"},{"Code": "SN", "Name": "Senegal"},{"Code": "RS", "Name": "Serbia"},{"Code": "SC", "Name": "Seychelles"},{"Code": "SL", "Name": "Sierra Leone"},{"Code": "SG", "Name": "Singapore"},{"Code": "SX", "Name": "Sint Maarten (Dutch part)"},{"Code": "SK", "Name": "Slovakia"},{"Code": "SI", "Name": "Slovenia"},{"Code": "SB", "Name": "Solomon Islands"},{"Code": "SO", "Name": "Somalia"},{"Code": "ZA", "Name": "South Africa"},{"Code": "GS", "Name": "South Georgia and the South Sandwich Islands"},{"Code": "SS", "Name": "South Sudan"},{"Code": "ES", "Name": "Spain"},{"Code": "LK", "Name": "Sri Lanka"},{"Code": "SD", "Name": "Sudan"},{"Code": "SR", "Name": "Suriname"},{"Code": "SJ", "Name": "Svalbard and Jan Mayen"},{"Code": "SZ", "Name": "Swaziland"},{"Code": "SE", "Name": "Sweden"},{"Code": "CH", "Name": "Switzerland"},{"Code": "SY", "Name": "Syrian Arab Republic"},{"Code": "TW", "Name": "Taiwan, Province of China"},{"Code": "TJ", "Name": "Tajikistan"},{"Code": "TZ", "Name": "Tanzania, United Republic of"},{"Code": "TH", "Name": "Thailand"},{"Code": "TL", "Name": "Timor-Leste"},{"Code": "TG", "Name": "Togo"},{"Code": "TK", "Name": "Tokelau"},{"Code": "TO", "Name": "Tonga"},{"Code": "TT", "Name": "Trinidad and Tobago"},{"Code": "TN", "Name": "Tunisia"},{"Code": "TR", "Name": "Turkey"},{"Code": "TM", "Name": "Turkmenistan"},{"Code": "TC", "Name": "Turks and Caicos Islands"},{"Code": "TV", "Name": "Tuvalu"},{"Code": "UG", "Name": "Uganda"},{"Code": "UA", "Name": "Ukraine"},{"Code": "AE", "Name": "United Arab Emirates"},{"Code": "GB", "Name": "United Kingdom"},{"Code": "US", "Name": "United States"},{"Code": "UM", "Name": "United States Minor Outlying Islands"},{"Code": "UY", "Name": "Uruguay"},{"Code": "UZ", "Name": "Uzbekistan"},{"Code": "VU", "Name": "Vanuatu"},{"Code": "VE", "Name": "Venezuela, Bolivarian Republic of"},{"Code": "VN", "Name": "Viet Nam"},{"Code": "VG", "Name": "Virgin Islands, British"},{"Code": "VI", "Name": "Virgin Islands, U.S."},{"Code": "WF", "Name": "Wallis and Futuna"},{"Code": "EH", "Name": "Western Sahara"},{"Code": "YE", "Name": "Yemen"},{"Code": "ZM", "Name": "Zambia"},{"Code": "ZW", "Name": "Zimbabwe"}];
 
 	/*
@@ -257,16 +251,19 @@ var SR = SR || (function()
 	function carttotal()
 	{
 		//multipily the price by the number of items in the cart
-		var producttotal = price * itemcount;
+		producttotal = price * itemcount;
 		//set it to 8 decimal places as it's Bitcoin
 		producttotal = parseFloat(producttotal).toFixed(8);
 		changeClassText(document.getElementById('sr-checkouttotal'),producttotal);
 		//update counter
 	  	changeClassText(document.querySelector('.sr-count'),itemcount);	
 	  	//store product
-		var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
-		//call the store produt endpoint
-		fetchurl(url,'storeproduct')
+	  	if (serverless == 0)
+		{
+			var url = serverurl+"api/storeproduct?name="+name+"&quantity="+itemcount+"&address="+address+"&price="+price;
+			//call the store produt endpoint
+			fetchurl(url,'storeproduct')
+		}
 	}
 
 	//this function calls endpoints on the server
@@ -322,12 +319,44 @@ var SR = SR || (function()
 				//add the click elements listeners
 				clickElements()
 				//get an address
-				var url = serverurl+"api/address?uid="+uid;
-				fetchurl(url,'getaddress')
+				if (serverless == 0)
+				{
+					//todo : this is code is called in 2 place so we can refactor it into the init
+					var elproduct = document.getElementById('sr-add-to-cart');
+					if (elproduct.getAttribute('cart-type') != null)
+					{
+						carttype = elproduct.getAttribute('cart-type');
+						//alert(carttype)
+					}
+					var url = serverurl+"api/address?uid="+uid+"&carttype="+carttype;
+					fetchurl(url,'getaddress')
+				}
+				else
+				{
+					address = serverlessbtcaddress;
+				    //set the address in the checkout
+				    var elbtcaddress = document.getElementById('sr-bitcoinaddress');
+				    //set the href
+				    elbtcaddress.setAttribute('href', "bitcoin:"+address);
+				    //set the address
+		    		elbtcaddress.innerText =address;
+		    		//do pay from wallet also
+		    		var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
+				    //set the href
+				    elbtcaddress.setAttribute('href', "bitcoin:"+address);
+		    		//do pay from wallet alo
+
+		    		//debug
+				    //console.log(elbtcaddress)
+
+				    //generate the qr code
+				    var elbtcqr = document.getElementById('sr-bitcoinqrcode');
+					elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl="+address);
+				}
 		    }
 		    if (method == "storeuserdetails")
 		    {
-		    	cartstate(4);
+		    	cartstate(3);
 		    }
 
 		    //process the check
@@ -340,7 +369,7 @@ var SR = SR || (function()
 
 		    	//check if we have enough confirmartions
 		    	if (data.status == 1)
-		    		cartstate(7)
+		    		cartstate(4)
 		    }
 
 		  } 
@@ -356,71 +385,16 @@ var SR = SR || (function()
 		request.send();
 	}
 
-	//this function sets the correct addres state. billing / shipping etc
+	//this function sets the correct addres state, shipping etc
 	function checkAddressState()
 	{
-		checkAddressClickState();
-		//chek if shipping and billing has been enabled
-		if ((shippingaddress == 1) && ( billingaddress == 1))
-    	{
-
-    		//show the both
-    		showClass(document.getElementById('sr-addresswrapper'));
-    		showClass(document.getElementById('sr-billingaddressswrapper'));
-    		//hide shipping
-    		hideClass(document.getElementById('sr-shippingaddresswrapper'));
-    		//populate countries dropdown
-    		populateDropdown(['sr-billingcountry','sr-shippingcountry'],countries,startcountry);
-
-    	}
-    	else
-    	{
-    		//check if shipping is enabled
-    		if (shippingaddress == 1)
-    		{
-    			populateDropdown(['sr-shippingcountry'],countries,startcountry);
-    			//hide billing and show shipping
-    			showClass(document.getElementById('sr-addresswrapper'));
-    			showClass(document.getElementById('sr-shippingaddresswrapper'));
-    			hideClass(document.getElementById('sr-sbillingaddressswrapper'));
-
-
-    		}
-    		//check if billing is enabled
-    		if (billingaddress == 1)
-    		{
-    			populateDropdown(['sr-billingcountry'],countries,startcountry);
-    			//hide shipping and show billing
-    			showClass(document.getElementById('addresswrapper'));
-    			hideClass(document.getElementById('shippingaddresswrapper'));
-    			showClass(document.getElementById('billingaddressswrapper'));
-
-    		}
-    	}
-	}
-
-
-	function checkAddressClickState()
-	{
-		var checkbox =  document.getElementById('sr-billingandshippingcheck');
-
-		if (checkbox.checked) 
+		//check if shipping is enabled
+		if (shippingaddress == 1)
 		{
-
-		    //Checkbox has been checked
-	        showClass(document.getElementById('sr-pay'));
-		    hideClass(document.getElementById('sr-billing'));
-	        hideClass(document.getElementById('sr-shipping'));
-
-
-		} 
-		else 
-		{
-		    //Checkbox has been unchecked
-		    hideClass(document.getElementById('sr-pay'));
-		    hideClass(document.getElementById('sr-billing'));
-	        showClass(document.getElementById('sr-shipping'));
-
+			populateDropdown(['sr-shippingcountry'],countries,startcountry);
+			//show shipping
+			showClass(document.getElementById('sr-addresswrapper'));
+			showClass(document.getElementById('sr-shippingaddresswrapper'));
 		}
 	}
 
@@ -442,8 +416,11 @@ var SR = SR || (function()
 		switch (state) {
 		    case 1:
 		    	stopPaymentCheck()
+		    	//hide the pay button
+		    	hideClass(document.getElementById('sr-pay'));
+		    	//hide the paid view
 		    	hideClass(document.getElementById('sr-paid'));
-		    	hideClass(document.getElementById('sr-billing'));
+		    	//hide the shipping view
 		        hideClass(document.getElementById('sr-shipping'));
 		    	//hide the address
 		        hideClass(document.getElementById('sr-addresswrapper'));
@@ -461,6 +438,8 @@ var SR = SR || (function()
 				showClass(document.getElementById('sr-cartlistitems'));
 		        break;
 		    case 2:
+		    	//show the pay button
+		    	showClass(document.getElementById('sr-pay'));
 		    	//check address
 		    	checkAddressState();
 		    	//hide btc stuff
@@ -473,18 +452,11 @@ var SR = SR || (function()
 		    	//hide btc stuff
 				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
 		        break;
-		    case 3:
-		    	//check address
-		    	checkAddressState();
-		    	//show the check out button
-				showClass(document.getElementById('sr-checkout'));
-				//show the product details
-		       	showClass(document.getElementById('sr-cartlistitems'));
-				//hide the customer details			  	
-			    hideClass(document.getElementById('sr-customerdetailswrapper'));
-			   	hideClass(document.getElementById('sr-back-button'));
-		        break;
-		    case 4:
+		    case 3: //btc address cart mode 0
+		    	//set the amount to pay in the btc address screen
+				changeClassText(document.getElementById('sr-btctotal'), producttotal+' BTC');
+		    	//hide the pay button
+		    	hideClass(document.getElementById('sr-pay'));
 				//hide the product details
 		    	hideClass(document.getElementById('sr-cartlistitems'));
 		    	//show btc stuff		    	
@@ -493,25 +465,11 @@ var SR = SR || (function()
 				showClass(document.getElementById('sr-back-button'));
 				hideClass(document.getElementById('sr-customerdetailswrapper'));
 				//call the check payment
-				checkpaymentres = setInterval(checkPayment, 3000)
+				//note in serverless mode we will have to make it move to the payment successful page. 
+				if (serverless == 0)
+					checkpaymentres = setInterval(checkPayment, 3000)
 		        break;
-		    case 5:
-		    	//check address
-		    	checkAddressState();
-		    	//hide the product details
-		    	hideClass(document.getElementById('sr-cartlistitems'));
-				//show the customer details
-				showClass(document.getElementById('sr-back-button'));
-				showClass(document.getElementById('sr-customerdetailswrapper'));
-		    	//show btc stuff
-				hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
-		        break; 
-		     case 6:
-		     	hideClass(document.getElementById('sr-billingaddressswrapper'));
-		     	showClass(document.getElementById('sr-shippingaddresswrapper'));
-		     	showClass(document.getElementById('sr-pay'));
-		     	hideClass(document.getElementById('sr-shipping'));
-		     case 7:
+		     case 4:
 		     	//stop payment timer
 		     	stopPaymentCheck()
 		     	//hide back button
@@ -521,11 +479,20 @@ var SR = SR || (function()
 		     	//show paid screeb
 		    	showClass(document.getElementById('sr-paid'));
 		     	break;
-		     case 8: //donaton mode
+		     case 5: //donaton mode (cart mode 2)
+		     	//get the total no product so this is just the amount in the sr button
+		     	carttotal();
+		     	//sto the payment checker
 		    	stopPaymentCheck();
+		    	//hide the pay button
+		    	hideClass(document.getElementById('sr-pay'));
+		    	//set the amount to pay in the btc address screen
+				changeClassText(document.getElementById('sr-btctotal'), producttotal+' BTC');
+				//hide the paid view
 		    	hideClass(document.getElementById('sr-paid'));
-		    	hideClass(document.getElementById('sr-billing'));
+		    	//hide the shiping view
 		        hideClass(document.getElementById('sr-shipping'));
+		        //hide the cart header
 		        hideClass(document.getElementById('sr-cart-header'));
 		        //hide the customer details
 				hideClass(document.getElementById('sr-customerdetailswrapper'));
@@ -538,12 +505,7 @@ var SR = SR || (function()
 		        //open it
 				addClass(document.querySelector('.sr-cart-container'),'cart-open');
 		        //show btc stuff		    	
-				showClass(document.getElementById('sr-bitcoinaddresswrapper'));
-
-
-
-
-		     	
+				showClass(document.getElementById('sr-bitcoinaddresswrapper')); 	
 		}
 	}
 
@@ -570,19 +532,6 @@ var SR = SR || (function()
 		//payment click
 		document.getElementById('sr-pay').addEventListener('click', function () 
 		{
-			var checkbox =  document.getElementById('sr-billingandshippingcheck');
-			//check if it the shipping / billing the same has been clicked
-			if (checkbox.checked) 
-			{
-				//note we could do this at the server end and cut down on the size of the call but I prefer
-				//to keep the server failry agnostic and keep the logic here in this usecase.
-				document.getElementById("sr-shippingaddress1").value = document.getElementById("sr-billingaddress1").value;
-				document.getElementById("sr-shippingcity").value = document.getElementById("sr-billingcity").value;
-				document.getElementById("sr-shippingstate").value = document.getElementById("sr-billingstate").value;
-				document.getElementById("sr-shippingzip").value = document.getElementById("sr-billingzip").value;
-				document.getElementById("sr-shippingcountry").value = document.getElementById("sr-billingcountry").value;
-
-			}
 			var cartstring = "";
 			var elements = document.getElementsByClassName("sr-input");
 			for (var i = 0, len = elements.length; i < len; i++) {
@@ -614,10 +563,17 @@ var SR = SR || (function()
 			    }
 			}
 
-			var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+address;
-			//console.log(url)
-			//call the store produt endpoint
-			fetchurl(url,'storeuserdetails')		
+			if (serverless == 0)
+			{
+				var url = serverurl+"api/storeuserdetails"+cartstring+"&address="+address;
+				//console.log(url)
+				//call the store produt endpoint
+				fetchurl(url,'storeuserdetails')
+			}
+			else
+			{
+				cartstate(3)
+			}		
 			
 							
 			
@@ -637,19 +593,6 @@ var SR = SR || (function()
   			document.body.removeChild(el);      
 		});
 		
-		//shipping and billing checbox
-		document.getElementById('sr-billingandshippingcheck').addEventListener('click', function () 
-		{
-			checkAddressClickState()
-			
-		});
-		
-		//shipping button clicked
-		document.getElementById('sr-shipping').addEventListener('click', function () 
-		{
-			cartstate(6)			
-			
-		});
 
 		//add to cart click element
 		document.querySelector('.sr-checkout').addEventListener('click', function () 
@@ -690,7 +633,7 @@ var SR = SR || (function()
 			//check if cart type has been set and if so override default.
 			if (elproduct.getAttribute('cart-type') != null)
 			{
-				cartytype = elproduct.getAttribute('cart-type');
+				carttype = elproduct.getAttribute('cart-type');
 			}
 
 			/*
@@ -698,7 +641,7 @@ var SR = SR || (function()
 			note we can (and shall) refactor this as we this is not required for cart type and if we add more in the future we ]
 			want this to funciton slicker.
 			*/
-			if (cartytype == 0)
+			if (carttype == 0)
 			{
 				//will update when we use multipile products
 				var productid = 1;
@@ -775,7 +718,7 @@ var SR = SR || (function()
 		  		//open the container;	
 		  		showClass(document.querySelector('.sr-cart-container'));
 		  		//render the cart state
-		  		cartstate(8);
+		  		cartstate(5);
 
 		  	}
 		});
@@ -798,7 +741,7 @@ var SR = SR || (function()
 	  		}
 	  		else
 	  		{
-  				if (cartytype == 2)
+  				if (carttype == 2)
 	  			{
 	  				hideClass(document.getElementById('sr-cart-container'));
 	  			}
@@ -833,15 +776,15 @@ var SR = SR || (function()
 
         	Server vars you can pass set to "" to ignore
 
-			0 = server url
-			1 = animated
-			2 = quantity count
-			3 = cdn url
-			4 = uid
-    	    5 = theme
-			6 = billing address 
-			7 = shipping address
-			8 = start country
+	         0 = server url
+	         1 = animated
+	         2 = quantity count
+	         3 = cdn url
+	         4 = uid
+	         5 = shipping address
+	         6 = start country
+	         7 = serverless
+	         8 = serverless btc address
 
         	*/
 			_args = Args;
@@ -852,50 +795,45 @@ var SR = SR || (function()
 				serverurl = _args[0];
 				//alert(serverurl);
 			}
-			//check if it is a boolean and if so then set it.
-			if (typeof(_args[1]) === "boolean")
-			{
-				animating = _args[1]
-			}
 			//quantity
-			if (_args[2] != "")
+			if (_args[1] != "")
 			{
-				quantity = _args[2]
+				quantity = _args[1]
 			}
 			//cdn url
-			if (_args[3] != "")
+			if (_args[2] != "")
 			{
-				cdnurl = _args[3]
+				cdnurl = _args[2]
 			}	
 			//uid
-			if (_args[4] != "")
+			if (_args[3] != "")
 			{
-				uid = _args[4]
-			}
-			//theme
-			if (_args[5] != "")
-			{
-				theme = _args[5]
-			}
-			//billing address
-			if (_args[6] != "")
-			{
-				billingaddress = _args[6]
+				uid = _args[3]
 			}
 			//shipping address
-			if (_args[7] != "")
+			if (_args[4] != "")
 			{
-				shippingaddress = _args[7]
+				shippingaddress = _args[4]
 			}
 			//start country
-			if (_args[8] != "")
+			if (_args[5] != "")
 			{
-				startcountry = _args[8]
+				startcountry = _args[5]
+			}
+			//run in serverless mode (mainly a quick way to debug)
+			if (_args[6] != "")
+			{
+				serverless = _args[6]
+			}
+			//we require a btc address for serverless mode
+			if (_args[7] != "")
+			{
+				serverlessbtcaddress = _args[7]
 			}
 			//load css
-        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'theme/'+theme+'.css" rel="stylesheet">'	
+        	document.head.innerHTML = document.head.innerHTML +'<link href="'+cdnurl+'cart.css" rel="stylesheet">'	
 			//fetch the template so we can use themes 
-			fetchurl(cdnurl+'theme/'+theme+'.html','carttemplate');
+			fetchurl(cdnurl+'cart.html','carttemplate');
         }
         ,
         //this function changes the quantity of the item in the cart
@@ -908,6 +846,7 @@ var SR = SR || (function()
 			itemcount = parseInt(itemcountq.value);
 			carttotal();	
         }
+
         ,
         //this function deletes an item in the cart
         //note : it is in the name space like this as the cart items are created dynamically so the dom does not always know about it's existence 

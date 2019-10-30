@@ -12,44 +12,6 @@ var generichelper = require('./api/helpers/generic.js').Generic;
 var generic = new generichelper();
 
 
-/*
-const sqlite3 = require("sqlite3").verbose();
-let db = new sqlite3.Database("./db/db.db", err => {
-  if (err) {
-    console.error(err.message);
-  }
-});
-
-let sqldata = ['2N5Wh7AdqASEyhyh9TNWESKu5bLHaqs6LLs']; 
-let sql = `select *
-          from order_product  
-          where address =?`
-db.get(sql, sqldata, function(err,result) {
-  if (err) {
-  }
-  let sqldata = [result.id]; 
-  let sql = `select metavalue FROM order_meta where productid = ? and metaname = 'email'`;
-  db.get(sql, sqldata, (err, result2) => {
-    if (err) {
-      console.error('sql error ' + err.message);
-      return;
-    }
-    let total = result.price*result.quantity;
-    let mailMerge = {
-      ORDEREMAIL: result2.metavalue,
-      ORDERDETAILS:result.price+" BTC "+result.name+" quantity "+result.quantity,
-      ORDERTOTAL:total,
-      COLDSTORAGE:"2N5Wh7AdqASEyhyh9TNWESKu5bLHaqs6LLs"
-    };
-    generic.sendMail(3,"cryptoskillz@protonmail.com",mailMerge);
-
-  });
-});    
-
-
-return;
-*/
-
 //init it
 const app = express();
 
@@ -141,6 +103,10 @@ It is disabled at the moment in time as it is causing time out error and some DB
 
 
 */
+
+//debug
+//checkforPayment();
+
 if (process.env.AUTOPAYMENT == 1)
   setInterval(checkforPayment, process.env.AUTOPAYMENTTICK);
 
@@ -335,7 +301,19 @@ app.get("/admin/payments", (req, res) => {
   let adminhelper = require('./api/helpers/admin.js').admin;
   let admin = new adminhelper(); 
   //call the get orders function
-  admin.getOrders(req.query.token,res);
+  admin.getPayments(req.query.token,res);
+
+});
+
+//return a list of payments
+app.get("/admin/deletepayment", (req, res) => {
+  //set the headers
+  res = generic.setHeaders(res);
+  //load the admin helper
+  let adminhelper = require('./api/helpers/admin.js').admin;
+  let admin = new adminhelper(); 
+  //call the get orders function
+  admin.deletePayment(req.query.address,res);
 
 });
 
@@ -400,7 +378,7 @@ app.get("/api/address", (req, res) => {
   let apihelper = require('./api/helpers/api.js').api;
   let api = new apihelper(); 
   //call the login function
-  api.generateAddress(req.query.uid,res);
+  api.generateAddress(req.query.uid,req.query.carttype,res);
 });
 
 //store user details called from sr.js
