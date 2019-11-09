@@ -9,6 +9,8 @@ let db = new sqlite3.Database("./db/db.db", err => {
   }
 });
 
+
+
 var Generic = function ()
 {
 	this.test = function test() {
