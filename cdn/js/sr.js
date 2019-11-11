@@ -1038,7 +1038,7 @@ var SR = SR || (function() {
                             carttype = elproduct.getAttribute('cart-type');
                             //alert(carttype)
                         }
-                        var url = serverurl + "api/address?uid=" + uid + "&carttype=" + carttype + "&addresstype="+addresstype;
+                        var url = serverurl + "api/address?uid=" + uid + "&carttype=" + carttype + "&addresstype=" + addresstypere;
                         fetchurl(url, 'getaddress')
                     } else {
                         address = serverlessbtcaddress;

@@ -21,24 +21,6 @@ app.get("/", (req, res) => {
 });
 /*
 ==============================
-START OF STRIKE ROUTING
-=============================
-*/
-app.get("/strike/charge", (req, res) => {
-    res = generic.setHeaders(res);
-    //load the back office helper
-    let strikehelper = require('./api/helpers/strike.js').strike;
-    let strike = new strikehelper();
-    //debug
-    strike.charge(req, res);
-});
-/*
-==============================
-END OF END ROUTING
-=============================
-*/
-/*
-==============================
 START OF BACKOFFICE ROUTING
 =============================
 */
@@ -79,6 +61,61 @@ It is disabled at the moment in time as it is causing time out error and some DB
 //debug
 //checkforPayment();
 if (process.env.AUTOPAYMENT == 1) setInterval(checkforPayment, process.env.AUTOPAYMENTTICK);
+if (process.env.LIGHTNING == 1) {
+    /*
+
+    todo
+
+    check for funded channels
+    check for address to fund channel
+
+    */
+    var dockerCLI = require('docker-cli-js');
+    var DockerOptions = dockerCLI.Options;
+    var Docker = dockerCLI.Docker;
+    var docker = new Docker();
+    //get the lightning image 
+    var imageid;
+    var channelinfo;
+    //loop through the images
+    docker.command('ps').then(function(data) {
+        //console.log('looking for id')
+        //console.log(data)
+        for (var p in data.containerList) {
+            if (data.containerList[p].image == 'cyphernode/clightning:v0.7.1') {
+                //console.log(data.containerList[p]['container id'])
+                imageid = data.containerList[p]['container id'];
+
+
+                /*
+                //get a funding address new address
+                docker.command('exec ' + imageid + ' lightning-cli --lightning-dir=.lightning newaddr', function(err, data2) {
+
+
+                });
+                */
+
+                ///console.log(imageid);
+                docker.command('exec ' + imageid + ' lightning-cli --lightning-dir=.lightning listfunds', function(err, data2) {
+                channelinfo = data2.raw;
+
+
+
+
+                //debug
+                //console.log('channel info');
+                //console.log("ss" + channelinfo);
+                //console.log(imageid)
+                //console.log(channelinfo.length)
+                for (var channel in channelinfo.channels) {
+                  console.log('channelss')
+                  console.log(channel);
+                }
+                });
+            }
+        }
+    });
+}
 /*
 ==============================
 END OF TIMER FUNCTIONS
@@ -122,32 +159,6 @@ app.get("/webhook/checkpayment", (req, res) => {
     let webhook = new webhookhelper();
     //check for payment
     webhook.checkPayment(req.query.token, req.query.address, res);
-});
-/*
-
-This function checks for strike payments to be processed
-
-*/
-app.post("/webhook/checkstrikepayment", (req, res) => {
-    res = generic.setHeaders(res);
-    //load the back office helper
-    let webhookhelper = require('./api/helpers/webhook.js').webhook;
-    let webhook = new webhookhelper();
-    //debug
-    webhook.checkStrikePayment(req, res);
-});
-/*
-
-This function checks for call backs from strike to tell payment has been made
-
-*/
-app.get("/webhook/strikenotification", (req, res) => {
-    res = generic.setHeaders(res);
-    //load the back office helper
-    let webhookhelper = require('./api/helpers/webhook.js').webhook;
-    let webhook = new webhookhelper();
-    //debug
-    webhook.strikeNotification(req, res);
 });
 /*
 ========================
@@ -304,7 +315,7 @@ app.get("/api/address", (req, res) => {
     let apihelper = require('./api/helpers/api.js').api;
     let api = new apihelper();
     //call the login function
-    api.generateAddress(req.query,res);
+    api.generateAddress(req.query, res);
 });
 //store user details called from sr.js
 app.get("/api/storeuserdetails", (req, res) => {
@@ -352,8 +363,7 @@ console.log(module.exports.name + ": " + module.exports.version);
 console.log('listenting on port:' + port)
 if (process.env.NETWORK == 2) console.log('connected to BTC mainnet')
 if (process.env.NETWORK == 1) console.log('connected to BTC testnet')
-if (process.env.LIGHTNETWORK == 0) console.log('not using Lightning ')
-if (process.env.LIGHTNETWORK == 1) console.log('connected to Lightning testnet')
-if (process.env.LIGHTNETWORK == 2) console.log('connected to Lightning mainnet')
+if (process.env.LIGHTNING == 0) console.log('Not using Lightning ')
+else console.log('Using Lightning')
 //listen
 app.listen(port);

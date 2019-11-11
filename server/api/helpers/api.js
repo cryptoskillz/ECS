@@ -324,12 +324,12 @@ var api = function() {
                 //check if the address has any unspent transactions
                 client.listUnspent(1, 9999999, [address]).then(listResult => {
                     //debug
-                    console.log(listResult)
+                    //console.log(listResult)
                     //check there is at least one unspent transaction
                     if (listResult.length == 0) {
                         //there is not so move on
                         //debug
-                        console.log(row.id + ' : ' + address + ' no unspent transactions');
+                        //console.log(row.id + ' : ' + address + ' no unspent transactions');
                         let sqldata = [row.id];
                         let sql = `UPDATE sessions
                   SET sessioncountcheck = sessioncountcheck+1
