@@ -8,7 +8,6 @@
   "dependencies": {
     "bitcoin-core": "^3.0.0",
     "body-parser": "^1.19.0",
-    "clightning-rpc": "^0.3.2",
     "const": "^1.0.0",
     "docker-cli-js": "^2.6.0",
     "dotenv": "^6.2.0",

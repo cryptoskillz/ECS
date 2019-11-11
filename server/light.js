@@ -1,61 +1,50 @@
-const CLightning = require('clightning-rpc')
-const client = new CLightning('.lightning')
-//Returns Promises. No Callbacks (It is 2018)
+
+
 /*
-client.listNodes()
-.then(nodes => {
-    console.log(nodes)
-})
-.catch(e => {
-    console.log(e)
-})
+=========================================
+START OF DOCKER INTERACTIONS
+=========================================
 */
 var dockerCLI = require('docker-cli-js');
 var DockerOptions = dockerCLI.Options;
 var Docker = dockerCLI.Docker;
 var docker = new Docker()
-var imageid = "30f630c12a87";//hold the image id (note some tests get this others you will have to set by running docker ps from the command line)
-
-
-var testid = 0;// set the test id so we can run the various docker instances
-
+var imageid = "30f630c12a87"; //hold the image id (note some tests get this others you will have to set by running docker ps from the command line)
+if (process.argv[2] != undefined) imageid = process.argv[2];
+else {
+    console.log('no container id for c-lightning set run command docker ps and the add it is the first argv I.E "node light.js 12345 2"');
+    return;
+}
+var testid = 0; // set the test id so we can run the various docker instances
 //get the passed in id (if there is one)
-if (process.argv[2] != undefined)
-	testid = process.argv[2]
-
-
+if (process.argv[3] != undefined) testid = process.argv[3];
 //this test gets the Lightning info
-if (testid == 0)
-{
-	docker.command('exec '+imageid+' lightning-cli --lightning-dir=.lightning getinfo', function (err, data) 
-	{
-		console.log('data = ', data);
-	});
+if (testid == 0) {
+    console.log('Ruuning getinfo:');
+    docker.command('exec ' + imageid + ' lightning-cli --lightning-dir=.lightning getinfo', function(err, data) {
+        console.log('data = ', data);
+    });
 }
-
 //this funciton calls the newaddr function on the lightning cli
-if (testid == 1)
-{
-	docker.command('exec '+imageid+' lightning-cli --lightning-dir=.lightning newaddr', function (err, data) 
-	{
-		console.log('data = ', data);
-	});
+if (testid == 1) {
+    console.log('Ruuning newaddr:');
+    docker.command('exec ' + imageid + ' lightning-cli --lightning-dir=.lightning newaddr', function(err, data) {
+        console.log('data = ', data);
+    });
 }
-
 //this test calls the list funds method on the lightning cli
-if (testid == 2)
-{
-	docker.command('exec '+imageid+' lightning-cli --lightning-dir=.lightning listfunds', function (err, data) 
-	{
-		console.log('data = ', data);
-	});
+if (testid == 2) {
+    console.log('Ruuning Listfunds:');
+    docker.command('exec ' + imageid + ' lightning-cli --lightning-dir=.lightning listfunds', function(err, data) {
+        console.log('data = ', data);
+    });
 }
 
-
-
-
-
-
+/*
+=========================================
+END OF DOCKER INTERACTIONS
+=========================================
+*/
 
 /*
 //loop through the images
