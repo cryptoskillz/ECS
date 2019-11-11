@@ -70,51 +70,6 @@ if (process.env.LIGHTNING == 1) {
     check for address to fund channel
 
     */
-    var dockerCLI = require('docker-cli-js');
-    var DockerOptions = dockerCLI.Options;
-    var Docker = dockerCLI.Docker;
-    var docker = new Docker();
-    //get the lightning image 
-    var imageid;
-    var channelinfo;
-    //loop through the images
-    docker.command('ps').then(function(data) {
-        //console.log('looking for id')
-        //console.log(data)
-        for (var p in data.containerList) {
-            if (data.containerList[p].image == 'cyphernode/clightning:v0.7.1') {
-                //console.log(data.containerList[p]['container id'])
-                imageid = data.containerList[p]['container id'];
-
-
-                /*
-                //get a funding address new address
-                docker.command('exec ' + imageid + ' lightning-cli --lightning-dir=.lightning newaddr', function(err, data2) {
-
-
-                });
-                */
-
-                ///console.log(imageid);
-                docker.command('exec ' + imageid + ' lightning-cli --lightning-dir=.lightning listfunds', function(err, data2) {
-                channelinfo = data2.raw;
-
-
-
-
-                //debug
-                //console.log('channel info');
-                //console.log("ss" + channelinfo);
-                //console.log(imageid)
-                //console.log(channelinfo.length)
-                for (var channel in channelinfo.channels) {
-                  console.log('channelss')
-                  console.log(channel);
-                }
-                });
-            }
-        }
-    });
 }
 /*
 ==============================

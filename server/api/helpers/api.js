@@ -220,37 +220,35 @@ var api = function() {
     */
     this.generateAddress = function generateAddress(req, res) {
         //create a new address in theaccount account :]
+        /*
+            todo
+
+            generate both on chain and lightning address is required (lightning activated)
+            maybe rename adddress type to paymenttype (what we had orginally, requires some more thought)
+
+        */
         //insert it into the database
-        if (req.addresstype == 0) {
-            //generare BTC address
-            client.getNewAddress().then(address => {
-                //debug
-                //console.log(address);
-                db.run(`INSERT INTO sessions(address,addresstype,userid,net,carttype) VALUES(?,?,?,?,?)`, [req.address, req.addresstype, req.uid, process.env.NETWORK, req.carttype], function(err) {
-                    if (err) {
-                        //debug
-                        //return console.log(err.message);
-                        //return error
-                        res.send(JSON.stringify({
-                            error: err.message
-                        }));
-                        return;
-                    }
-                    //return the address
+        //generare BTC address
+        client.getNewAddress().then(address => {
+            //debug
+            //console.log(address);
+            db.run(`INSERT INTO sessions(address,addresstype,userid,net,carttype) VALUES(?,?,?,?,?)`, [address, req.addresstype, req.uid, process.env.NETWORK, req.carttype], function(err) {
+                if (err) {
+                    //debug
+                    //return console.log(err.message);
+                    //return error
                     res.send(JSON.stringify({
-                        address: address
+                        error: err.message
                     }));
-                });
-                return;
-            });
-        } else {
-            //generate lightning
-            docker.command('exec 89b35eae3333 curl   -H "content-type: text/plain;"  http://127.0.0.1:8888/ln_getinfo', function(err, data) {
+                    return;
+                }
+                //return the address
                 res.send(JSON.stringify({
-                    address: data.raw
+                    address: address
                 }));
             });
-        }
+            return;
+        });
     };
     /*
     *
@@ -315,7 +313,7 @@ var api = function() {
             //loop through it
             rows.forEach(row => {
                 //debug
-                //console.log(row);
+                console.log(row);
                 //get the address
                 let address = row.address;
                 //client.GetUnconfirmedBalance().then(res => {
@@ -324,7 +322,7 @@ var api = function() {
                 //check if the address has any unspent transactions
                 client.listUnspent(1, 9999999, [address]).then(listResult => {
                     //debug
-                    //console.log(listResult)
+                    console.log(listResult)
                     //check there is at least one unspent transaction
                     if (listResult.length == 0) {
                         //there is not so move on

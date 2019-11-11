@@ -41,7 +41,7 @@ var SR = SR || (function() {
     //note: we could detect the IP to set this automitcally. 
     var startcountry = "US"
     //hold if it is serverless or not 
-    var serverless = 0;
+    var serverless = 0; // 0 = no 1 = yes
     var serverlessbtcaddress = ''; // replace this with a proper one for testing or let the debugger pass it in.
     var addresstype = 0; //hold the address type 0 = BTC, 1 = LIGHTNING
     /*
@@ -1038,7 +1038,7 @@ var SR = SR || (function() {
                             carttype = elproduct.getAttribute('cart-type');
                             //alert(carttype)
                         }
-                        var url = serverurl + "api/address?uid=" + uid + "&carttype=" + carttype + "&addresstype=" + addresstypere;
+                        var url = serverurl + "api/address?uid=" + uid + "&carttype=" + carttype + "&addresstype=" + addresstype;
                         fetchurl(url, 'getaddress')
                     } else {
                         address = serverlessbtcaddress;
