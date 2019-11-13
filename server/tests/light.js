@@ -38,8 +38,14 @@ START OF DOCKER COMMANDS TO DIRECTLY INTERACT WITH C-LIGHTNING
 There are the main lightning commands that we use as well as a 4th which can use to pass any command into to get the results.
 
 */
+
 //get the passed in id (if there is one)
-if (process.argv[4] != undefined) testid = process.argv[4];
+if (process.argv[2] != undefined) testid = process.argv[2];
+
+//debug
+//console.log(testid);
+//console.log(containerid);
+
 //this test gets the Lightning info
 if (testid == 0) {
     console.log('Ruuning getinfo:');
@@ -95,6 +101,7 @@ if (testid == 6) {
     docker.command('exec ' + containerid + ' curl   -H "content-type: text/plain;"  http://127.0.0.1:8888/ln_getinfo', function(err, data) {});
 }
 if (testid == 7) {
+    //list the containers
     docker.command('info', function(err, data) {});
 }
 /*
