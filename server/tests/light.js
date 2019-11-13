@@ -6,6 +6,13 @@ START OF DOCKER INTERACTIONS
 This is a simple script to allow us easily interact with the different cyphernode docker images. 
 It is a standalone script that is not require for ECS but allows to debug easily.
 
+usage (from terminal)
+
+node light.js <testid> <containderid>
+node light.js 0 ded324549726 
+
+if you just run node light.js you will get a list of all running containers which you can use as the second paramater.
+
 */
 var dockerCLI = require('docker-cli-js');
 var DockerOptions = dockerCLI.Options;
@@ -17,7 +24,7 @@ var testid = 0; // set the test id so we can run the various docker instances
 if (process.argv[3] != undefined) containerid = process.argv[3];
 else {
     console.log('no container id listing all containers use  "node light.js <testid>x <containerid> 2"');
-    //list all the containers running. Copy the one you are intrested in and pass it in as the first paramater.
+    //list all the containers running. Copy the one you are interested in and pass it in as the first parameter.
     docker.command('ps').then(function(data) {
         console.log(data);
     })
