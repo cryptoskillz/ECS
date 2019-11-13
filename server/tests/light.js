@@ -19,6 +19,7 @@ var DockerOptions = dockerCLI.Options;
 var Docker = dockerCLI.Docker;
 var docker = new Docker()
 var containerid = ""; //hold the image id (note some tests get this others you will have to set by running docker ps from the command line)
+var containerid2 = ""; //hold the proxy container if.
 var testid = 0; // set the test id so we can run the various docker instances
 //check if we have a contatinerid and if not show the ones to chose from.
 if (process.argv[3] != undefined) containerid = process.argv[3];
@@ -30,6 +31,9 @@ else {
     })
     return;
 }
+
+if (process.argv[4] != undefined) containerid2 = process.argv[4];
+
 /*
 ==============================================================
 START OF DOCKER COMMANDS TO DIRECTLY INTERACT WITH C-LIGHTNING
@@ -103,6 +107,22 @@ if (testid == 6) {
 if (testid == 7) {
     //list the containers
     docker.command('info', function(err, data) {});
+}
+
+if (testid == 8) {
+    docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning getinfo', function(err, data) {
+        //parse the json
+        var lightinfo = JSON.parse(data.raw);
+        //get the current Bitocin block height
+        docker.command('exec ' + containerid2 + ' curl   -H "content-type: text/plain;"  http://127.0.0.1:8888/getblockchaininfo', function(err, data) {
+            var bitcoininfo = JSON.parse(data.raw);
+            //get the % complete
+            var per = parseInt(lightinfo.blockheight) / parseInt(bitcoininfo.blocks) * 100; 
+            console.log("Bitcoin blocks:"+bitcoininfo.blocks)
+            console.log("Lightning blocks: "+lightinfo.blockheight)
+            console.log("% complete:"+per);
+        });
+    });
 }
 /*
 ==============================================================
