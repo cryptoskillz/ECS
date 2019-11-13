@@ -83,6 +83,8 @@ END OF GENERIC DOCKER COMMANDS
 ==============================================================
 START OF DOCKER COMMANDS TO INTERACT WITH THE PROXY 
 ==============================================================
+
+The tests are pretty much the same as the above but we are going through the proxy instead of the Lightning container directly.
 */
 if (testid == 5) {
     //calling API
