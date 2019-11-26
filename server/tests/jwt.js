@@ -27,14 +27,11 @@ As you see the code below breaks the above command down and refactors it into th
 
 
 */
-
-
 /*
 ===========================
 START OF JWT TOKEN CREATION
 ===========================
 */
-
 //load request
 const request = require('request');
 //load dotenv to get accces to the vars in .env
@@ -46,78 +43,68 @@ const cryptojs = require("crypto-js");
 var expiryInSeconds = 36000;
 //get our API key from the env variables
 var api_key = process.env.CYPHERNODE_API_KEY
-
 //create a bearer token
-
 //build the data
 //set an id
 id = "003";
 //set the expiry time to a point in the future
 exp = Math.round(new Date().getTime() / 1000) + expiryInSeconds;
 //set the algo type we are going to use and base 64 it
-h64 = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64");
+h64 = Buffer.from(JSON.stringify({
+    alg: "HS256",
+    typ: "JWT"
+})).toString("base64");
 //set the payload and set it to h64
-p64 = Buffer.from(JSON.stringify({ id: id, exp: exp })).toString("base64");
-
-
+p64 = Buffer.from(JSON.stringify({
+    id: id,
+    exp: exp
+})).toString("base64");
 //join them together
 msg = h64 + "." + p64;
 //get a sha256 has or the h64,p64 and the API key (which is the secret in JWT world)
-const hash =  cryptojs.HmacSHA256(msg, api_key);
+const hash = cryptojs.HmacSHA256(msg, api_key);
 //create the JWT token
-const token = h64+"."+p64+"."+hash
+const token = h64 + "." + p64 + "." + hash
 //output it 
-console.log("token - " +token);
-
+console.log("token - " + token);
 /*
 ===========================
 END OF JWT TOKEN CREATION
 ===========================
 */
-
-
 /*
 ====================================
 START OF REQUEST TO CYPHERNODE PROXY 
 ====================================
 */
-
 //set the menthod we want to call
 const method = "ln_getinfo";
 //set the body we want to send, this is not required for every method call but it does no harm to send it
 const body = '{"hash":"123","callbackUrl":"http://callback"}';
 //create the Bearer header
-const authheaader = "Bearer "+token;
-
-
+const authheaader = "Bearer " + token;
 //create the options object
 //note : does CYPHER_GATEWAY_URL have to be different from RPC host?
 const options = {
-  url: process.env.CYPHER_GATEWAY_URL+method,
-  headers: {
-    'Authorization':authheaader
-  },
-  body: body
+    url: process.env.CYPHER_GATEWAY_URL + method,
+    headers: {
+        'Authorization': authheaader
+    },
+    body: body
 };
-
 //create the call back
 function callback(error, response, body) {
-  if (!error && response.statusCode == 200) {
-    const info = JSON.parse(body);
-    //do stuff with the result
-    console.log(body);
-
-  }
-  else
-  {
-  	//you done messed up boi
-  	console.log(error)
-  }
+    if (!error && response.statusCode == 200) {
+        const info = JSON.parse(body);
+        //do stuff with the result
+        console.log(body);
+    } else {
+        //you done messed up boi
+        console.log(error)
+    }
 }
 //make the calls
 request.post(options, callback);
-
-
 /*
 ====================================
 END OF REQUEST TO CYPHERNODE PROXY 
