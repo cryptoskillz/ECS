@@ -42,6 +42,7 @@ require('dotenv').config();
 //load cruytpo js
 const cryptojs = require("crypto-js");
 //set an expiry time for the tokens.  Not this should be much lower in production, like 100 seconds but for testing it is fine.
+//note maybe this should be an env var
 var expiryInSeconds = 36000;
 //get our API key from the env variables
 var api_key = process.env.CYPHERNODE_API_KEY
