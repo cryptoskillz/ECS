@@ -83,7 +83,7 @@ START OF REQUEST TO CYPHERNODE PROXY
 
 //set the menthod we want to call
 const method = "ln_getinfo";
-//set the body we want to send, this is not required for every function
+//set the body we want to send, this is not required for every method call but it does no harm to send it
 const body = '{"hash":"123","callbackUrl":"http://callback"}';
 //create the Bearer header
 const authheaader = "Bearer "+token;
