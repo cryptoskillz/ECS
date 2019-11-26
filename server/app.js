@@ -6,8 +6,9 @@ const bodyParser = require('body-parser');
 //include the version package
 require('pkginfo')(module, 'version', 'name', 'description');
 //load the generic functions
-var generichelper = require('./api/helpers/generic.js').Generic;
-var generic = new generichelper();
+//var generichelper = require('./api/helpers/generic.js').Generic;
+
+
 //init it
 const app = express();
 app.use(bodyParser.json());

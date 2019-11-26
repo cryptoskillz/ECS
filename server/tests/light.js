@@ -65,8 +65,24 @@ if (testid == 2) {
     console.log('Ruuning Listfunds:');
     docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning listfunds', function(err, data) {});
 }
-//this runs any c-lightn ing command you pass to it
+//this test calls the list funds method on the lightning cli
 if (testid == 3) {
+    console.log('Ruuning connect:');
+    docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning connect '+process.argv[4]+' '+process.argv[5]+' '+process.argv[6], function(err, data) {});
+}
+
+//this test calls the list funds method on the lightning cli
+if (testid == 4) {
+    console.log('Ruuning fundchannel:');
+    docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning fundchannel '+process.argv[4]+' '+process.argv[5], function(err, data) {});
+}
+//this test calls the list funds method on the lightning cli
+if (testid == 5) {
+    console.log('Ruuning listpeers:');
+    docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning listpeers ', function(err, data) {});
+}
+//this runs any c-lightn ing command you pass to it
+if (testid == 6) {
     console.log('Ruuning ' + process.argv[4] + ':');
     docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning ' + process.argv[4], function(err, data) {});
 }
@@ -81,7 +97,7 @@ START OF GENERIC DOCKER COMMANDS
 ==============================================================
 */
 //list all the images
-if (testid == 4) {
+if (testid == 7) {
     docker.command('images').then(function(data) {})
 }
 /*
@@ -96,20 +112,20 @@ START OF DOCKER COMMANDS TO INTERACT WITH THE PROXY
 
 The tests are pretty much the same as the above but we are going through the proxy instead of the Lightning container directly.
 */
-if (testid == 5) {
+if (testid == 8) {
     //calling API
     docker.command('exec ' + containerid + ' curl   -H "content-type: text/plain;"  http://127.0.0.1:8888/getbalance', function(err, data) {});
 }
-if (testid == 6) {
+if (testid == 9) {
     //lighting info
     docker.command('exec ' + containerid + ' curl   -H "content-type: text/plain;"  http://127.0.0.1:8888/ln_getinfo', function(err, data) {});
 }
-if (testid == 7) {
+if (testid == 10) {
     //list the containers
     docker.command('info', function(err, data) {});
 }
 
-if (testid == 8) {
+if (testid == 11) {
     docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning getinfo', function(err, data) {
         //parse the json
         var lightinfo = JSON.parse(data.raw);
