@@ -45,7 +45,7 @@ var expiryInSeconds = 36000;
 var api_key = process.env.CYPHERNODE_API_KEY
 //create a bearer token
 //build the data
-//set an id
+//set an this the id of the key you want to use which can be found in cyphernode/gatekeeper/keys.properties 
 id = "003";
 //set the expiry time to a point in the future
 exp = Math.round(new Date().getTime() / 1000) + expiryInSeconds;
