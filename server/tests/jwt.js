@@ -15,7 +15,7 @@ This the main command and basically what it is doing the following
 1) creating an algo type and storing it in a a var called h64
 2) creating a payload with ID and an expiry date in it and storing this in P64
 3) setting the cyphernode api key as the secret and storing it in a variable called k
-4) creating a SH!256 has from the above and storing it in a var called s
+4) creating a SH256 has from the above and storing it in a var called s
 5) joining the h64,p64 and s vars together to create a JWT token
 6) sending this to cyphernode proxy for processing
 
@@ -24,6 +24,8 @@ id="003";h64=$(echo -n "{\"alg\":\"HS256\",\"typ\":\"JWT\"}" | base64);p64=$(ech
 
 
 As you see the code below breaks the above command down and refactors it into the code that can be used in node.js
+Note, if you have not set up the SSL correctly you will have to override it by running the follwoing command
+DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 node app.js or set it as an env file using sometjing like dotenv
 
 
 */
@@ -32,17 +34,19 @@ As you see the code below breaks the above command down and refactors it into th
 START OF JWT TOKEN CREATION
 ===========================
 */
-//load request
-const request = require('request');
 //load dotenv to get accces to the vars in .env
 require('dotenv').config();
-//load cruytpo js
+//load request
+//console.log(process.env.CYPHERNODE_API_KEY)
+const request = require('request');
+//load crytpo js
 const cryptojs = require("crypto-js");
 //set an expiry time for the tokens.  Not this should be much lower in production, like 100 seconds but for testing it is fine.
 //note maybe this should be an env var
 var expiryInSeconds = 36000;
 //get our API key from the env variables
 var api_key = process.env.CYPHERNODE_API_KEY
+var cyphernodeurl = process.env.CYPHER_GATEWAY_URL
 //create a bearer token
 //build the data
 //set an this the id of the key you want to use which can be found in cyphernode/gatekeeper/keys.properties 
@@ -83,10 +87,17 @@ const method = "ln_getinfo";
 const body = '{"hash":"123","callbackUrl":"http://callback"}';
 //create the Bearer header
 const authheaader = "Bearer " + token;
+//use resuest
 //create the options object
 //note : does CYPHER_GATEWAY_URL have to be different from RPC host?
+/*
+request.defaults({
+    strictSSL: false, // allow us to use our self-signed cert for testing
+    rejectUnauthorized: false
+});
+*/
 const options = {
-    url: process.env.CYPHER_GATEWAY_URL + method,
+    url: cyphernodeurl + method,
     headers: {
         'Authorization': authheaader
     },
@@ -100,6 +111,7 @@ function callback(error, response, body) {
         console.log(body);
     } else {
         //you done messed up boi
+        console.log(body)
         console.log(error)
     }
 }

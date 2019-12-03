@@ -219,19 +219,12 @@ var api = function() {
 
     */
     this.generateAddress = function generateAddress(req, res) {
-        //create a new address in theaccount account :]
-        /*
-            todo
 
-            generate both on chain and lightning address is required (lightning activated)
-            maybe rename adddress type to paymenttype (what we had orginally, requires some more thought)
-
-        */
-        //insert it into the database
         //generare BTC address
         client.getNewAddress().then(address => {
             //debug
             //console.log(address);
+            //insert it into the database
             db.run(`INSERT INTO sessions(address,addresstype,userid,net,carttype) VALUES(?,?,?,?,?)`, [address, req.addresstype, req.uid, process.env.NETWORK, req.carttype], function(err) {
                 if (err) {
                     //debug

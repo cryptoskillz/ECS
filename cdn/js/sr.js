@@ -44,6 +44,9 @@ var SR = SR || (function() {
     var serverless = 0; // 0 = no 1 = yes
     var serverlessbtcaddress = ''; // replace this with a proper one for testing or let the debugger pass it in.
     var addresstype = 0; //hold the address type 0 = BTC, 1 = LIGHTNING
+
+    var paymenttoggle = 1; //we have hard coded this for now but it should either be sent down from the server or
+                           //loaded from the init (maybe both) as this will set if we support lightnng or not.
     /*
      *  List of countries
      *      source : https://datahub.io/core/country-list#resource-country-list_zip
@@ -1038,7 +1041,7 @@ var SR = SR || (function() {
                             carttype = elproduct.getAttribute('cart-type');
                             //alert(carttype)
                         }
-                        var url = serverurl + "api/address?uid=" + uid + "&carttype=" + carttype + "&addresstype=" + addresstype;
+                        var url = serverurl + "api/btcaddress?uid=" + uid + "&carttype=" + carttype;
                         fetchurl(url, 'getaddress')
                     } else {
                         address = serverlessbtcaddress;
@@ -1156,6 +1159,18 @@ var SR = SR || (function() {
                 //hide the customer details                             
                 showClass(document.getElementById('sr-back-button'));
                 hideClass(document.getElementById('sr-customerdetailswrapper'));
+                //check if we are allowing Lightning payment and enable the toggle if we are
+                if (paymenttoggle == 1)
+                {
+                    //show payment toggle
+                    showClass(document.getElementById('sr-choosepaymenttype'));
+                }
+                else
+                {
+                    //hide the payment toggle, not necessary but may clear up some odd ux flows and costs us nothing. 
+                    hideClass(document.getElementById('sr-choosepaymenttype'));
+
+                }
                 //call the check payment
                 //note in serverless mode we will have to make it move to the payment successful page. 
                 if (serverless == 0) checkpaymentres = setInterval(checkPayment, 3000)
@@ -1359,6 +1374,27 @@ var SR = SR || (function() {
                 showClass(document.querySelector('.sr-cart-container'));
                 //render the cart state
                 cartstate(5);
+            }
+        });
+        document.querySelector('.sr-paymentoggle').addEventListener('click', function() {
+            //check toggle
+            if (this.checked == true) {
+                //show lightning view
+                showClass(document.getElementById('sr-lightningwrapper'));
+                //hide the btc view
+                hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+                //set address type to lightning
+                addresstype = 1;
+            }
+            else
+            {
+                //hide the lightning view
+                hideClass(document.getElementById('sr-lightningwrapper'));
+                //show the btc view
+                showClass(document.getElementById('sr-bitcoinaddresswrapper'));
+                //set address type to btc
+                addresstype = 0;
+
             }
         });
         /*

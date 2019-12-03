@@ -6,7 +6,9 @@ const bodyParser = require('body-parser');
 //include the version package
 require('pkginfo')(module, 'version', 'name', 'description');
 //load the generic functions
-//var generichelper = require('./api/helpers/generic.js').Generic;
+var generichelper = require('./api/helpers/generic.js').Generic;
+var generic = new generichelper();
+
 
 
 //init it
@@ -262,7 +264,7 @@ app.get("/api/sweep", (req, res) => {
     api.sweep(req.query.address, res);
 });
 //generate an address and output it called rom sr.js
-app.get("/api/address", (req, res) => {
+app.get("/api/btcaddress", (req, res) => {
     //debug
     //generic.test();
     //set the headers
