@@ -39,9 +39,9 @@ var webhook = function() {
     =============================================================================================================================
 
     */
-    this.checkPayment = function checkPayment(token, address, res) {
+    this.checkPayment = function checkBTCPayment(token, btcaddress, res) {
         //check if it has been processed
-        let sqldata = [address];
+        let sqldata = [btcaddress];
         let sql = `select * from sessions where address = ?`;
         db.get(sql, sqldata, function(err, result) {
             if (err) {}

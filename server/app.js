@@ -98,7 +98,7 @@ a sucessful payment.
 
 
 */
-app.get("/webhook/checkpayment", (req, res) => {
+app.get("/webhook/checkbtcpayment", (req, res) => {
     //debug
     //console.log(req.body.data.payment_request)
     //res.send(JSON.stringify({ status: "ok" }));//return;
@@ -116,7 +116,7 @@ app.get("/webhook/checkpayment", (req, res) => {
     let webhookhelper = require('./api/helpers/webhook.js').webhook;
     let webhook = new webhookhelper();
     //check for payment
-    webhook.checkPayment(req.query.token, req.query.address, res);
+    webhook.checkBTCPayment(req.query.token, req.query.btcaddress, res);
 });
 /*
 ========================
@@ -273,8 +273,23 @@ app.get("/api/btcaddress", (req, res) => {
     let apihelper = require('./api/helpers/api.js').api;
     let api = new apihelper();
     //call the login function
-    api.generateAddress(req.query, res);
+    api.generateBTCAddress(req.query, res);
 });
+
+//generate a lightning invoice
+app.get("/api/lightningaddress", (req, res) => {
+    //debug
+    //generic.test();
+    //set the headers
+    res = generic.setHeaders(res);
+    //load the api helper
+    let apihelper = require('./api/helpers/api.js').api;
+    let api = new apihelper();
+    //call the login function
+    api.generateLightningAddress(req.query, res);
+});
+
+
 //store user details called from sr.js
 app.get("/api/storeuserdetails", (req, res) => {
     //set the headers
@@ -287,6 +302,9 @@ app.get("/api/storeuserdetails", (req, res) => {
 });
 //storeproduct  called rom sr.js
 app.get("/api/storeproduct", (req, res) => {
+    //note : we are started using BTC address as the unquie identifier and now  we also have Lightning support there is an 
+    //       argument to say that we should not be usng the BTC address anymore as we have to store it even if it is never 
+    //       going to be.  We feel it is a fine trade of for to keep things simple in the database.
     //set the headers
     res = generic.setHeaders(res);
     //load the api helper

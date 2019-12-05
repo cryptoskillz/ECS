@@ -35,9 +35,9 @@ var api = function() {
         //debug
         //console.log("query")
         //console.log(req.query);
-        let data = [req.query.address];
+        let data = [req.query.btcaddress];
         //console.log(data)
-        let sql = `SELECT * FROM order_product where address = "` + req.query.address + `"`;
+        let sql = `SELECT * FROM order_product where address = "` + req.query.btcaddress + `"`;
         //debug
         db.get(sql, [], (err, result) => {
             //console.log(result)
@@ -160,7 +160,7 @@ var api = function() {
             });
         } else {
             //see if we have it already
-            let sql = `SELECT * FROM order_product where address = "` + req.query.address + `"`;
+            let sql = `SELECT * FROM order_product where address = "` + req.query.btcaddress + `"`;
             //debug
             //console.log(sql);
             db.all(sql, [], (err, rows) => {
@@ -172,7 +172,7 @@ var api = function() {
                     //insert it
                     //delete the record
                     db.run(`INSERT INTO order_product(address,name,price,quantity) VALUES(?,?,?,?)`, [
-                        req.query.address,
+                        req.query.btcaddress,
                         req.query.name,
                         req.query.price,
                         req.query.quantity
@@ -183,7 +183,7 @@ var api = function() {
                     });
                 } else {
                     //update it
-                    let data = [req.query.quantity, req.query.address];
+                    let data = [req.query.quantity, req.query.btcaddress];
                     let sql = `UPDATE order_product SET quantity = ? WHERE address = ?`;
                     db.run(sql, data, function(err) {
                         if (err) {
@@ -218,8 +218,7 @@ var api = function() {
     =============================================================================================================================
 
     */
-    this.generateAddress = function generateAddress(req, res) {
-
+    this.generateBTCAddress = function generateBTCAddress(req, res) {
         //generare BTC address
         client.getNewAddress().then(address => {
             //debug
@@ -242,6 +241,29 @@ var api = function() {
             });
             return;
         });
+    };
+    /*
+    =============================================================================================================================
+
+    This function generate a new address
+  
+    Note if Bitcoin core is slow in returning an addresss this could have an adverse impact on the functionality
+    to avoid this we could cache a number of addresses ready to use in the database.
+  
+    todo 
+
+    add passphrase back. 
+    allow nartive, Segwit or Bech32 address to be specified.
+  
+    =============================================================================================================================
+
+    */
+    this.generateLightningAddress = function generateLightningAddress(req, res) {
+        //todo : add the address generation code
+        let address = '12r3244234234234';
+        res.send(JSON.stringify({
+            address: address
+        }));
     };
     /*
     *

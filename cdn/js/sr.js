@@ -13,7 +13,9 @@ var SR = SR || (function() {
     //hold the name of the product
     var name = '';
     //hold the addres of the product
-    var address = '';
+    var btcaddress = '';
+    //hold the lightning invoice address
+    var lightningaddress = '';
     //hold the preview image
     var preview = '';
     //hold the cart type
@@ -44,9 +46,9 @@ var SR = SR || (function() {
     var serverless = 0; // 0 = no 1 = yes
     var serverlessbtcaddress = ''; // replace this with a proper one for testing or let the debugger pass it in.
     var addresstype = 0; //hold the address type 0 = BTC, 1 = LIGHTNING
-
-    var paymenttoggle = 1; //we have hard coded this for now but it should either be sent down from the server or
-                           //loaded from the init (maybe both) as this will set if we support lightnng or not.
+    //notewe have hard coded this for now but it should either be sent down from the server or
+    //loaded from the init (maybe both) as this will set if we support lightnng or not.
+    var acceptlightning = 1; //hold payment toggle state.
     /*
      *  List of countries
      *      source : https://datahub.io/core/country-list#resource-country-list_zip
@@ -810,14 +812,16 @@ var SR = SR || (function() {
      *=========================
      */
     function stopPaymentCheck() {
-        clearInterval(checkpaymentres);
+        if (checkpaymentres != null)
+            clearInterval(checkpaymentres);
     }
 
-    function checkPayment() {
+    function startPaymentCheck() {
         //debug
         //console.log('check payment ticker')
         //var url = serverurl+"/webhook/checkpayment?address="+address+"&token="+token;
-        var url = serverurl + "webhook/checkpayment?address=" + address;
+
+        var url = serverurl + "webhook/checkbtcpayment?btcaddress=" + btcaddress;
         fetchurl(url, 'checkpayment')
     }
     //this function loops through a JSON object and adds the items to a select. 
@@ -983,7 +987,7 @@ var SR = SR || (function() {
         changeClassText(document.querySelector('.sr-count'), itemcount);
         //store product
         if (serverless == 0) {
-            var url = serverurl + "api/storeproduct?name=" + name + "&quantity=" + itemcount + "&address=" + address + "&price=" + price;
+            var url = serverurl + "api/storeproduct?name=" + name + "&quantity=" + itemcount + "&btcaddress=" + btcaddress + "&price=" + price;
             //call the store produt endpoint
             fetchurl(url, 'storeproduct')
         }
@@ -997,31 +1001,43 @@ var SR = SR || (function() {
         //call it
         request.onload = function() {
             if (request.status >= 200 && request.status < 400) {
-                if (method == "getaddress") {
+                if (method == "getbtcaddress") {
                     // parse the data
                     var data = JSON.parse(request.responseText);
                     //debug
                     //console.log(data)
                     //set the address
-                    address = data.address;
+                    btcaddress = data.address;
                     //set the address in the checkout
                     var elbtcaddress = document.getElementById('sr-bitcoinaddress');
                     //set the href
-                    elbtcaddress.setAttribute('href', "bitcoin:" + address);
+                    elbtcaddress.setAttribute('href', "bitcoin:" + btcaddress);
                     //set the address
-                    elbtcaddress.innerText = address;
+                    elbtcaddress.innerText = btcaddress;
                     //do pay from wallet also
                     var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
                     //set the href
-                    elbtcaddress.setAttribute('href', "bitcoin:" + address);
+                    elbtcaddress.setAttribute('href', "bitcoin:" + btcaddress);
                     //do pay from wallet alo
                     //debug
                     //console.log(elbtcaddress)
                     //generate the qr code
                     var elbtcqr = document.getElementById('sr-bitcoinqrcode');
-                    elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + address);
+                    elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + btcaddress);
                     //debug
                     //console.log(elbtcqr)
+                }
+                if (method == "getlightningaddress")
+                {
+                     // parse the data
+                    var data = JSON.parse(request.responseText);
+                    //debug
+                    //console.log(data);
+                    lightningaddress = data.address;
+                    //todo build the liughtning invoice
+
+                    //draw the lightning view
+                    cartstate(8);
                 }
                 if (method == "storeproduct") {
                     //do stuff if you want.
@@ -1042,25 +1058,25 @@ var SR = SR || (function() {
                             //alert(carttype)
                         }
                         var url = serverurl + "api/btcaddress?uid=" + uid + "&carttype=" + carttype;
-                        fetchurl(url, 'getaddress')
+                        fetchurl(url, 'getbtcaddress')
                     } else {
-                        address = serverlessbtcaddress;
+                        btcaddress = serverlessbtcaddress;
                         //set the address in the checkout
                         var elbtcaddress = document.getElementById('sr-bitcoinaddress');
                         //set the href
-                        elbtcaddress.setAttribute('href', "bitcoin:" + address);
+                        elbtcaddress.setAttribute('href', "bitcoin:" + btcaddress);
                         //set the address
-                        elbtcaddress.innerText = address;
+                        elbtcaddress.innerText = btcaddress;
                         //do pay from wallet also
                         var elbtcaddress = document.getElementById('sr-bitcoinaddresswallet');
                         //set the href
-                        elbtcaddress.setAttribute('href', "bitcoin:" + address);
+                        elbtcaddress.setAttribute('href', "bitcoin:" + btcaddress);
                         //do pay from wallet alo
                         //debug
                         //console.log(elbtcaddress)
                         //generate the qr code
                         var elbtcqr = document.getElementById('sr-bitcoinqrcode');
-                        elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + address);
+                        elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + btcaddress);
                     }
                 }
                 if (method == "storeuserdetails") {
@@ -1106,6 +1122,7 @@ var SR = SR || (function() {
             5 = bitcoin details back click*
             6 = shipping button clicked
             7 = check payment result
+            8 = show lightning view
         */
         //alert(state);
         switch (state) {
@@ -1160,7 +1177,7 @@ var SR = SR || (function() {
                 showClass(document.getElementById('sr-back-button'));
                 hideClass(document.getElementById('sr-customerdetailswrapper'));
                 //check if we are allowing Lightning payment and enable the toggle if we are
-                if (paymenttoggle == 1)
+                if (acceptlightning == 1)
                 {
                     //show payment toggle
                     showClass(document.getElementById('sr-choosepaymenttype'));
@@ -1173,7 +1190,11 @@ var SR = SR || (function() {
                 }
                 //call the check payment
                 //note in serverless mode we will have to make it move to the payment successful page. 
-                if (serverless == 0) checkpaymentres = setInterval(checkPayment, 3000)
+                //note only check if it is a btc paymemt
+                if ((serverless == 0) && (addresstype == 0))
+                {
+                    checkpaymentres = setInterval(startPaymentCheck, 3000)
+                }
                 break;
             case 4:
                 //stop payment timer
@@ -1212,6 +1233,18 @@ var SR = SR || (function() {
                 addClass(document.querySelector('.sr-cart-container'), 'cart-open');
                 //show btc stuff                
                 showClass(document.getElementById('sr-bitcoinaddresswrapper'));
+            case 8: //lightning view
+                //debug
+                //console.log(lightningaddress);
+                //set address type to lightning
+                addresstype = 1;
+                //show lightning view
+                showClass(document.getElementById('sr-lightningwrapper'));
+                //hide the btc view
+                hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+                //stop the payment timer
+                stopPaymentCheck();
+                break;
         }
     }
     /*
@@ -1255,7 +1288,7 @@ var SR = SR || (function() {
                 }
             }
             if (serverless == 0) {
-                var url = serverurl + "api/storeuserdetails" + cartstring + "&address=" + address;
+                var url = serverurl + "api/storeuserdetails" + cartstring + "&btcaddress=" + btcaddress;
                 //console.log(url)
                 //call the store produt endpoint
                 fetchurl(url, 'storeuserdetails')
@@ -1265,7 +1298,7 @@ var SR = SR || (function() {
         });
         document.getElementById('sr-bitcoinaddresscopy').addEventListener('click', function() {
             const el = document.createElement('textarea'); // Create a <textarea> element
-            el.value = address; // Set its value to the string that you want copied
+            el.value = btcaddress; // Set its value to the string that you want copied
             el.setAttribute('readonly', ''); // Make it readonly to be tamper-proof
             el.style.position = 'absolute';
             el.style.left = '-9999px'; // Move outside the screen to make it invisible
@@ -1379,21 +1412,33 @@ var SR = SR || (function() {
         document.querySelector('.sr-paymentoggle').addEventListener('click', function() {
             //check toggle
             if (this.checked == true) {
-                //show lightning view
-                showClass(document.getElementById('sr-lightningwrapper'));
-                //hide the btc view
-                hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
-                //set address type to lightning
-                addresstype = 1;
+                //check if we have a lighning address or not 
+                if (lightningaddress != '')
+                {
+                    cartstate(8)
+
+                }
+                else
+                {
+                    var url = serverurl + "api/lightningaddress?uid=" + uid + "&carttype=" + carttype;
+                    fetchurl(url, 'getlightningaddress')
+                }
             }
             else
             {
+                //todo there should a cart state for this.  We can maybe use cartstate 3 if not this may be a good time to
+                //     refactor the rendering of the different views.  
                 //hide the lightning view
                 hideClass(document.getElementById('sr-lightningwrapper'));
                 //show the btc view
                 showClass(document.getElementById('sr-bitcoinaddresswrapper'));
                 //set address type to btc
                 addresstype = 0;
+                //start the payment checker again
+                if ((serverless == 0) && (addresstype == 0))
+                {
+                    checkpaymentres = setInterval(startPaymentCheck, 3000)
+                }
 
             }
         });
@@ -1446,6 +1491,7 @@ var SR = SR || (function() {
              5 = start country
              6 = serverless
              7 = serverless btc address
+             8 = lightning support
 
             */
             _args = Args;
@@ -1482,6 +1528,10 @@ var SR = SR || (function() {
             if (_args[7] != "") {
                 serverlessbtcaddress = _args[7]
             }
+            //set the lightning
+            if (_args[8] != "") {
+                acceptlightning = _args[8]
+            }            
             //load css
             document.head.innerHTML = document.head.innerHTML + '<link href="' + cdnurl + 'cart.css" rel="stylesheet">'
             //fetch the template so we can use themes 
