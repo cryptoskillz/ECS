@@ -245,25 +245,110 @@ var api = function() {
     /*
     =============================================================================================================================
 
-    This function generate a new address
+    This function generate a new Lightning invoice
   
-    Note if Bitcoin core is slow in returning an addresss this could have an adverse impact on the functionality
-    to avoid this we could cache a number of addresses ready to use in the database.
-  
-    todo 
-
-    add passphrase back. 
-    allow nartive, Segwit or Bech32 address to be specified.
+    Note: at present it is tied into cyphernode, at a point in the future we will decouple it and make it plaform agnostic
   
     =============================================================================================================================
 
     */
     this.generateLightningAddress = function generateLightningAddress(req, res) {
-        //todo : add the address generation code
-        let address = '12r3244234234234';
-        res.send(JSON.stringify({
-            address: address
-        }));
+        //todo : replace this with its own lightning class and/or cryphrnode sdk
+        let address = '';
+        const request = require('request');
+        //load crytpo js
+        const cryptojs = require("crypto-js");
+        //set an expiry time for the tokens.  Not this should be much lower in production, like 100 seconds but for testing it is fine.
+        //note maybe this should be an env var
+        var expiryInSeconds = 36000;
+        //get our API key from the env variables
+        var api_key = process.env.CYPHERNODE_API_KEY
+        var cyphernodeurl = process.env.CYPHER_GATEWAY_URL
+        //create a bearer token
+        //build the data
+        //set an this the id of the key you want to use which can be found in cyphernode/gatekeeper/keys.properties 
+        id = "003";
+        //set the expiry time to a point in the future
+        exp = Math.round(new Date().getTime() / 1000) + expiryInSeconds;
+        //set the algo type we are going to use and base 64 it
+        h64 = Buffer.from(JSON.stringify({
+            alg: "HS256",
+            typ: "JWT"
+        })).toString("base64");
+        //set the payload and set it to h64
+        p64 = Buffer.from(JSON.stringify({
+            id: id,
+            exp: exp
+        })).toString("base64");
+        //join them together
+        msg = h64 + "." + p64;
+        //get a sha256 has or the h64,p64 and the API key (which is the secret in JWT world)
+        const hash = cryptojs.HmacSHA256(msg, api_key);
+        //create the JWT token
+        const token = h64 + "." + p64 + "." + hash
+        //debug
+        //output it 
+        //console.log("token - " + token);
+        /*
+        ===========================
+        END OF JWT TOKEN CREATION
+        ===========================
+        */
+        /*
+        ====================================
+        START OF REQUEST TO CYPHERNODE PROXY 
+        ====================================
+        */
+        //set the menthod we want to call
+        const method = "ln_create_invoice";
+        //set the body we want to send, this is not required for every method call but it does no harm to send it
+        //note : is label optional?
+        //note: what does bolt11 stand for?
+        //todo: pass up satoshi amount, label, and description.
+        //todo: set the expiry in a process env.
+        const body = '{"msatoshi":10000,"label":"sskossNCcrSvdsdshX3dmyddFhWw","description":"Bylls order #10649","expiry":900}';
+        //create the Bearer header
+        const authheaader = "Bearer " + token;
+        //use resuest
+        //create the options object
+        //note : does CYPHER_GATEWAY_URL have to be different from RPC host?
+        /*
+        request.defaults({
+            strictSSL: false, // allow us to use our self-signed cert for testing
+            rejectUnauthorized: false
+        });
+        */
+        const options = {
+            url: cyphernodeurl + method,
+            headers: {
+                'Authorization': authheaader
+            },
+            body: body
+        };
+        //create the call back
+        function callback(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                const info = JSON.parse(body);
+                //debug
+                //console.log(info.bolt11);
+                address = info.bolt11
+                //make the calls
+                //request.post(options, callback);
+                res.send(JSON.stringify({
+                    address: address
+                }));
+            } else {
+                //console.log(error);
+                //you done messed up boi
+                //note there can be many reasons for this to fail, we may trap them later for now we do not care a blank address
+                //     means it failed and we can work with that for now
+                res.send(JSON.stringify({
+                    address: ""
+                }));
+            }
+        }
+        //make the calls
+        request.post(options, callback);
     };
     /*
     *

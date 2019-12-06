@@ -1034,6 +1034,25 @@ var SR = SR || (function() {
                     //debug
                     //console.log(data);
                     lightningaddress = data.address;
+                    //set the address in the checkout
+                    var eladdress = document.getElementById('sr-lightningaddress');
+                    //set the href (*todo)
+                    eladdress.setAttribute('href', "lightning:" + lightningaddress);
+                    //set the address
+                    eladdress.innerText = lightningaddress;
+                    //do pay from wallet also
+                    var eladdress = document.getElementById('sr-lightningaddresswallet');
+                    //set the href
+                    eladdress.setAttribute('href', "lightning:" + lightningaddress);
+                    //do pay from wallet alo
+                    //debug
+                    //console.log(elbtcaddress)
+                    //generate the qr code
+                    //var elbtcqr = document.getElementById('sr-bitcoinqrcode');
+                    //elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + btcaddress);
+                    //debug
+                    //console.log(elbtcqr)
+                    
                     //todo build the liughtning invoice
 
                     //draw the lightning view
