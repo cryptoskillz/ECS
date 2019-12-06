@@ -307,7 +307,7 @@ var api = function() {
         START OF REQUEST TO CYPHERNODE PROXY 
         ====================================
         */
-        //set the menthod we want to call
+        //set the method we want to call in this case create invoice
         const method = "ln_create_invoice";
         //create a unique label 
         let u = '',
@@ -322,13 +322,12 @@ var api = function() {
         //console.log(u)
         //set the body we want to send, this is not required for every method call but it does no harm to send it
         //note: what does bolt11 stand for?
-        //todo: pass up description from sr.js?
-        //todo: set the expiry in a process env.
         //note: the any for msatoshi is not working as excetped, will have to look into that. 
         //note: removed the optional expiry field, we may decied to put this back later.`
-        const body = '{"msatoshi":'+amount+',"label":"' + u + '","description":"order #111"}';
+        //note: we use the BTC address as the order description after all it is as unquie as we are going to get
+        const body = '{"msatoshi":' + amount + ',"label":"' + u + '","description":"order #' + btcaddress + '"}';
         //debug
-        console.log(body);
+        //console.log(body);
         //create the Bearer header
         const authheaader = "Bearer " + token;
         //use resuest
@@ -359,7 +358,7 @@ var api = function() {
                 //note: we may to store all the invloic information table if so we can create a new table for this. 
                 lightningaddress = info.bolt11;
                 //debug
-                console.log(info.bolt11);
+                //console.log(info.bolt11);
                 //note: for this to work in this manner we are always using the BTC address as the join this means we would 
                 //      not be able to offer a lightning only vrsion of the cart.  At this moment in time it is fine as we do 
                 //      not have the UX etc to handle the cart in this way.  If we want to add this in the future then it would
