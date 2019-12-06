@@ -253,8 +253,16 @@ var api = function() {
 
     */
     this.generateLightningAddress = function generateLightningAddress(req, res) {
+        //debug
+        //console.log(req)
         //todo : replace this with its own lightning class and/or cryphrnode sdk
-        let address = '';
+        let lightningaddress = '';
+        //hold the btc address
+        let btcaddress = req.btcaddress;
+        //hold the amount
+        let amount = req.amount;
+        //turn it into a sat amount
+        amount = amount / 0.00000001;
         const request = require('request');
         //load crytpo js
         const cryptojs = require("crypto-js");
@@ -301,12 +309,26 @@ var api = function() {
         */
         //set the menthod we want to call
         const method = "ln_create_invoice";
+        //create a unique label 
+        let u = '',
+            i = 0;
+        while (i++ < 36) {
+            var c = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx' [i - 1],
+                r = Math.random() * 16 | 0,
+                v = c == 'x' ? r : (r & 0x3 | 0x8);
+            u += (c == '-' || c == '4') ? c : v.toString(16)
+        }
+        //debug
+        //console.log(u)
         //set the body we want to send, this is not required for every method call but it does no harm to send it
-        //note : is label optional?
         //note: what does bolt11 stand for?
-        //todo: pass up satoshi amount, label, and description.
+        //todo: pass up description from sr.js?
         //todo: set the expiry in a process env.
-        const body = '{"msatoshi":10000,"label":"sskossNCcrSvdsdshX3dmyddFhWw","description":"Bylls order #10649","expiry":900}';
+        //note: the any for msatoshi is not working as excetped, will have to look into that. 
+        //note: removed the optional expiry field, we may decied to put this back later.`
+        const body = '{"msatoshi":'+amount+',"label":"' + u + '","description":"order #111"}';
+        //debug
+        console.log(body);
         //create the Bearer header
         const authheaader = "Bearer " + token;
         //use resuest
@@ -327,16 +349,37 @@ var api = function() {
         };
         //create the call back
         function callback(error, response, body) {
+            //debug 
+            //console.log(btcaddress)
+            //console.log(body);
             if (!error && response.statusCode == 200) {
+                //parse the response
                 const info = JSON.parse(body);
+                //get the address
+                //note: we may to store all the invloic information table if so we can create a new table for this. 
+                lightningaddress = info.bolt11;
                 //debug
-                //console.log(info.bolt11);
-                address = info.bolt11
-                //make the calls
-                //request.post(options, callback);
-                res.send(JSON.stringify({
-                    address: address
-                }));
+                console.log(info.bolt11);
+                //note: for this to work in this manner we are always using the BTC address as the join this means we would 
+                //      not be able to offer a lightning only vrsion of the cart.  At this moment in time it is fine as we do 
+                //      not have the UX etc to handle the cart in this way.  If we want to add this in the future then it would
+                //      require us to refactor slightly and maybe use a uniqie ID as the join and have rename address field to
+                //      BTCaddress
+                let data = [lightningaddress, btcaddress];
+                //build the query
+                let sql = `UPDATE sessions
+                  SET lightningaddress = ?
+                  WHERE address = ?`;
+                //run the query
+                db.run(sql, data, function(err) {
+                    if (err) {
+                        return console.error(err.message);
+                    }
+                    //retun response
+                    res.send(JSON.stringify({
+                        address: lightningaddress
+                    }));
+                });
             } else {
                 //console.log(error);
                 //you done messed up boi

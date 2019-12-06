@@ -1034,6 +1034,7 @@ var SR = SR || (function() {
                     //debug
                     //console.log(data);
                     lightningaddress = data.address;
+                    console.log(lightningaddress);
                     //set the address in the checkout
                     var eladdress = document.getElementById('sr-lightningaddress');
                     //set the href (*todo)
@@ -1439,8 +1440,14 @@ var SR = SR || (function() {
                 }
                 else
                 {
-                    var url = serverurl + "api/lightningaddress?uid=" + uid + "&carttype=" + carttype;
-                    fetchurl(url, 'getlightningaddress')
+                    //var url = serverurl + "api/lightningaddress?uid=" + uid + "&carttype=" + carttype;
+                    //fetchurl(url, 'getlightningaddress'
+                    //note: as there is going to be a delay with the toggle to get the lightning address we should disable the toggle 
+                    //      button until it has been fetched. 
+                    //Stop the payment check timer here as it may take more than a tick to complete
+                    stopPaymentCheck();
+                    var url = serverurl + "api/lightningaddress?uid=" + uid + "&carttype=" + carttype+'&btcaddress='+btcaddress+'&amount='+producttotal;
+                    fetchurl(url, 'getlightningaddress');
                 }
             }
             else
