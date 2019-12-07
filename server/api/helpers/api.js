@@ -1,9 +1,8 @@
 /*
   todo: *more details in the section where this todo is required
-  Cache pay to adddress so it will work with no Bitcoin Core
   Check that bticoin is running and not frozen before calling it
   Finish email temaplates.  Note complitaing removing these complelty out of the database.
-
+  move generate address anf lightning address into an init function that can be called at the start.
 
 */
 const config = require("./config");

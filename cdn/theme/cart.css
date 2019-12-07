@@ -259,7 +259,7 @@ Main Components
   z-index: 2;
   width: 90%;
   max-width: 440px;
-  height: 400px;
+  height: 450px;
   max-height: 90%;
   pointer-events: none;
 }
@@ -616,10 +616,10 @@ Main Components
     letter-spacing: .1em
 }
 
-#sr-bitcoinaddresswrapper  {
+.sr-addresswrapper  {
   text-align: center;
 }
-#sr-bitcoinaddresswrapper img {
+.sr-addresswrapper img {
   width: 45%;
 }
 
@@ -631,14 +631,31 @@ Main Components
 }
 
 
-.sr-bitcoinoptions a {
-  display: block;
-  margin-bottom: 10px;
+.sr-addressoptions a {
+  /*display: block;*/
+  margin-bottom: 5px;
+  font-size:12px;
+}
+
+.sr-addresstotal {
+  font-size:17px;
 }
 
 .sr-bitcoinaddress {
-  border-bottom: 1px dashed gray;
+  /*border-bottom: 1px dashed gray;*/
   cursor: pointer;
+  word-wrap: break-word;
+  width:90%;
+  font-size:12px;
+}
+
+.sr-lightningaddress {
+  /*border-bottom: 1px dashed gray; <--- fix this to underline the whole thing*/
+  cursor: pointer;
+  word-wrap: break-word;
+  width:90%;
+  font-size:12px;
+
 }
 
 .sr-bitcoinoptions {

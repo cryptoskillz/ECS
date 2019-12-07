@@ -1045,12 +1045,11 @@ var SR = SR || (function() {
                     var eladdress = document.getElementById('sr-lightningaddresswallet');
                     //set the href
                     eladdress.setAttribute('href', "lightning:" + lightningaddress);
-                    //do pay from wallet alo
                     //debug
                     //console.log(elbtcaddress)
                     //generate the qr code
-                    //var elbtcqr = document.getElementById('sr-bitcoinqrcode');
-                    //elbtcqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + btcaddress);
+                    var elqr = document.getElementById('sr-lightningqrcode');
+                    elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=" + lightningaddress);
                     //debug
                     //console.log(elbtcqr)
                     
@@ -1160,6 +1159,10 @@ var SR = SR || (function() {
                 showClass(document.getElementById('sr-checkout'));
                 //hide btc stuff
                 hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
+                //hide lightning view
+                hideClass(document.getElementById('sr-lightningwrapper'));
+                //hide the payment toggle, not necessary but may clear up some odd ux flows and costs us nothing. 
+                hideClass(document.getElementById('sr-choosepaymenttype'));
                 //hide the customer details
                 hideClass(document.getElementById('sr-customerdetailswrapper'));
                 //hide back button
@@ -1168,6 +1171,7 @@ var SR = SR || (function() {
                 addClass(document.querySelector('.sr-cart-container'), 'cart-open');
                 //show the product details
                 showClass(document.getElementById('sr-cartlistitems'));
+
                 break;
             case 2:
                 //show the pay button
@@ -1186,7 +1190,10 @@ var SR = SR || (function() {
                 break;
             case 3: //btc address cart mode 0
                 //set the amount to pay in the btc address screen
-                changeClassText(document.getElementById('sr-btctotal'), producttotal + ' BTC');
+                //note we are updating the BTC and Lightning totals here we will have to refactor this code is we ever
+                //     have a lightning only version of the cart (as stated elsewhere in the notes)
+                changeClassText(document.getElementById('sr-lightningtotal'), producttotal + ' BTC');
+                changeClassText(document.getElementById('sr-bitcointotal'), producttotal + ' BTC');
                 //hide the pay button
                 hideClass(document.getElementById('sr-pay'));
                 //hide the product details
@@ -1316,6 +1323,8 @@ var SR = SR || (function() {
                 cartstate(3)
             }
         });
+
+        //todo : these can be refactoed into one generic copy function
         document.getElementById('sr-bitcoinaddresscopy').addEventListener('click', function() {
             const el = document.createElement('textarea'); // Create a <textarea> element
             el.value = btcaddress; // Set its value to the string that you want copied
@@ -1327,6 +1336,20 @@ var SR = SR || (function() {
             document.execCommand('copy'); // Copy - only works as a result of a user action (e.g. click events)
             document.body.removeChild(el);
         });
+
+        document.getElementById('sr-lightningaddresscopy').addEventListener('click', function() {
+            const el = document.createElement('textarea'); // Create a <textarea> element
+            el.value = lightningaddress; // Set its value to the string that you want copied
+            el.setAttribute('readonly', ''); // Make it readonly to be tamper-proof
+            el.style.position = 'absolute';
+            el.style.left = '-9999px'; // Move outside the screen to make it invisible
+            document.body.appendChild(el);
+            el.select(); // Select the <textarea> content
+            document.execCommand('copy'); // Copy - only works as a result of a user action (e.g. click events)
+            document.body.removeChild(el);
+        });
+
+
         //add to cart click element
         document.querySelector('.sr-checkout').addEventListener('click', function() {
             cartstate(2);

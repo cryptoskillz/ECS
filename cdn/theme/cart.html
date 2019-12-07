@@ -94,12 +94,14 @@
                     </label>
                 </div>
                 <!-- this element holds the payment details -->
-                <div id="sr-lightningwrapper" style="display:none">
+                <div id="sr-lightningwrapper" class="sr-addresswrapper" style="display:none">
+                    <div id="sr-lightningtotal" class="sr-addresstotal"></div>
+                    <img id="sr-lightningqrcode" src=""/>
                     <div>
                         <a class="sr-lightningaddress" href="" id="sr-lightningaddress">
                         </a>
                     </div>
-                    <div class="sr-lightningoptions">
+                    <div class="sr-addressoptions">
                         <a class="sr-lightningaddresscopy" href="#" id="sr-lightningaddresscopy">
                             <i class="fa fa-copy">
                             </i>
@@ -111,16 +113,16 @@
                             Pay from wallet
                         </a>
                     </div>
-                    <div id="sr-lightningtotal">
-                    </div>
-                    <img id="sr-lightningqrcode" src=""/>
+                    
                 </div>
-                <div id="sr-bitcoinaddresswrapper">
+                <div id="sr-bitcoinaddresswrapper" class="sr-addresswrapper">
+                    <div id="sr-bitcointotal" class="sr-addresstotal"></div>
+                    <img id="sr-bitcoinqrcode" src=""/>
                     <div>
                         <a class="sr-bitcoinaddress" href="" id="sr-bitcoinaddress">
                         </a>
                     </div>
-                    <div class="sr-bitcoinoptions">
+                    <div class="sr-addressoptions">
                         <a class="sr-bitcoinaddresscopy" href="#" id="sr-bitcoinaddresscopy">
                             <i class="fa fa-copy">
                             </i>
@@ -132,9 +134,7 @@
                             Pay from wallet
                         </a>
                     </div>
-                    <div id="sr-btctotal">
-                    </div>
-                    <img id="sr-bitcoinqrcode" src=""/>
+
                 </div>
                 <!-- this element holds the paid confirmation screen -->
                 <div class="sr-paid " id="sr-paid">
