@@ -118,6 +118,18 @@ app.get("/webhook/checkbtcpayment", (req, res) => {
     //check for payment
     webhook.checkBTCPayment(req.query.token, req.query.btcaddress, res);
 });
+
+app.get("/webhook/checklightningpayment", (req, res) => {
+    //set the headers
+    res = generic.setHeaders(res);
+    //load the webhook helper helper
+    let webhookhelper = require('./api/helpers/webhook.js').webhook;
+    let webhook = new webhookhelper();
+    //check for payment
+    webhook.checkLightningPaymemt(req.query.lightninglabel, res);
+});
+
+
 /*
 ========================
 END OF WEBHOOK FUNCTION

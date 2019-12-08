@@ -16,6 +16,8 @@ var SR = SR || (function() {
     var btcaddress = '';
     //hold the lightning invoice address
     var lightningaddress = '';
+    //hold the lighning label
+    var lightninglabel = '';
     //hold the preview image
     var preview = '';
     //hold the cart type
@@ -818,11 +820,18 @@ var SR = SR || (function() {
 
     function startPaymentCheck() {
         //debug
-        //console.log('check payment ticker')
-        //var url = serverurl+"/webhook/checkpayment?address="+address+"&token="+token;
-
-        var url = serverurl + "webhook/checkbtcpayment?btcaddress=" + btcaddress;
-        fetchurl(url, 'checkpayment')
+        console.log('check payment ticker:'+addresstype)
+        if (addresstype == 0)
+        {
+            var url = serverurl + "webhook/checkbtcpayment?btcaddress=" + btcaddress;
+            fetchurl(url, 'checkpayment')
+        }
+        if (addresstype == 1)
+        {
+            //lighting
+            var url = serverurl + "webhook/checklightningpayment/?lightninglabel="+lightninglabel
+            fetchurl(url, 'checkpayment')           
+        }
     }
     //this function loops through a JSON object and adds the items to a select. 
     //note: It makes the assumpation that you pass it a json object with a Name and Code key value pair, anything else will break
@@ -1034,7 +1043,11 @@ var SR = SR || (function() {
                     //debug
                     //console.log(data);
                     lightningaddress = data.address;
-                    console.log(lightningaddress);
+                    lightninglabel = data.label;
+                    //debug
+                    //console.log(lightninglabel);
+                    //console.log(lightningaddress);
+
                     //set the address in the checkout
                     var eladdress = document.getElementById('sr-lightningaddress');
                     //set the href (*todo)
@@ -1217,8 +1230,7 @@ var SR = SR || (function() {
                 }
                 //call the check payment
                 //note in serverless mode we will have to make it move to the payment successful page. 
-                //note only check if it is a btc paymemt
-                if ((serverless == 0) && (addresstype == 0))
+                if (serverless == 0)
                 {
                     checkpaymentres = setInterval(startPaymentCheck, 3000)
                 }
@@ -1230,6 +1242,10 @@ var SR = SR || (function() {
                 hideClass(document.getElementById('sr-back-button'));
                 //hide payment details
                 hideClass(document.getElementById('sr-bitcoinaddresswrapper'))
+                //hide lightning view
+                hideClass(document.getElementById('sr-lightningwrapper'));
+                //hide the payment toggle, not necessary but may clear up some odd ux flows and costs us nothing. 
+                hideClass(document.getElementById('sr-choosepaymenttype'));
                 //show paid screeb
                 showClass(document.getElementById('sr-paid'));
                 break;
@@ -1269,8 +1285,12 @@ var SR = SR || (function() {
                 showClass(document.getElementById('sr-lightningwrapper'));
                 //hide the btc view
                 hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
-                //stop the payment timer
-                stopPaymentCheck();
+                //start the payment checker again
+                if (serverless == 0)
+                {
+                    checkpaymentres = setInterval(startPaymentCheck, 3000)
+                }
+
                 break;
         }
     }
@@ -1484,7 +1504,7 @@ var SR = SR || (function() {
                 //set address type to btc
                 addresstype = 0;
                 //start the payment checker again
-                if ((serverless == 0) && (addresstype == 0))
+                if (serverless == 0)
                 {
                     checkpaymentres = setInterval(startPaymentCheck, 3000)
                 }

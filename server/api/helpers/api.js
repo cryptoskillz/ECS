@@ -241,6 +241,10 @@ var api = function() {
             return;
         });
     };
+
+
+
+
     /*
     =============================================================================================================================
 
@@ -363,10 +367,11 @@ var api = function() {
                 //      not have the UX etc to handle the cart in this way.  If we want to add this in the future then it would
                 //      require us to refactor slightly and maybe use a uniqie ID as the join and have rename address field to
                 //      BTCaddress
-                let data = [lightningaddress, btcaddress];
+                let data = [lightningaddress,u, btcaddress];
                 //build the query
                 let sql = `UPDATE sessions
-                  SET lightningaddress = ?
+                  SET lightningaddress = ?,
+                  lightninglabel = ?
                   WHERE address = ?`;
                 //run the query
                 db.run(sql, data, function(err) {
@@ -375,7 +380,8 @@ var api = function() {
                     }
                     //retun response
                     res.send(JSON.stringify({
-                        address: lightningaddress
+                        address: lightningaddress,
+                        label:u
                     }));
                 });
             } else {
