@@ -50,7 +50,7 @@ var SR = SR || (function() {
     var addresstype = 0; //hold the address type 0 = BTC, 1 = LIGHTNING
     //notewe have hard coded this for now but it should either be sent down from the server or
     //loaded from the init (maybe both) as this will set if we support lightnng or not.
-    var acceptlightning = 1; //hold payment toggle state.
+    var acceptlightning = 0; //hold payment toggle state.
     /*
      *  List of countries
      *      source : https://datahub.io/core/country-list#resource-country-list_zip
@@ -814,23 +814,20 @@ var SR = SR || (function() {
      *=========================
      */
     function stopPaymentCheck() {
-        if (checkpaymentres != null)
-            clearInterval(checkpaymentres);
+        if (checkpaymentres != null) clearInterval(checkpaymentres);
     }
 
     function startPaymentCheck() {
         //debug
-        console.log('check payment ticker:'+addresstype)
-        if (addresstype == 0)
-        {
+        console.log('check payment ticker:' + addresstype)
+        if (addresstype == 0) {
             var url = serverurl + "webhook/checkbtcpayment?btcaddress=" + btcaddress;
             fetchurl(url, 'checkpayment')
         }
-        if (addresstype == 1)
-        {
+        if (addresstype == 1) {
             //lighting
-            var url = serverurl + "webhook/checklightningpayment/?lightninglabel="+lightninglabel
-            fetchurl(url, 'checkpayment')           
+            var url = serverurl + "webhook/checklightningpayment/?lightninglabel=" + lightninglabel
+            fetchurl(url, 'checkpayment')
         }
     }
     //this function loops through a JSON object and adds the items to a select. 
@@ -985,12 +982,28 @@ var SR = SR || (function() {
             elements[i].style.display = "";
         }
     }
+
+    function checkLightning() {
+        //check if we are allowing Lightning payment and enable the toggle if we are
+        if (acceptlightning == 1) {
+            //show payment toggle
+            showClass(document.getElementById('sr-choosepaymenttype'));
+        } else {
+            //hide the payment toggle, not necessary but may clear up some odd ux flows and costs us nothing. 
+            hideClass(document.getElementById('sr-choosepaymenttype'));
+        }
+    }
     //this functions updates the totals for the cart
     function carttotal() {
         //multipily the price by the number of items in the cart
         producttotal = price * itemcount;
         //set it to 8 decimal places as it's Bitcoin
         producttotal = parseFloat(producttotal).toFixed(8);
+        //set the amount to pay in the btc address screen
+        //note we are updating the BTC and Lightning totals here we will have to refactor this code is we ever
+        //     have a lightning only version of the cart (as stated elsewhere in the notes)
+        changeClassText(document.getElementById('sr-lightningtotal'), producttotal + ' BTC');
+        changeClassText(document.getElementById('sr-bitcointotal'), producttotal + ' BTC');
         changeClassText(document.getElementById('sr-checkouttotal'), producttotal);
         //update counter
         changeClassText(document.querySelector('.sr-count'), itemcount);
@@ -1036,9 +1049,8 @@ var SR = SR || (function() {
                     //debug
                     //console.log(elbtcqr)
                 }
-                if (method == "getlightningaddress")
-                {
-                     // parse the data
+                if (method == "getlightningaddress") {
+                    // parse the data
                     var data = JSON.parse(request.responseText);
                     //debug
                     //console.log(data);
@@ -1047,7 +1059,6 @@ var SR = SR || (function() {
                     //debug
                     //console.log(lightninglabel);
                     //console.log(lightningaddress);
-
                     //set the address in the checkout
                     var eladdress = document.getElementById('sr-lightningaddress');
                     //set the href (*todo)
@@ -1065,9 +1076,7 @@ var SR = SR || (function() {
                     elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=" + lightningaddress);
                     //debug
                     //console.log(elbtcqr)
-                    
                     //todo build the liughtning invoice
-
                     //draw the lightning view
                     cartstate(8);
                 }
@@ -1156,7 +1165,6 @@ var SR = SR || (function() {
             7 = check payment result
             8 = show lightning view
         */
-        //alert(state);
         switch (state) {
             case 1:
                 stopPaymentCheck()
@@ -1184,7 +1192,6 @@ var SR = SR || (function() {
                 addClass(document.querySelector('.sr-cart-container'), 'cart-open');
                 //show the product details
                 showClass(document.getElementById('sr-cartlistitems'));
-
                 break;
             case 2:
                 //show the pay button
@@ -1203,10 +1210,6 @@ var SR = SR || (function() {
                 break;
             case 3: //btc address cart mode 0
                 //set the amount to pay in the btc address screen
-                //note we are updating the BTC and Lightning totals here we will have to refactor this code is we ever
-                //     have a lightning only version of the cart (as stated elsewhere in the notes)
-                changeClassText(document.getElementById('sr-lightningtotal'), producttotal + ' BTC');
-                changeClassText(document.getElementById('sr-bitcointotal'), producttotal + ' BTC');
                 //hide the pay button
                 hideClass(document.getElementById('sr-pay'));
                 //hide the product details
@@ -1216,22 +1219,10 @@ var SR = SR || (function() {
                 //hide the customer details                             
                 showClass(document.getElementById('sr-back-button'));
                 hideClass(document.getElementById('sr-customerdetailswrapper'));
-                //check if we are allowing Lightning payment and enable the toggle if we are
-                if (acceptlightning == 1)
-                {
-                    //show payment toggle
-                    showClass(document.getElementById('sr-choosepaymenttype'));
-                }
-                else
-                {
-                    //hide the payment toggle, not necessary but may clear up some odd ux flows and costs us nothing. 
-                    hideClass(document.getElementById('sr-choosepaymenttype'));
-
-                }
+                checkLightning();
                 //call the check payment
                 //note in serverless mode we will have to make it move to the payment successful page. 
-                if (serverless == 0)
-                {
+                if (serverless == 0) {
                     checkpaymentres = setInterval(startPaymentCheck, 3000)
                 }
                 break;
@@ -1252,12 +1243,11 @@ var SR = SR || (function() {
             case 5: //donaton mode (cart mode 2)
                 //get the total no product so this is just the amount in the sr button
                 carttotal();
+                checkLightning();
                 //sto the payment checker
                 stopPaymentCheck();
                 //hide the pay button
                 hideClass(document.getElementById('sr-pay'));
-                //set the amount to pay in the btc address screen
-                changeClassText(document.getElementById('sr-btctotal'), producttotal + ' BTC');
                 //hide the paid view
                 hideClass(document.getElementById('sr-paid'));
                 //hide the shiping view
@@ -1272,10 +1262,13 @@ var SR = SR || (function() {
                 hideClass(document.getElementById('sr-cartlistitems'));
                 //hide the check out button
                 hideClass(document.getElementById('sr-checkout'));
-                //open it
-                addClass(document.querySelector('.sr-cart-container'), 'cart-open');
                 //show btc stuff                
                 showClass(document.getElementById('sr-bitcoinaddresswrapper'));
+                //hide lightning view
+                hideClass(document.getElementById('sr-lightningwrapper'));
+                //open it
+                addClass(document.querySelector('.sr-cart-container'), 'cart-open');
+                break;
             case 8: //lightning view
                 //debug
                 //console.log(lightningaddress);
@@ -1286,11 +1279,9 @@ var SR = SR || (function() {
                 //hide the btc view
                 hideClass(document.getElementById('sr-bitcoinaddresswrapper'));
                 //start the payment checker again
-                if (serverless == 0)
-                {
+                if (serverless == 0) {
                     checkpaymentres = setInterval(startPaymentCheck, 3000)
                 }
-
                 break;
         }
     }
@@ -1343,7 +1334,6 @@ var SR = SR || (function() {
                 cartstate(3)
             }
         });
-
         //todo : these can be refactoed into one generic copy function
         document.getElementById('sr-bitcoinaddresscopy').addEventListener('click', function() {
             const el = document.createElement('textarea'); // Create a <textarea> element
@@ -1356,7 +1346,6 @@ var SR = SR || (function() {
             document.execCommand('copy'); // Copy - only works as a result of a user action (e.g. click events)
             document.body.removeChild(el);
         });
-
         document.getElementById('sr-lightningaddresscopy').addEventListener('click', function() {
             const el = document.createElement('textarea'); // Create a <textarea> element
             el.value = lightningaddress; // Set its value to the string that you want copied
@@ -1368,8 +1357,6 @@ var SR = SR || (function() {
             document.execCommand('copy'); // Copy - only works as a result of a user action (e.g. click events)
             document.body.removeChild(el);
         });
-
-
         //add to cart click element
         document.querySelector('.sr-checkout').addEventListener('click', function() {
             cartstate(2);
@@ -1476,25 +1463,19 @@ var SR = SR || (function() {
             //check toggle
             if (this.checked == true) {
                 //check if we have a lighning address or not 
-                if (lightningaddress != '')
-                {
+                if (lightningaddress != '') {
                     cartstate(8)
-
-                }
-                else
-                {
+                } else {
                     //var url = serverurl + "api/lightningaddress?uid=" + uid + "&carttype=" + carttype;
                     //fetchurl(url, 'getlightningaddress'
                     //note: as there is going to be a delay with the toggle to get the lightning address we should disable the toggle 
                     //      button until it has been fetched. 
                     //Stop the payment check timer here as it may take more than a tick to complete
                     stopPaymentCheck();
-                    var url = serverurl + "api/lightningaddress?uid=" + uid + "&carttype=" + carttype+'&btcaddress='+btcaddress+'&amount='+producttotal;
+                    var url = serverurl + "api/lightningaddress?uid=" + uid + "&carttype=" + carttype + '&btcaddress=' + btcaddress + '&amount=' + producttotal;
                     fetchurl(url, 'getlightningaddress');
                 }
-            }
-            else
-            {
+            } else {
                 //todo there should a cart state for this.  We can maybe use cartstate 3 if not this may be a good time to
                 //     refactor the rendering of the different views.  
                 //hide the lightning view
@@ -1504,11 +1485,9 @@ var SR = SR || (function() {
                 //set address type to btc
                 addresstype = 0;
                 //start the payment checker again
-                if (serverless == 0)
-                {
+                if (serverless == 0) {
                     checkpaymentres = setInterval(startPaymentCheck, 3000)
                 }
-
             }
         });
         /*
@@ -1598,9 +1577,10 @@ var SR = SR || (function() {
                 serverlessbtcaddress = _args[7]
             }
             //set the lightning
-            if (_args[8] != "") {
+            //note: it is the last paramter so it does not have to be set so we can check for undefined.
+            if (_args[8] != undefined) {
                 acceptlightning = _args[8]
-            }            
+            }
             //load css
             document.head.innerHTML = document.head.innerHTML + '<link href="' + cdnurl + 'cart.css" rel="stylesheet">'
             //fetch the template so we can use themes 

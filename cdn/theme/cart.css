@@ -616,10 +616,10 @@ Main Components
     letter-spacing: .1em
 }
 
-.sr-addresswrapper  {
+.sr-qrcodewrapper  {
   text-align: center;
 }
-.sr-addresswrapper img {
+.sr-qrcodewrapper img {
   width: 45%;
 }
 
