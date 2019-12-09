@@ -1073,7 +1073,7 @@ var SR = SR || (function() {
                     //console.log(elbtcaddress)
                     //generate the qr code
                     var elqr = document.getElementById('sr-lightningqrcode');
-                    elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=" + lightningaddress);
+                    elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + lightningaddress);
                     //debug
                     //console.log(elbtcqr)
                     //todo build the liughtning invoice
