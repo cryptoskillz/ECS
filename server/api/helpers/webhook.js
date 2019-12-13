@@ -29,6 +29,8 @@ var webhook = function() {
     it checks the invoice using the label. 
 
     todo: refactot the jwt code etc as it is now being used in 2 places
+
+    todo: send out confirmation emails
   
   
     =============================================================================================================================
@@ -103,21 +105,27 @@ var webhook = function() {
                 const info = JSON.parse(body);
                 let invoices = info.invoices;
                 //debug
-                //console.log(invoices[0].status);
-                if (invoices[0].status == "paid") {
-                    let data = [1, 1, lightninglabel];
-                    //build the query
-                    let sql = `UPDATE sessions SET processed = ? ,addresstype = ? WHERE lightninglabel = ? `;
-                    //run the query
-                    db.run(sql, data, function(err) {
-                        if (err) {
-                            return console.error(err.message);
-                        }
-                        //retun response
+                //console.log(invoices);
+                if (invoices.length > 0) {
+                    if (invoices[0].status == "paid") {
+                        let data = [1, 1, lightninglabel];
+                        //build the query
+                        let sql = `UPDATE sessions SET processed = ? ,addresstype = ? WHERE lightninglabel = ? `;
+                        //run the query
+                        db.run(sql, data, function(err) {
+                            if (err) {
+                                return console.error(err.message);
+                            }
+                            //retun response
+                            res.send(JSON.stringify({
+                                status: 1
+                            }));
+                        });
+                    } else {
                         res.send(JSON.stringify({
-                            status: 1
+                            status: 0
                         }));
-                    });
+                    }
                 } else {
                     res.send(JSON.stringify({
                         status: 0

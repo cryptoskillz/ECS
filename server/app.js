@@ -72,6 +72,8 @@ if (process.env.LIGHTNING == 1) {
     check for funded channels
     check for address to fund channel
 
+    may never do this :]
+
     */
 }
 /*

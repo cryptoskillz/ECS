@@ -14,10 +14,14 @@ let db = new sqlite3.Database("./db/db.db", err => {
         console.error(err.message);
     }
 });
-var dockerCLI = require('docker-cli-js');
-var DockerOptions = dockerCLI.Options;
-var Docker = dockerCLI.Docker;
-var docker = new Docker()
+
+let bitcoinunits = require('bitcoin-units');
+
+
+//var dockerCLI = require('docker-cli-js');
+//var DockerOptions = dockerCLI.Options;
+//var Docker = dockerCLI.Docker;
+//var docker = new Docker()
 //load the generic functions
 //note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that.
 var generichelper = require("./generic.js").Generic;
@@ -263,8 +267,17 @@ var api = function() {
         //hold the btc address
         let btcaddress = req.btcaddress;
         //hold the amount
-        let amount = req.amount;
+        let amount = parseInt(req.amount);
+                console.log(amount);
+
+amount = bitcoinunits(parseInt(amount), 'satoshi').to('BTC').value()
+
+
+        
         //turn it into a sat amount
+        console.log(amount);
+        //amount = sb.toSatoshi(amount);
+        //console.log(amount)
         amount = amount / 0.00000001;
         const request = require('request');
         //load crytpo js
@@ -561,7 +574,7 @@ var api = function() {
                                                                 let total = result.price * result.quantity;
                                                                 let mailMerge = {
                                                                     ORDEREMAIL: result2.metavalue,
-                                                                    ORDERDETAILS: result.price + " BTC " + result.name + " quantity " + result.quantity,
+                                                                    ORDERDETAILS: result.price + " satoshi " + result.name + " quantity " + result.quantity,
                                                                     ORDERTOTAL: total,
                                                                     COLDSTORAGE: coldstorageaddressesresult.address
                                                                 };

@@ -993,18 +993,32 @@ var SR = SR || (function() {
             hideClass(document.getElementById('sr-choosepaymenttype'));
         }
     }
+    function isFloat(n) {
+        return n === +n && n !== (n|0);
+    }
+    //format the satoshis
+    function currencyFormat(num) {
+        //debug
+        //console.log('in')
+        //console.log('1'+num)
+        //console.log('2'+isFloat(num))
+
+        //check if we have to cast it
+        if (isFloat(num) == false)
+            num = parseFloat(num);
+        return num.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+    }
+
     //this functions updates the totals for the cart
     function carttotal() {
         //multipily the price by the number of items in the cart
         producttotal = price * itemcount;
-        //set it to 8 decimal places as it's Bitcoin
-        producttotal = parseFloat(producttotal).toFixed(8);
-        //set the amount to pay in the btc address screen
+        let formatproducttotal = currencyFormat(producttotal)
         //note we are updating the BTC and Lightning totals here we will have to refactor this code is we ever
         //     have a lightning only version of the cart (as stated elsewhere in the notes)
-        changeClassText(document.getElementById('sr-lightningtotal'), producttotal + ' BTC');
-        changeClassText(document.getElementById('sr-bitcointotal'), producttotal + ' BTC');
-        changeClassText(document.getElementById('sr-checkouttotal'), producttotal);
+        changeClassText(document.getElementById('sr-lightningtotal'), formatproducttotal + ' satoshi');
+        changeClassText(document.getElementById('sr-bitcointotal'), formatproducttotal + ' satoshi');
+        changeClassText(document.getElementById('sr-checkouttotal'), formatproducttotal);
         //update counter
         changeClassText(document.querySelector('.sr-count'), itemcount);
         //store product
@@ -1383,6 +1397,8 @@ var SR = SR || (function() {
             //get details
             var elproduct = document.getElementById('sr-add-to-cart');
             price = elproduct.getAttribute('data-price');
+            //format the satoshi
+            let formatprice = currencyFormat(price);
             name = elproduct.getAttribute('data-name');
             preview = elproduct.getAttribute('data-preview');
             //check if cart type has been set and if so override default.
@@ -1420,7 +1436,7 @@ var SR = SR || (function() {
                     //product name
                     prodcuthtml = prodcuthtml + '<div class=""><h3><a href="#0">' + name + '</a></h3>';
                     //product price
-                    prodcuthtml = prodcuthtml + '<div class="sr-price">' + price + ' BTC</div>';
+                    prodcuthtml = prodcuthtml + '<div class="sr-price">' + formatprice + '</div>';
                     //actions div
                     prodcuthtml = prodcuthtml + '<div class="sr-actions">';
                     //delete option
