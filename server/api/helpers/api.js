@@ -14,14 +14,7 @@ let db = new sqlite3.Database("./db/db.db", err => {
         console.error(err.message);
     }
 });
-
 let bitcoinunits = require('bitcoin-units');
-
-
-//var dockerCLI = require('docker-cli-js');
-//var DockerOptions = dockerCLI.Options;
-//var Docker = dockerCLI.Docker;
-//var docker = new Docker()
 //load the generic functions
 //note we could ass this down i am not sure which is th emost efficient way to do this to be honest.  I shall look into that.
 var generichelper = require("./generic.js").Generic;
@@ -245,10 +238,6 @@ var api = function() {
             return;
         });
     };
-
-
-
-
     /*
     =============================================================================================================================
 
@@ -372,7 +361,7 @@ var api = function() {
                 //      not have the UX etc to handle the cart in this way.  If we want to add this in the future then it would
                 //      require us to refactor slightly and maybe use a uniqie ID as the join and have rename address field to
                 //      BTCaddress
-                let data = [lightningaddress,u, btcaddress];
+                let data = [lightningaddress, u, btcaddress];
                 //build the query
                 let sql = `UPDATE sessions
                   SET lightningaddress = ?,
@@ -386,7 +375,7 @@ var api = function() {
                     //retun response
                     res.send(JSON.stringify({
                         address: lightningaddress,
-                        label:u
+                        label: u
                     }));
                 });
             } else {
@@ -638,6 +627,7 @@ var api = function() {
                     return;
                 } else {
                     if (result[0].confirmations >= process.env.CONFIRMATIONS) {
+                        //todo : check this works now we use satoshis.
                         amounttosend = result[0].amount.toFixed(8);
                         //debug
                         //console.log('ams'+amounttosend);

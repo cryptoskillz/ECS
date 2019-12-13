@@ -23,7 +23,6 @@
     "npm": "^6.12.0",
     "package.json": "^2.0.1",
     "pkginfo": "^0.4.1",
-    "satoshi-bitcoin": "^1.0.4",
     "sqlite3": "^4.1.0"
   }
 }
