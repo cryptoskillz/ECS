@@ -266,19 +266,11 @@ var api = function() {
         let lightningaddress = '';
         //hold the btc address
         let btcaddress = req.btcaddress;
-        //hold the amount
+        //hold the amount as an int
         let amount = parseInt(req.amount);
-                console.log(amount);
-
-amount = bitcoinunits(parseInt(amount), 'satoshi').to('BTC').value()
-
-
-        
-        //turn it into a sat amount
-        console.log(amount);
-        //amount = sb.toSatoshi(amount);
-        //console.log(amount)
-        amount = amount / 0.00000001;
+        //times it by a 1000
+        //note: note sure why we are doing this they have a term called msatoshi (I assume million satohsi whihc makes sense)
+        amount = amount * 1000;
         const request = require('request');
         //load crytpo js
         const cryptojs = require("crypto-js");
