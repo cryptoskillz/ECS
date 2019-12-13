@@ -55,8 +55,9 @@ var api = function() {
                         if (req.query.hasOwnProperty(metaname)) {
                             var metavalue = req.query[metaname];
                             if (metaname.indexOf("sr-product-") > -1) {
+                                //debug
                                 //console.log('prod:'+req.query[metaname])
-                                //inser into proiduct meta
+                                //insert into product meta table
                                 if (req.query[metaname] != "" && req.query[metaname] != "undefined") {
                                     metaname = metaname.replace("sr-product-", "");
                                     //insert into oder meta
@@ -364,9 +365,9 @@ var api = function() {
                 let data = [lightningaddress, u, btcaddress];
                 //build the query
                 let sql = `UPDATE sessions
-                  SET lightningaddress = ?,
-                  lightninglabel = ?
-                  WHERE address = ?`;
+                           SET lightningaddress = ?,
+                           lightninglabel = ?
+                           WHERE address = ?`;
                 //run the query
                 db.run(sql, data, function(err) {
                     if (err) {
@@ -413,9 +414,9 @@ var api = function() {
                 let data = ["1", result, address];
                 //build the query
                 let sql = `UPDATE sessions
-                  SET processed = ?,
-                    amount = ?
-                  WHERE address = ?`;
+                           SET processed = ?,
+                           amount = ?
+                           WHERE address = ?`;
                 //run the query
                 db.run(sql, data, function(err) {
                     if (err) {
@@ -471,8 +472,8 @@ var api = function() {
                         //console.log(row.id + ' : ' + address + ' no unspent transactions');
                         let sqldata = [row.id];
                         let sql = `UPDATE sessions
-                  SET sessioncountcheck = sessioncountcheck+1
-                  WHERE id = ?`;
+                                   SET sessioncountcheck = sessioncountcheck+1
+                                   WHERE id = ?`;
                         //run sql
                         db.run(sql, sqldata, function(err) {
                             if (err) {}
@@ -486,8 +487,8 @@ var api = function() {
                             //over and over.
                             let sqldata = [row.id];
                             let sql = `UPDATE sessions
-                  SET sessioncountcheck = sessioncountcheck+1
-                  WHERE id = ?`;
+                                       SET sessioncountcheck = sessioncountcheck+1
+                                       WHERE id = ?`;
                             //run sql
                             db.run(sql, sqldata, function(err) {
                                 if (err) {}
@@ -497,16 +498,16 @@ var api = function() {
                                 let sqldata = [row.userid, 1];
                                 //build the query
                                 let sql = `select 
-                        ecs_user.id,
-                        ecs_user.username,
-                        ecs_coldstorageaddresses.userid,
-                        ecs_coldstorageaddresses.autosendfunds,
-                        ecs_coldstorageaddresses.address
-                        from ecs_user 
-                        LEFT JOIN ecs_coldstorageaddresses
-                        ON ecs_user.id = ecs_coldstorageaddresses.userid
-                        where ecs_coldstorageaddresses.userid = ? 
-                        and ecs_coldstorageaddresses.autosendfunds = ?`;
+                                           ecs_user.id,
+                                           ecs_user.username,
+                                           ecs_coldstorageaddresses.userid,
+                                           ecs_coldstorageaddresses.autosendfunds,
+                                           ecs_coldstorageaddresses.address
+                                           from ecs_user 
+                                           LEFT JOIN ecs_coldstorageaddresses
+                                           ON ecs_user.id = ecs_coldstorageaddresses.userid
+                                           where ecs_coldstorageaddresses.userid = ? 
+                                           and ecs_coldstorageaddresses.autosendfunds = ?`;
                                 db.get(sql, sqldata, function(err, coldstorageaddressesresult) {
                                     if (err) {
                                         //no cold storage address.
@@ -531,9 +532,9 @@ var api = function() {
                                                 //update session table
                                                 let sqldata = ["1", "1", address];
                                                 let sql = `UPDATE sessions
-                      SET swept = ?,
-                      processed =  ?
-                      WHERE address = ?`;
+                                                           SET swept = ?,
+                                                           processed =  ?
+                                                           WHERE address = ?`;
                                                 //run sql
                                                 db.run(sql, sqldata, function(err) {
                                                     if (err) {}
@@ -541,8 +542,8 @@ var api = function() {
                                                     if (row.carttype == 0) {
                                                         let sqldata = [address];
                                                         let sql = `select *
-                                  from order_product  
-                                  where address =?`;
+                                                                   from order_product  
+                                                                   where address =?`;
                                                         db.get(sql, sqldata, function(err, result) {
                                                             if (err) {}
                                                             let sqldata = [result.id];
@@ -638,8 +639,8 @@ var api = function() {
                             //console.log(result);
                             let sqldata = ["1", address];
                             let sql = `UPDATE sessions
-                  SET swept = ?
-                  WHERE address = ?`;
+                                       SET swept = ?
+                                       WHERE address = ?`;
                             //run sql
                             db.run(sql, sqldata, function(err) {
                                 if (err) {}
@@ -647,8 +648,8 @@ var api = function() {
                                 //build sql
                                 let sqldata = ["1", coldstorageaddress];
                                 let sql = `UPDATE ecs_coldstorageaddresses
-                               SET used = ?
-                              WHERE ecs_coldstorageaddress = ?`;
+                                           SET used = ?
+                                           WHERE ecs_coldstorageaddress = ?`;
                                 //run sql
                                 db.run(sql, sqldata, function(err) {
                                     if (err) {}
