@@ -116,6 +116,9 @@ var webhook = function() {
                             if (err) {
                                 return console.error(err.message);
                             }
+
+                            //todo: send a confirmation email
+
                             //retun response
                             res.send(JSON.stringify({
                                 status: 1

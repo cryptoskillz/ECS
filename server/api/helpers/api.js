@@ -429,6 +429,7 @@ var api = function() {
                     //todo: send the email confirmations.
                     //send email to customer.
                     //console.log('send email in monitor')
+                    //todo : this should go to the person who placed the order and not hard coded.
                     generic.sendMail(2, "cryptoskillz@protonmail.com");
                 });
             } else {
@@ -441,6 +442,10 @@ var api = function() {
     };
     /*
       This function runs through the session table and looks for unprocessed payments.
+
+      note: We may have to check for lightning payments here but it may not be required as Lightnng is pretty much instant 
+            and should be able to he handled in the webhook check for payment function but if it turns out this is not the 
+            case then we will add it to this funciton as well
 
     */
     this.checksessionforpayment = function checkSessionForPayment() {
@@ -564,7 +569,7 @@ var api = function() {
                                                                 //
                                                                 //send to admin
                                                                 generic.sendMail(3, coldstorageaddressesresult.username, mailMerge);
-                                                                console.log(amounttosend + " sent from " + address + " to " + coldstorageaddressesresult.address);
+                                                                //console.log(amounttosend + " sent from " + address + " to " + coldstorageaddressesresult.address);
                                                             });
                                                         });
                                                     } else {

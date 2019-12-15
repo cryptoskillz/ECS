@@ -631,11 +631,7 @@ Main Components
 }
 
 
-.sr-addressoptions a {
-  /*display: block;*/
-  margin-bottom: 5px;
-  font-size:12px;
-}
+
 
 .sr-addresstotal {
   font-size:17px;
@@ -720,6 +716,10 @@ input:checked + .sr-slider:before {
   transform: translateX(26px);
 }
 
+.sr-address-icon {
+  width:25px!important;
+  height:25px!important;
+}
 /* Rounded sliders */
 .sr-slider.sr-round {
   border-radius: 34px;
@@ -728,5 +728,17 @@ input:checked + .sr-slider:before {
 .sr-slider.sr-round:before {
   border-radius: 50%;
 }
+
+.sr-addressoptions {
+  /*display: block;*/
+  margin-bottom: 5px;
+  font-size:12px;
+}
+.sr-lightninglabel {
+  /*display: block;*/
+  margin-bottom: 5px;
+  font-size:12px;
+}
+
 
 /* end of switch*/

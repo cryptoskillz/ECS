@@ -899,6 +899,14 @@ var SR = SR || (function() {
             elements[i].className = elements[i].className.replace(reg, ' ');
         }
     }
+    //this funtion detects if a element is visible or not
+    function isVisible(element, value) {
+        if (!element.offsetParent && element.offsetWidth === 0 && element.offsetHeight === 0) {
+            return (false)
+        } else {
+            return (true);
+        }
+    }
     //this function chnages the text of a div/span etc using a class or id
     function changeClassText(elements, value) {
         // if there are no elements, we're done
@@ -993,8 +1001,9 @@ var SR = SR || (function() {
             hideClass(document.getElementById('sr-choosepaymenttype'));
         }
     }
+
     function isFloat(n) {
-        return n === +n && n !== (n|0);
+        return n === +n && n !== (n | 0);
     }
     //format the satoshis
     function currencyFormat(num) {
@@ -1002,13 +1011,10 @@ var SR = SR || (function() {
         //console.log('in')
         //console.log('1'+num)
         //console.log('2'+isFloat(num))
-
         //check if we have to cast it
-        if (isFloat(num) == false)
-            num = parseFloat(num);
+        if (isFloat(num) == false) num = parseFloat(num);
         return num.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
     }
-
     //this functions updates the totals for the cart
     function carttotal() {
         //multipily the price by the number of items in the cart
@@ -1016,8 +1022,8 @@ var SR = SR || (function() {
         let formatproducttotal = currencyFormat(producttotal)
         //note we are updating the BTC and Lightning totals here we will have to refactor this code is we ever
         //     have a lightning only version of the cart (as stated elsewhere in the notes)
-        changeClassText(document.getElementById('sr-lightningtotal'), formatproducttotal + ' satoshi');
-        changeClassText(document.getElementById('sr-bitcointotal'), formatproducttotal + ' satoshi');
+        changeClassText(document.getElementById('sr-lightningtotal'), 'Pay '+formatproducttotal + ' satoshi');
+        changeClassText(document.getElementById('sr-bitcointotal'), 'Pay '+formatproducttotal + ' satoshi');
         changeClassText(document.getElementById('sr-checkouttotal'), formatproducttotal);
         //update counter
         changeClassText(document.querySelector('.sr-count'), itemcount);
@@ -1070,6 +1076,9 @@ var SR = SR || (function() {
                     //console.log(data);
                     lightningaddress = data.address;
                     lightninglabel = data.label;
+                    //set the label
+                    var ellabel = document.getElementById('sr-lightninglabel');
+                    changeClassText( document.getElementById('sr-lightninglabel'),"Order: "+lightninglabel);
                     //debug
                     //console.log(lightninglabel);
                     //console.log(lightningaddress);
@@ -1087,7 +1096,7 @@ var SR = SR || (function() {
                     //console.log(elbtcaddress)
                     //generate the qr code
                     var elqr = document.getElementById('sr-lightningqrcode');
-                    elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + lightningaddress);
+                    elqr.setAttribute('src', "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + lightningaddress);
                     //debug
                     //console.log(elbtcqr)
                     //todo build the liughtning invoice
@@ -1310,6 +1319,54 @@ var SR = SR || (function() {
          *START OF ELEMENT CLICK FUNCTIONS
          *================================
          */
+        //this function checks if the bitcoin address show icon has been clicked
+        document.getElementById('sr-bitcoinaddressshow').addEventListener('click', function() {
+            //get the address element
+            var el = document.getElementById('sr-bitcoinaddress')
+            //hide the show image
+            hideClass(document.getElementById('bitcoinaddresshowimg'));
+            //show the hide image
+            showClass(document.getElementById('bitcoinaddreshideimg'));
+            //show the address
+            showClass(el)
+        });
+        //this function check if the bitcoin hide address icon has been pressed
+        document.getElementById('sr-bitcoinaddresshide').addEventListener('click', function() {
+            //get the address element
+            var el = document.getElementById('sr-bitcoinaddress')
+            //show the show image
+            showClass(document.getElementById('bitcoinaddresshowimg'));
+            //hide the hide image
+            hideClass(document.getElementById('bitcoinaddreshideimg'));
+            //hide the address
+            hideClass(el)
+        });
+
+                //this function checks if the bitcoin address show icon has been clicked
+        document.getElementById('sr-lightningaddressshow').addEventListener('click', function() {
+            //get the address element
+            var el = document.getElementById('sr-lightningaddress')
+            //hide the show image
+            hideClass(document.getElementById('lightningaddresshowimg'));
+            //show the hide image
+            showClass(document.getElementById('lightningaddreshideimg'));
+            //show the address
+            showClass(el)
+        });
+        //this function check if the bitcoin hide address icon has been pressed
+        document.getElementById('sr-lightningaddresshide').addEventListener('click', function() {
+            //get the address element
+            var el = document.getElementById('sr-lightningaddress')
+            //show the show image
+            showClass(document.getElementById('lightningaddresshowimg'));
+            //hide the hide image
+            hideClass(document.getElementById('lightningaddreshideimg'));
+            //hide the address
+            hideClass(el)
+        });
+
+
+
         //bitcoin back click
         document.getElementById('sr-back-button').addEventListener('click', function() {
             //reset cart
