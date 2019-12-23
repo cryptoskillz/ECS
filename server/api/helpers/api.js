@@ -352,11 +352,13 @@ var api = function() {
             if (!error && response.statusCode == 200) {
                 //parse the response
                 const info = JSON.parse(body);
+                //console.log('body');
+                //console.log(body);
                 //get the address
                 //note: we may to store all the invloic information table if so we can create a new table for this. 
                 lightningaddress = info.bolt11;
                 //debug
-                //console.log(info.bolt11);
+                console.log(info.bolt11);
                 //note: for this to work in this manner we are always using the BTC address as the join this means we would 
                 //      not be able to offer a lightning only vrsion of the cart.  At this moment in time it is fine as we do 
                 //      not have the UX etc to handle the cart in this way.  If we want to add this in the future then it would
@@ -380,7 +382,7 @@ var api = function() {
                     }));
                 });
             } else {
-                //console.log(error);
+                console.log(error);
                 //you done messed up boi
                 //note there can be many reasons for this to fail, we may trap them later for now we do not care a blank address
                 //     means it failed and we can work with that for now
@@ -469,7 +471,7 @@ var api = function() {
                 //check if the address has any unspent transactions
                 client.listUnspent(1, 9999999, [address]).then(listResult => {
                     //debug
-                    console.log(listResult)
+                    //console.log(listResult)
                     //check there is at least one unspent transaction
                     if (listResult.length == 0) {
                         //there is not so move on

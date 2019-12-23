@@ -8,7 +8,7 @@ It is a standalone script that is not require for ECS but allows to debug easily
 
 usage (from terminal)
 
-node light.js <testid> <containderid>
+node light.js <testid> <containderid> <containderid2>
 node light.js 0 ded324549726 
 
 if you just run node light.js you will get a list of all running containers which you can use as the second paramater.
@@ -19,7 +19,7 @@ var DockerOptions = dockerCLI.Options;
 var Docker = dockerCLI.Docker;
 var docker = new Docker()
 var containerid = ""; //hold the image id (note some tests get this others you will have to set by running docker ps from the command line)
-var containerid2 = ""; //hold the proxy container if.
+var containerid2 = ""; //hold the proxy container id.
 var testid = 0; // set the test id so we can run the various docker instances
 //check if we have a contatinerid and if not show the ones to chose from.
 if (process.argv[3] != undefined) containerid = process.argv[3];
@@ -81,7 +81,7 @@ if (testid == 5) {
     console.log('Ruuning listpeers:');
     docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning listpeers ', function(err, data) {});
 }
-//this runs any c-lightn ing command you pass to it
+//this runs any c-lightning ing command you pass to it
 if (testid == 6) {
     console.log('Ruuning ' + process.argv[4] + ':');
     docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning ' + process.argv[4], function(err, data) {});
@@ -125,6 +125,14 @@ if (testid == 10) {
     docker.command('info', function(err, data) {});
 }
 
+
+/*
+    to use type into terminal
+    node light.js 11 lightningcontainerid proxxy containerid
+
+*/
+
+console.log(containerid2)
 if (testid == 11) {
     docker.command('exec ' + containerid + ' lightning-cli --lightning-dir=.lightning getinfo', function(err, data) {
         //parse the json

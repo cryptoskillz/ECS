@@ -47,6 +47,9 @@ var expiryInSeconds = 36000;
 //get our API key from the env variables
 var api_key = process.env.CYPHERNODE_API_KEY
 var cyphernodeurl = process.env.CYPHER_GATEWAY_URL
+//debug
+console.log(api_key)
+console.log(cyphernodeurl);
 //create a bearer token
 //build the data
 //set an this the id of the key you want to use which can be found in cyphernode/gatekeeper/keys.properties 
@@ -103,6 +106,9 @@ const options = {
     },
     body: body
 };
+//debug
+console.log('options')
+console.log(options)
 //create the call back
 function callback(error, response, body) {
     if (!error && response.statusCode == 200) {
