@@ -1,98 +1,158 @@
-
 <!-- 
  remove the display none if you want to see the cart with zero on it.  
  //todo : fix it so it it works if you do this at present it has to has to start in hidden mode and it displays
 -->
 <!-- main cart container-->
 <div class="sr-cart-container" id="sr-cart-container" style="display:none">
-  <!-- the cart trigger -->
-   <a href="#0" class="sr-cart-trigger">
-      <!-- the cart counter -->
-      <span class="sr-count"> 
-         0
-      </span> 
-   </a>
-   <!-- the cart element -->
-   <div class="sr-cart">
-      <!-- the cart wrapper (is this required) -->
-      <div class="sr-wrapper">
-         <!-- the cart header -->
-         <sr-header>
-            <h2 id="sr-cart-header">Cart</h2>
-            <span><a class="sr-back"  id="sr-back-button" href="#0">Back</a></span>
-         </sr-header>
-         <!-- the cart body -->
-         <div class="sr-body">
-            <!-- this element hold the cart items that user adds -->
-            <ul id='sr-cartlistitems'>
-            </ul>
-            <!-- this element holds the cuatomer details -->
-            <div id="sr-customerdetailswrapper" class="sr-customerdetails">
-              <label>Email</label>  
-              <input type="text" class="sr-textbox sr-input" name="sr-email" id="sr-email">
-              <!-- this element holds the customers addres (if activated) -->
-              <div id="sr-addresswrapper" class="sr-addresswrapper">
-                  <!-- this element holds the customer address -->
-                  <div id="sr-shippingaddresswrapper" class="sr-shippingaddresswrapper">
-                      <span>Shipping Address</span>
-                      <div>
-                      <label>Address</label>  
-                      <input type="text" class="sr-textbox sr-input" name="sr-shippingaddress1" id="sr-shippingaddress1">
-                    </div>
-                    <div>
-                      <label>City</label>  
-                      <input type="text" class="sr-textbox sr-input" name="sr-shippingcity" id="sr-shippingcity">
-                    </div>
-                    <div>
-                      <label>State</label>  
-                      <input type="text" class="sr-textbox sr-input" name="sr-shippingstate" id="sr-shippingstate">
-                    </div>
-                    <div>
-                      <label>Zip</label>  
-                      <input type="text" class="sr-textbox sr-input" name="sr-shippingzip" id="sr-shippingzip">
-                    </div>
-                    <div>
-                      <label>Country</label>  
-                      <select name="sr-shippingcountry" id="sr-shippingcountry" class="sr-cart-country sr-input">
-                      </select>
-                    </div>
-                  </div>
-              </div>
-              <!-- hold the buttons -->
-              
-            </div>
-            <!-- this element holds the payment details -->
-            <div id="sr-bitcoinaddresswrapper">
-               <div>
-                    <a id="sr-bitcoinaddress" class="sr-bitcoinaddress" href=""></a>
+    <!-- the cart trigger -->
+    <a class="sr-cart-trigger" href="#0">
+        <!-- the cart counter -->
+        <span class="sr-count">
+            0
+        </span>
+    </a>
+    <!-- the cart element -->
+    <div class="sr-cart">
+        <!-- the cart wrapper (is this required) -->
+        <div class="sr-wrapper">
+            <!-- the cart header -->
+            <sr-header>
+                <h2 id="sr-cart-header">
+                    Cart
+                </h2>
+                <span>
+                    <a class="sr-back" href="#0" id="sr-back-button">
+                        Back
+                    </a>
+                </span>
+            </sr-header>
+            <!-- the cart body -->
+            <div class="sr-body">
+                <!-- this element hold the cart items that user adds -->
+                <ul id="sr-cartlistitems">
+                </ul>
+                <!-- this element holds the cuatomer details -->
+                <div class="sr-customerdetails" id="sr-customerdetailswrapper">
+                    <label>
+                        Email
+                    </label>
+                    <input class="sr-textbox sr-input" id="sr-email" name="sr-email" type="text">
+                        <!-- this element holds the customers addres (if activated) -->
+                        <div class="sr-addresswrapper" id="sr-addresswrapper">
+                            <!-- this element holds the customer address -->
+                            <div class="sr-shippingaddresswrapper" id="sr-shippingaddresswrapper">
+                                <span>
+                                    Shipping Address
+                                </span>
+                                <div>
+                                    <label>
+                                        Address
+                                    </label>
+                                    <input class="sr-textbox sr-input" id="sr-shippingaddress1" name="sr-shippingaddress1" type="text">
+                                    </input>
+                                </div>
+                                <div>
+                                    <label>
+                                        City
+                                    </label>
+                                    <input class="sr-textbox sr-input" id="sr-shippingcity" name="sr-shippingcity" type="text">
+                                    </input>
+                                </div>
+                                <div>
+                                    <label>
+                                        State
+                                    </label>
+                                    <input class="sr-textbox sr-input" id="sr-shippingstate" name="sr-shippingstate" type="text">
+                                    </input>
+                                </div>
+                                <div>
+                                    <label>
+                                        Zip
+                                    </label>
+                                    <input class="sr-textbox sr-input" id="sr-shippingzip" name="sr-shippingzip" type="text">
+                                    </input>
+                                </div>
+                                <div>
+                                    <label>
+                                        Country
+                                    </label>
+                                    <select class="sr-cart-country sr-input" id="sr-shippingcountry" name="sr-shippingcountry">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- hold the buttons -->
+                    </input>
                 </div>
-                <div class="sr-bitcoinoptions" >
-                  <a href="#" class="sr-bitcoinaddresscopy" id="sr-bitcoinaddresscopy">
-                       <i class="fa fa-copy"></i>
-                       Copy
-                   </a>
-                   <a href="" id="sr-bitcoinaddresswallet">
-                       <i class="fa fa-btc"></i>
-                       Pay from wallet
-                   </a>
+                <div id='sr-choosepaymenttype' style="display:none">
+                    <label class="sr-switch">
+                        <input class="sr-paymentoggle" type="checkbox" value="0">
+                            <span class="sr-slider sr-round">
+                            </span>
+                        </input>
+                        BTC
+                    </label>
                 </div>
-                <div id="sr-btctotal">
-                  
-               </div>
-               <img id="sr-bitcoinqrcode" src="" />
+                <!-- this element holds the payment details -->
+                <div id="sr-lightningwrapper" class="sr-qrcodewrapper" style="display:none">
+                    <span class="sr-lightninglabel" id="sr-lightninglabel"></span>
+                    <div id="sr-lightningtotal" class="sr-addresstotal"></div>
+                    <img id="sr-lightningqrcode" src=""/>
+                    <div>
+                        <a class="sr-lightningaddress" href="" id="sr-lightningaddress" style="display:none">
+                        </a>
+                    </div>
+                    <div class="sr-addressoptions">
 
-            </div>
-            <!-- this element holds the paid confirmation screen -->
-            <div id="sr-paid" class="sr-paid ">
-               Thank you for paying.  Your order is being processed.
-            </div>
-          </div>
-          <!-- this element holds the footer-->
-          <sr-footer>
-            <a href="#0" id="sr-checkout" class="sr-checkout"><em>Checkout - <span id="sr-checkouttotal">0</span> BTC</em></a>
-            <a href="#0" id="sr-pay" class="sr-checkout"><em>Click to Pay</em></a>
+                        <a href="#" class="sr-lightningaddressshow"  id="sr-lightningaddressshow"><img id="lightningaddresshowimg" class="sr-address-icon" class="sr-address-icon" src="img/sr-show.svg" width="25px" height="25px" alt="show address"/></a>
+                         <a href="#" class="sr-lightningaddresshide"  id="sr-lightningaddresshide"><img id="lightningaddreshideimg" class="sr-address-icon" src="img/sr-hide.svg" width="25px" height="25px" alt="hide address" style="display:none"/></a>
+                        <a class="sr-lightningaddresscopy" href="#" id="sr-lightningaddresscopy">
+                            <img  src="img/sr-copy.svg" class="sr-address-icon" width="25px" height="25px" alt="copy address"/></a> 
+                        </a>
+                        <a href="" id="sr-lightningaddresswallet">
+                            <img src="img/sr-wallet.svg" class="sr-address-icon" width="25px" height="25px" alt="pay with wallet"/>
+                        </a>
+                    </div>
+                    
+                </div>
+                <div id="sr-bitcoinaddresswrapper" class="sr-qrcodewrapper" style="display:none">
+                    <div id="sr-bitcointotal" class="sr-addresstotal"></div>
+                    <img id="sr-bitcoinqrcode" src=""/>
+                    <div>
+                        <a class="sr-bitcoinaddress" href="" id="sr-bitcoinaddress" style="display:none">
+                        </a>
+                    </div>
+                    <div class="sr-addressoptions">
 
-          </sr-footer>
-      </div>
-   </div> 
-</div>  
+                        <a href="#" class="sr-bitcoinaddressshow"  id="sr-bitcoinaddressshow"><img id="bitcoinaddresshowimg" class="sr-address-icon" src="img/sr-show.svg" width="25px" height="25px" alt="show address"/></a>
+                        <a href="#" class="sr-bitcoinaddresshide"  id="sr-bitcoinaddresshide"><img id="bitcoinaddreshideimg" class="sr-address-icon" src="img/sr-hide.svg" width="25px" height="25px" alt="hide address" style="display:none"/></a>
+                        <a href="#" class="sr-bitcoinaddresscopy"  id="sr-bitcoinaddresscopy"><img  src="img/sr-copy.svg" class="sr-address-icon" width="25px" height="25px" alt="copy address"/></a> 
+                        <a href="" class="sr-bitcoinaddresswallet" id="sr-bitcoinaddresswallet"><img src="img/sr-wallet.svg" class="sr-address-icon" width="25px" height="25px" alt="pay with wallet"/></a>
+                    </div>
+
+                </div>
+                <!-- this element holds the paid confirmation screen -->
+                <div class="sr-paid " id="sr-paid">
+                    Thank you for paying.  Your order is being processed.
+                </div>
+            </div>
+            <!-- this element holds the footer-->
+            <sr-footer>
+                <a class="sr-checkout" href="#0" id="sr-checkout">
+                    <em>
+                        Checkout -
+                        <span id="sr-checkouttotal">
+                            0
+                        </span>
+                        Satoshi
+                    </em>
+                </a>
+                <a class="sr-checkout" href="#0" id="sr-pay">
+                    <em>
+                        Click to Pay
+                    </em>
+                </a>
+            </sr-footer>
+        </div>
+    </div>
+</div>

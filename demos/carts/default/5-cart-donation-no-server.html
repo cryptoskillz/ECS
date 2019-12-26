@@ -1,36 +1,40 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
-  </head>
-  <body>
-  <div>
-    <span>
-        This demo shows the ECS cart in donation mode. It will use the address passed to it from the init function.  This method does not require a full node or a server so it is very cheap to run.
-        <br>Click the add to cart link below
-        <br><br>
-        Back to <a href="index.html">Index</a>
-        <br><br>
-    </span>
-    <a href="#0" id="sr-add-to-cart" class="sr-add-to-cart" cart-type="2" data-price="0.01" data-name="Entity T" data-preview="">Add To Cart</a>
-  </div>
- </body>
-
-
-
-<script type="text/javascript" src="https://cryptoskillz.com/srcrypto/prod/cdn/js/sr.js"></script>
-<!--
- <script type="text/javascript" src="http://127.0.0.1:8080/cdn/js/sr.js"></script>
--->
+    <head>
+        <!-- Tweaks for older IEs-->
+        <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+    </head>
+    <body>
+        <div>
+            <span>
+                This demo shows the ECS cart in donation mode. It will use the address passed to it from the init function.  This method does not require a full node or a server so it is very cheap to run.
+                <br>
+                    Click the add to cart link below
+                    <br>
+                        <br>
+                            Back to
+                            <a href="index.html">
+                                Index
+                            </a>
+                            <br>
+                                <br>
+                                </br>
+                            </br>
+                        </br>
+                    </br>
+                </br>
+            </span>
+            <a cart-type="2" class="sr-add-to-cart" data-name="Entity T" data-preview="" data-price="0.01" href="#0" id="sr-add-to-cart">
+                Add To Cart
+            </a>
+        </div>
+    </body>
+    
+<script type="text/javascript" src="http://127.0.0.1:8080/cdn/js/sr.js"></script>
     <script type="text/javascript">
-      //local
-      //SR.init(["",15,"http://127.0.0.1:8080/demos/carts/default/","3",1,"GB",1,"2N677tdA2xcYfkfC6b2HWfqir7P8bmkrwo3"]);
-      //production
-      SR.init(["",15,"https://cryptoskillz.com/srcrypto/prod/demos/carts/default/","3",1,"GB",1,"2N677tdA2xcYfkfC6b2HWfqir7P8bmkrwo3"]);
-     
-
+        //init
+        SR.init(["",15,"http://127.0.0.1:8080/demos/carts/default/","3",1,"GB",1,"2N677tdA2xcYfkfC6b2HWfqir7P8bmkrwo3",0]);
     </script>
-
 </html>
