@@ -740,5 +740,47 @@ input:checked + .sr-slider:before {
   font-size:12px;
 }
 
+.sr-bitcoinaddress-show  {
+  text-indent: -9999px;
+  width: 25px!important;
+  height: 25px;
+  background: url(img/sr-show.svg) no-repeat;
+  background-size: 25px 25px;
+  stroke: transparent;
+  stroke-width: 0px;
+}
+
+
+.sr-bitcoinaddress-hide  {
+  text-indent: -9999px;
+  width: 25px!important;
+  height: 25px;
+  background: url(img/sr-hide.svg) no-repeat;
+  background-size: 25px 25px;
+}
+
+.sr-bitcoinaddress-copy {
+  text-indent: -9999px;
+  width: 25px!important;
+  height: 25px;
+  background: url(img/sr-copy.svg) no-repeat;
+  background-size: 25px 25px;
+}
+
+.sr-bitcoinaddress-wallet {
+  text-indent: -9999px;
+  width: 25px!important;
+  height: 25px;
+  background: url(img/sr-wallet.svg) no-repeat;
+  background-size: 25px 25px;
+}
+
+
+
+
+
+
+
+
 
 /* end of switch*/

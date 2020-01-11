@@ -1655,6 +1655,7 @@ var SR = SR || (function() {
                 acceptlightning = _args[8]
             }
             //load css
+
             document.head.innerHTML = document.head.innerHTML + '<link href="' + cdnurl + 'cart.css" rel="stylesheet">'
             //fetch the template so we can use themes 
             fetchurl(cdnurl + 'cart.html', 'carttemplate');
