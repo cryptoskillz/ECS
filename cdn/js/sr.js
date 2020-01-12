@@ -1019,7 +1019,7 @@ var SR = SR || (function() {
     function carttotal() {
         //multipily the price by the number of items in the cart
         producttotal = price * itemcount;
-        let formatproducttotal = currencyFormat(producttotal)
+        var formatproducttotal = currencyFormat(producttotal);
         //note we are updating the BTC and Lightning totals here we will have to refactor this code is we ever
         //     have a lightning only version of the cart (as stated elsewhere in the notes)
         changeClassText(document.getElementById('sr-lightningtotal'), 'Pay '+formatproducttotal + ' satoshi');
