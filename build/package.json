@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"@node-minify/core": "^5.2.1",
+		"@node-minify/core": "^8.0.5",
 		"@node-minify/cssnano": "^5.2.0",
 		"@node-minify/uglify-js": "^5.2.1",
 		"@node-minify/yui": "^5.2.0"
